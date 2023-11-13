@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Justin Hong</title>
+    <title>JUSTIN_HONG</title>
     <link rel="icon" type="image/png" href="src/images1.png">
     <link href="https://fonts.cdnfonts.com/css/public-pixel" rel="stylesheet">
     <style>
@@ -10,7 +10,7 @@
             overflow: hidden;
             font-family: 'public pixel', sans-serif;
             color: white;
-            background-color: #f94847;
+            background-color: rgb(0, 0, 0);
         }
         #canvas-container {
             position: absolute;
@@ -23,33 +23,75 @@
             position: absolute;
             padding: 10px;
         }
-        #contact {
-            bottom: 0;
-            left: 0;
-            font-size: x-large; 
-            text-align: left;
-        }
-        #contact a {
-        color: white; /* Ensures the link is white */
-        text-decoration: none; /* No underline by default */
-        }
-
-        #contact a:hover {
-        text-decoration: underline; /* Underlines text on hover */
-        cursor: pointer; /* Changes cursor to a hand pointer */
-        }   
         #copyright {
             bottom: 0;
             right: 0;
             font-size: x-large;
             text-align: right;
+            background-color: white;
+            color: black;
+        }
+        #download-cv {
+            position: absolute;
+            bottom: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'public pixel', sans-serif;
+            font-size: x-large;
+            color: black;
+            background-color: white;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        #download-cv:hover {
+            background-color: black;
+            color: white;
+        }
+        #contact {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'public pixel', sans-serif;
+            font-size: x-large;
+            
+            color: black;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        #contact a {
+        color: black; 
+        background-color: white;
+        text-decoration: none; 
+        }
+        #contact a:hover {
+            font-size: x-large;
+            background-color: black;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        #copyright {
+            bottom: 0;
+            right: 0;
+            font-size: small;
+            text-align: right;
+            color: black;
+            background-color: white;
+            border: none;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
-    <div id="canvas-container"></div>
+    <div id="canvas-container" title="Greatest Album of All Time"></div>
+        <button id="download-cv">download cv</button>
+        <a href="src/Justin-Hong-CV.pdf" target="_blank" id="download-cv">download cv</a>
     <div class="overlay-text" id="contact">
-        <a href="mailto:namyang@mit.edu">namyang@mit.edu</a>
+        <a href="mailto:namyang@mit.edu">contact me</a>
     </div>
     <div class="overlay-text" id="copyright">
         &copy; Justin Hong 2023
