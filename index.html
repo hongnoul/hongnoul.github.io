@@ -18,14 +18,6 @@
             width: 100%;
             height: 100%;
         }
-        #copyright {
-            padding: 10px;
-            bottom: 0;
-            right: 0;
-            font-size: x-large;
-            text-align: right;
-            color: black;
-        }
         #download-cv {
             padding: 10px;
             position: absolute;
@@ -90,6 +82,21 @@
             text-decoration: underline;
             cursor: pointer;
         }
+        @media (max-width: 600px) { /* Adjust the max-width as needed */
+            #radio {
+                font-size: 36px; /* Increased font size for smaller screens */
+                /* additional style adjustments for mobile */
+            }
+            #art {
+                font-size: 36px; /* Larger size for headings */
+            }
+            #contact {
+                font-size: 36px; /* Larger size for paragraph text */
+            }
+            #download-cv {
+                font-size: 36px; /* Larger size for paragraph text */
+            }
+    }
     </style>
 </head>
 <body>
