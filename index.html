@@ -2,13 +2,12 @@
 <html>
 <head>
     <title>JUSTIN HONG</title>
-    <link rel="icon" type="image/png" href="src/images1.png">
-    <link href="https://fonts.cdnfonts.com/css/public-pixel" rel="stylesheet">
+    <link rel="icon" type="image/png" href="src/1.png">
     <style>
         body {  
             margin: 0;
             overflow: hidden;
-            font-family: 'public pixel', sans-serif;
+            font-family: 'Courier M', italic;
             color: white;
             background-color: rgb(0, 0, 0);
         }
@@ -19,83 +18,86 @@
             width: 100%;
             height: 100%;
         }
-        .overlay-text {
-            position: absolute;
-            padding: 10px;
-        }
         #copyright {
+            padding: 10px;
             bottom: 0;
             right: 0;
             font-size: x-large;
             text-align: right;
-            background-color: white;
             color: black;
         }
         #download-cv {
+            padding: 10px;
             position: absolute;
-            bottom: 35%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'public pixel', sans-serif;
-            font-size: x-large;
+            top: 0;
+            right: 0;
+            text-align: right;
+            font-family: 'Courier New', italic;
+            font-size: medium;
             color: black;
-            background-color: white;
             border: none;
-            cursor: pointer;
             text-decoration: none;
         }
         #download-cv:hover {
-            background-color: black;
-            color: white;
+            text-decoration: underline;
+            cursor: pointer;
         }
         #contact {
+            padding: 10px;
             position: absolute;
-            bottom: 25%;
-            left: 50%;
-            transform: translateX(-50%);
-            font-family: 'public pixel', sans-serif;
-            font-size: x-large;
-            
+            top: 0;
+            left: 0;
+            text-align: left;
+            font-family: 'Courier New', italic;
+            font-size: medium;
             color: black;
             border: none;
-            cursor: pointer;
             text-decoration: none;
         }
-        #contact a {
-        color: black; 
-        background-color: white;
-        text-decoration: none; 
+        #contact:hover {
+            text-decoration: underline;
+            cursor: pointer;
         }
-        #contact a:hover {
-            font-size: x-large;
-            background-color: black;
-            color: white;
+        #art {
+            padding: 10px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            text-align: left;
+            font-family: 'Courier New', italic;
+            font-size: medium;
+            color: black;
             border: none;
-            cursor: pointer;
             text-decoration: none;
         }
-        #copyright {
+        #art:hover {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        #radio {
+            padding: 10px;
+            position: absolute;
             bottom: 0;
             right: 0;
-            font-size: small;
             text-align: right;
+            font-family: 'Courier New', italic;
+            font-size: medium;
             color: black;
-            background-color: white;
             border: none;
             text-decoration: none;
+        }
+        #radio:hover {
+            text-decoration: underline;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div id="canvas-container" title="Greatest Album of All Time"></div>
-        <button id="download-cv">download cv</button>
-        <a href="src/Justin-Hong-CV.pdf" target="_blank" id="download-cv">download cv</a>
-    <div class="overlay-text" id="contact">
-        <a href="mailto:namyang@mit.edu">contact me</a>
-    </div>
-    <div class="overlay-text" id="copyright">
-        &copy; Justin Hong 2023
-    </div>
+    <div id="canvas-container"></div>
+    <a href="src/Justin-Hong-CV.pdf" target="_blank" id="download-cv">Curriculum Vitae</a>
+    <a href="mailto:namyang@mit.edu" id="contact">Justin Hong</a>
     <script type="module" src="app.js"></script>
+    <a id="art">Portfolio (In Progress)</a>
+    <a href="https://wmbr.org/cgi-bin/show?id=8066/" id="radio">WMBR Radio</a>
 </body>
 </html>

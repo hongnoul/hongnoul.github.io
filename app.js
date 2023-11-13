@@ -8,7 +8,7 @@ animate();
 function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, -1, 5);
+    camera.position.set(0, 0, 0.95);
 
     raycaster = new THREE.Raycaster();
     mouse = new THREE.Vector2();
@@ -19,14 +19,14 @@ function init() {
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
     let loader = new THREE.TextureLoader();
-    let texture = loader.load('src/images1.png');
+    let texture = loader.load('src/1.png');
 
     let materials = [];
     for (let i = 0; i < 6; i++) {
         materials.push(new THREE.MeshBasicMaterial({ map: texture }));
     }
 
-    let geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+    let geometry = new THREE.BoxGeometry(1, 1, 1);
     cube = new THREE.Mesh(geometry, materials);
     cube.position.set(0, 0, 0);
     scene.add(cube);
@@ -35,7 +35,7 @@ function init() {
     renderer.domElement.addEventListener('mousemove', onDocumentMouseMove, false);
     window.addEventListener('resize', onWindowResize, false);
 
-    let outlineGeometry = new THREE.BoxGeometry(1.55, 1.55, 1.55); // Slightly larger than the original cube
+    let outlineGeometry = new THREE.BoxGeometry(1.001, 1.001, 1.001); // Slightly larger than the original cube
     let outlineMaterial = new THREE.MeshBasicMaterial({ color: 0x0000, side: THREE.BackSide });
     outlineCube = new THREE.Mesh(outlineGeometry, outlineMaterial);
     outlineCube.visible = false; // Initially invisible
@@ -45,8 +45,8 @@ function init() {
 function animate() {
     requestAnimationFrame(animate);
 
-    cube.rotation.x += 0.01;
-    cube.rotation.y += 0.01;
+    cube.rotation.x += 0.001;
+    cube.rotation.y += 0.005;
 
     outlineCube.rotation.x = cube.rotation.x;
     outlineCube.rotation.y = cube.rotation.y;
@@ -66,7 +66,7 @@ function checkHover() {
     let intersects = raycaster.intersectObjects([cube]);
     if (intersects.length > 0) {
         renderer.domElement.style.cursor = 'pointer';
-        outlineCube.visible = true;
+        outlineCube.visible = false;
     } else {
         renderer.domElement.style.cursor = 'auto';
         outlineCube.visible = false;
@@ -78,7 +78,7 @@ function onDocumentMouseClick(event) {
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects([cube]);
     if (intersects.length > 0) {
-        window.location.href = 'https://www.last.fm/user/hongnoul/';
+        window.location.href = 'http://www.jhong.tech/';
     }
 }
 
