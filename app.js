@@ -78,7 +78,7 @@ function onDocumentMouseClick(event) {
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects([cube]);
     if (intersects.length > 0) {
-        window.location.href = 'http://www.jhong.tech/';
+        // window.location.href = 'http://www.jhong.tech/';
     }
 }
 
