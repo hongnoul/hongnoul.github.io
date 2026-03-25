@@ -137,7 +137,7 @@ body {
 .post-list li:first-child { border-top: 1px solid #eee; }
 .post-list a { font-size: 18px; font-weight: 500; color: #111; text-decoration: none; }
 .post-list a:hover { text-decoration: none; }
-.post-meta { font-size: 11px; color: #888; margin-top: 4px; }
+.post-meta { font-size: 11px; color: #111; margin-top: 4px; }
 .post-desc { font-size: 13px; color: #444; margin-top: 8px; line-height: 1.6; }
 
 /* ── Post back nav (above container) ────────── */
@@ -191,7 +191,7 @@ body {
 .post-body .affiliation {
   font-size: 11px;
   text-align: center;
-  color: #888;
+  color: #111;
   margin: 0 0 40px;
 }
 
