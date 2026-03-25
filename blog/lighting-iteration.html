@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body, { delimiters: [
+      { left: '$$', right: '$$', display: true },
+      { left: '$', right: '$', display: false }
+    ]})"></script>
+  <title>Lighting as a Design Tool — Justin Hong</title>
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <div class="post-page">
+    <nav><a href="/blog/">← Writing</a></nav>
+    <div class="post-body">
+
+      <h1>Lighting as a Design Tool:<br>A Randomized Grid for Illumination Exploration</h1>
+      <p class="authors">Justin Hong</p>
+      <p class="affiliation">TrustAI &mdash; March 25, 2025</p>
+
+      <div class="abstract">
+        <p class="abstract-label">Abstract</p>
+        <p>AI generation has made complex 3D geometry cheap to produce, but evaluating how a form reads under different lighting conditions remains a slow, intuition-dependent process. This paper describes a tool that addresses this gap: an infinite, pannable grid in which each cell renders the same geometry class under an independent, seeded-random lighting and material configuration. The tool is grounded in psychophysical evidence that surface quality judgments are relational rather than absolute, and that simultaneous presentation of a dense configuration sample accelerates the formation of perceptual vocabulary. The background of this page is a live instance.</p>
+      </div>
+
+      <h2>Specimen Geometry</h2>
+
+      <p>A useful specimen geometry must be complex enough to express lighting variation while carrying no semantic associations that would bias material judgments. A torus knot $T(p,q)$ satisfies both criteria.</p>
+
+      <p>$T(p,q)$ is a closed curve on $\mathbb{T}^2$, defined for coprime integers $p, q$ (i.e. $\gcd(p,q) = 1$) by the winding numbers: $p$ longitudinal revolutions through the hole, $q$ meridional revolutions around the tube. The embedding $\boldsymbol{\gamma} : [0, 2\pi) \to \mathbb{R}^3$ is:</p>
+
+      <div class="eq-row">
+        <div>$$\boldsymbol{\gamma}(t) = \begin{pmatrix} \bigl(\cos qt + 2\bigr)\cos pt \\ \bigl(\cos qt + 2\bigr)\sin pt \\ -\sin qt \end{pmatrix}$$</div>
+        <span class="eq-num">(1)</span>
+      </div>
+
+      <p>The rendered surface is the tubular neighborhood of $\boldsymbol{\gamma}$ at fixed radius $r$. Two constraints determine the valid domain. First, $T(1,q)$ is the unknot for all $q$, so $p \geq 2$ is required for non-trivial topology. Second, $T(p,q) \cong T(q,p)$, so the canonical form enforces $q > p$ to avoid duplicates:</p>
+
+      <div class="eq-row">
+        <div>$$p \geq 2, \quad q > p$$</div>
+        <span class="eq-num">(2)</span>
+      </div>
+
+      <p>Upper bounds on $p$ and $q$ are set as named implementation constants and control tessellation adequacy: at 256 tube segments, higher winding numbers produce crossings too dense to resolve visually at cell size. Geometries are built on demand and cached by $(p,q)$ key; no fixed pool is used.</p>
+
+      <h2>Parameter Space</h2>
+
+      <p>Each cell is determined by a configuration vector $\mathbf{v} \in [0,1]^n$ drawn via a seeded PRNG. The seed is $H(\text{col}, \text{row})$ where $H$ is a Thomas Wang integer hash composed with Mulberry32, giving a uniform, deterministic map over $\mathbb{Z}^2$. Every component is a raw $U[0,1]$ sample scaled linearly to its physical range at render time by a single named constant (e.g. $\texttt{LIGHT\_INT\_MAX} = 5$). No sub-range clipping or conditional draws are used.</p>
+
+      <p><strong>Geometry.</strong> Two draws mapped to integers satisfying $p \geq 2$, $q > p$, within tessellation bounds. Geometry is built on demand and cached by $(p,q)$ key.</p>
+
+      <p><strong>Material.</strong> Fourteen draws covering hue, saturation, and lightness of the object color and emissive channel; roughness; metalness; clearcoat; clearcoat roughness; emissive intensity. All map directly to $[0,1]$ material parameters or to their full physical ranges.</p>
+
+      <p><strong>Illumination.</strong> One draw partitions $[0,1)$ into three equal bins selecting light type; one draw maps to source count $n \in \{1,2,3,4\}$. Seven draws per source (hue, saturation, lightness, intensity, $x$, $y$, $z$) are always made for all four slots; unused slots are zeroed at apply time. Hemisphere sources receive six additional draws for sky and ground color.</p>
+
+      <p><strong>Motion.</strong> Five draws: $\omega_y$ magnitude and sign, $\omega_x$, oscillation amplitude $A$, and phase $\phi$. Motion is structurally important: the moving terminator line makes light direction legible without additional annotation.<sup>2</sup></p>
+
+      <h2>The Grid as Instrument</h2>
+
+      <p>Judgments of surface brightness are not absolute: Gilchrist et al.'s anchoring theory shows that perceived lightness is determined by a surface's luminance ratio relative to the highest-luminance region in its immediate framework, not by its physical luminance value.<sup>3</sup> Evaluating a single lighting configuration in isolation removes that anchor and makes the judgment unreliable. The grid restores it by providing many simultaneous anchors.</p>
+
+      <p>Fleming, Dror, and Adelson found that observers infer surface reflectance properties by implicitly matching a scene's illumination against a prior built from natural illumination statistics.<sup>4</sup> When only one configuration is visible, that prior dominates and suppresses variation; when many are visible simultaneously, variation across cells disrupts the prior and forces more direct comparison. The grid exploits this: adjacent cells share geometry but vary illumination and material jointly, making the contribution of each factor easier to isolate.</p>
+
+      <p>Pellacini et al. showed that identical PBR parameters produce substantially different perceived material qualities under different lighting conditions.<sup>1</sup> The same metalness value reads as polished metal under a focused directional source and as painted plastic under broad hemisphere fill. Color order systems such as Munsell and NCS address an analogous problem in the color domain by organizing a perceptual space into a navigable sample grid.<sup>5</sup> The format here applies the same logic to the joint space of illumination and reflectance.</p>
+
+      <h2>Implementation</h2>
+
+      <p>A single shared WebGL renderer uses scissor-based multi-viewport rendering to avoid exceeding the browser context limit. Visible cells $(c, r)$ satisfying $\text{pan}_x \le c \cdot w \le \text{pan}_x + v_w$ (and analogously for rows) are rendered each frame. The address space is infinite via $\mathbb{Z}^2$ cell coordinates feeding $H$ directly; no cells are cached or stored. Built with Three.js r128.</p>
+
+      <hr>
+
+      <h2 class="no-counter">References</h2>
+      <ol class="references">
+        <li>Pellacini, F., Ferwerda, J. A., &amp; Greenberg, D. P. (2000). Toward a psychophysically-based light reflection model for image synthesis. <em>Proceedings of SIGGRAPH 2000</em>, 55–64.</li>
+        <li>Ramachandran, V. S. (1988). Perception of shape from shading. <em>Nature</em>, 331(6152), 163–166.</li>
+        <li>Gilchrist, A., Kossyfidis, C., Bonato, F., Agostini, T., Cataliotti, J., Li, X., Spehar, B., Annan, V., &amp; Economou, E. (1999). An anchoring theory of lightness perception. <em>Psychological Review</em>, 106(4), 795–834.</li>
+        <li>Fleming, R. W., Dror, R. O., &amp; Adelson, E. H. (2003). Real-world illumination and the perception of surface reflectance properties. <em>Journal of Vision</em>, 3(5), 347–368.</li>
+        <li>Hard, A., &amp; Sivik, L. (1981). NCS — Natural Color System: A Swedish standard for color notation. <em>Color Research &amp; Application</em>, 6(3), 129–138.</li>
+      </ol>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="/scene.js"></script>
+</body>
+</html>

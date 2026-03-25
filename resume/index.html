@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Resume — Justin Hong</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Resume page ── */
+    body {
+      font-family: 'Times New Roman', Times, serif;
+      background: #f0f0f0;
+      color: #000;
+    }
+
+    .resume-outer {
+      display: flex;
+      justify-content: center;
+      padding: 24px 0 48px;
+    }
+
+    .resume {
+      background: #fff;
+      width: 816px;   /* 8.5in at 96dpi */
+      height: 1056px; /* 11in  at 96dpi */
+      overflow: hidden;
+      padding: 0.5in 0.65in;
+      flex-shrink: 0;
+      transform-origin: top center;
+      box-shadow: 0 2px 24px rgba(0,0,0,0.10);
+    }
+
+    /* Header */
+    .r-name {
+      font-size: 30pt;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.02em;
+      margin-bottom: 5px;
+    }
+
+    .r-contact {
+      font-size: 9pt;
+      text-align: center;
+      color: #222;
+      margin-bottom: 22px;
+    }
+    .r-contact a { color: #222; text-decoration: none; }
+    .r-contact a:hover { text-decoration: none; }
+
+    /* Section */
+    .r-section { margin-bottom: 14px; }
+
+    .r-section-title {
+      font-size: 9.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1.5px solid #000;
+      padding-bottom: 2px;
+      margin-bottom: 9px;
+    }
+
+    /* Entry */
+    .r-entry { margin-bottom: 9px; }
+    .r-section:last-child { margin-bottom: 0; }
+
+    .r-entry-top, .r-entry-sub {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .r-org   { font-size: 10.5pt; font-weight: 700; }
+    .r-loc   { font-size: 9.5pt; font-weight: 400; }
+    .r-role  { font-size: 9.5pt; font-style: italic; }
+    .r-date  { font-size: 9.5pt; font-style: italic; }
+
+    /* Bullets */
+    .r-bullets {
+      margin: 4px 0 0 18px;
+      list-style: disc;
+    }
+    .r-bullets li {
+      font-size: 9.5pt;
+      line-height: 1.45;
+      margin-bottom: 2px;
+    }
+    .r-bullets li strong { font-weight: 600; }
+
+    /* Single-column entries (honors, skills) */
+    .r-list {
+      margin: 0 0 0 18px;
+      list-style: disc;
+    }
+    .r-list li {
+      font-size: 9.5pt;
+      line-height: 1.5;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 816px) {
+      .resume-outer { padding: 0; }
+    }
+
+    /* ── Print ── */
+    @media print {
+      body { background: #fff; }
+      .resume-outer { display: block; padding: 0; }
+      .resume {
+        width: 8.5in; height: 11in;
+        overflow: hidden;
+        box-shadow: none;
+        transform: none !important;
+        margin-bottom: 0 !important;
+        padding: 0.5in 0.65in;
+      }
+      @page { size: letter; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="resume-outer">
+  <div class="resume">
+
+    <p class="r-name">Justin Hong</p>
+    <p class="r-contact">
+      <a href="mailto:namyang@mit.edu">namyang@mit.edu</a> &nbsp;|&nbsp;
+      (617) 256-8414 &nbsp;|&nbsp;
+      <a href="https://linkedin.com/in/hongnoul" target="_blank" rel="noopener">linkedin.com/in/hongnoul</a> &nbsp;|&nbsp;
+      U.S. Citizen
+    </p>
+
+    <!-- Education -->
+    <div class="r-section">
+      <div class="r-section-title">Education</div>
+      <div class="r-entry">
+        <div class="r-entry-top">
+          <span class="r-org">Massachusetts Institute of Technology</span>
+          <span class="r-loc">Cambridge, MA</span>
+        </div>
+        <div class="r-entry-sub">
+          <span class="r-role">BS in Computer Science and Engineering (GPA: 4.3)</span>
+          <span class="r-date">Expected May 2027</span>
+        </div>
+        <ul class="r-bullets">
+          <li><strong>Relevant Coursework:</strong> Data Structures &amp; Algorithms, Software Construction, Web Design</li>
+          <li><strong>Activities:</strong> MIT Undergraduate Research Opportunities Program, Walker Memorial Basement Radio 88.1FM, MIT Live</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Work & Leadership -->
+    <div class="r-section">
+      <div class="r-section-title">Work &amp; Leadership Experience</div>
+
+      <div class="r-entry">
+        <div class="r-entry-top">
+          <span class="r-org">TrustAI Labs (YCombinator S26)</span>
+          <span class="r-loc">San Francisco, CA</span>
+        </div>
+        <div class="r-entry-sub">
+          <span class="r-role">Founding Engineer &amp; Designer</span>
+          <span class="r-date">November 2025 &ndash; Present</span>
+        </div>
+        <ul class="r-bullets">
+          <li>Own end-to-end frontend of the product, prototyping features and delivering polished, production-ready interfaces</li>
+          <li>Built and maintain the full marketing site and interactive product demos used in investor and customer-facing presentations</li>
+          <li>Defined visual identity and design system including logo; responsible for all brand, motion, and interaction decisions</li>
+        </ul>
+      </div>
+
+      <div class="r-entry">
+        <div class="r-entry-top">
+          <span class="r-org">ROK Army</span>
+          <span class="r-loc">Yeoncheon, South Korea</span>
+        </div>
+        <div class="r-entry-sub">
+          <span class="r-role">Squad Leader &amp; Personnel Administration Specialist</span>
+          <span class="r-date">July 2024 &ndash; Jan 2026</span>
+        </div>
+        <ul class="r-bullets">
+          <li>Created advanced Excel macros to automate reports, minimizing errors in high-stakes administrative workflows</li>
+          <li>Served as squad leader in a top-ranked infantry platoon (1st of 48) in CQB room-clearing competition</li>
+        </ul>
+      </div>
+
+      <div class="r-entry">
+        <div class="r-entry-top">
+          <span class="r-org">MIT Political History Department</span>
+          <span class="r-loc">Cambridge, MA</span>
+        </div>
+        <div class="r-entry-sub">
+          <span class="r-role">Frontend Developer</span>
+          <span class="r-date">December 2023 &ndash; February 2024</span>
+        </div>
+        <ul class="r-bullets">
+          <li>Developed a server-side rendered digital exhibition platform with Next.js, improving accessibility and SEO</li>
+          <li>Collaborated with MIT History faculty to launch a digital archive of activist murals, increased visibility to 1,000+ users</li>
+        </ul>
+      </div>
+
+      <div class="r-entry">
+        <div class="r-entry-top">
+          <span class="r-org">MIT Walker Memorial Basement Radio 88.1FM</span>
+          <span class="r-loc">Cambridge, MA</span>
+        </div>
+        <div class="r-entry-sub">
+          <span class="r-role">Show Host</span>
+          <span class="r-date">September 2023 &ndash; May 2024</span>
+        </div>
+        <ul class="r-bullets">
+          <li>Curated and hosted live interviews with underground shoegaze musicians, increased audience visibility by 25%</li>
+          <li>Broadcasted music as a drummer for shoegaze band Doraji, promoting local artists and fostering community engagement</li>
+        </ul>
+      </div>
+
+      <div class="r-entry">
+        <div class="r-entry-top">
+          <span class="r-org">EAN Design Consulting Group</span>
+          <span class="r-loc">Seoul, South Korea</span>
+        </div>
+        <div class="r-entry-sub">
+          <span class="r-role">Architectural Design Intern</span>
+          <span class="r-date">August 2021</span>
+        </div>
+        <ul class="r-bullets">
+          <li>Produced high-fidelity architectural renderings for a commercial flagship project, enhancing client engagement and improving proposal clarity using Enscape and iterative design reviews</li>
+          <li>Conducted site research and prepared financial and ROI reports, integrating statistical analysis to support data-informed client planning and long-term investment decisions</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Technical Projects -->
+    <div class="r-section">
+      <div class="r-section-title">Technical Projects</div>
+      <div class="r-entry">
+        <div class="r-entry-top">
+          <span class="r-org">Amazon Nova AI Hackathon, Cadabra</span>
+          <span class="r-date">February &ndash; March 2026</span>
+        </div>
+        <ul class="r-bullets">
+          <li>Built a Chrome extension personalizing Amazon search rankings in real time using AI-inferred behavioral profiles</li>
+          <li>Engineered full-stack: TypeScript Lambda on AWS API Gateway, DynamoDB profile persistence, DOM reranking with AI-generated explanation badges</li>
+        </ul>
+      </div>
+
+      <div class="r-entry">
+        <div class="r-entry-top">
+          <span class="r-org">MIT Bitcoin Hackathon</span>
+          <span class="r-date">February 2024</span>
+        </div>
+        <ul class="r-bullets">
+          <li>Developed a tokenized property deed system and live marketplace prototype, leading a team of 5+ to explore trust, ownership, and verification in digital marketplaces</li>
+          <li>Built frontend with real-time transaction UI; presented to panel of judges at MIT Bitcoin Expo</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Honors -->
+    <div class="r-section">
+      <div class="r-section-title">Honors &amp; Awards</div>
+      <ul class="r-list">
+        <li>Educational Broadcasting System (EBS) Janghak Quiz Competition Winner (2023)</li>
+        <li>Cheongshim International Academy Valedictorian (2023)</li>
+      </ul>
+    </div>
+
+  </div>
+  </div>
+
+  <script>
+    function scaleResume() {
+      const resume = document.querySelector('.resume');
+      const scale = Math.min(1, window.innerWidth / 816);
+      resume.style.transform = scale < 1 ? `scale(${scale})` : '';
+      resume.style.marginBottom = scale < 1 ? `${(scale - 1) * 1056}px` : '';
+    }
+    scaleResume();
+    window.addEventListener('resize', scaleResume);
+  </script>
+</body>
+</html>
