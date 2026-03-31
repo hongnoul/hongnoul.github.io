@@ -393,6 +393,7 @@ body {
   cursor: grab;
   z-index: 1;
   background: transparent;
+  outline: none;
 }
 
 
