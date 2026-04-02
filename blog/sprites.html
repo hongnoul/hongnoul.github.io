@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+  <script src="/favicon.js"></script>
+  <title>Sprites</title>
+  <meta name="description" content="CSS sprite sheets, McMaster-Carr's sub-300ms load times, and a pixel character spun off from Claude Code's clawd.">
+  <meta name="author" content="Justin Hong">
+  <meta property="og:title" content="Sprites — Justin Hong">
+  <meta property="og:type" content="article">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      color: #949494;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 72px 36px 120px;
+    }
+
+    .rule {
+      border: none;
+      border-top: 1px solid #949494;
+      margin: 64px 0;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin-bottom: 80px;
+    }
+
+    #hero-sprite {
+      width: 128px;
+      height: 80px;
+      background: url('/truu.png') 0 0 / 1024px 80px;
+      image-rendering: pixelated;
+      flex-shrink: 0;
+      animation: hero-cycle 1.6s steps(8) infinite;
+    }
+
+    @keyframes hero-cycle {
+      from { background-position-x: 0; }
+      to   { background-position-x: -1024px; }
+    }
+
+    .hero-text h1 {
+      font-size: 40px;
+      font-weight: 700;
+      color: #f0f0f0;
+      line-height: 1;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+
+    .hero-text p { font-size: 13px; }
+
+    /* ── Section label ── */
+    h2 {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      color: #949494;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    /* ── Frames ── */
+    .frames-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: #949494;
+      border: 1px solid #949494;
+    }
+
+    .frame-cell {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 18px;
+      gap: 14px;
+    }
+
+    .frame-img {
+      width: 128px;
+      height: 80px;
+      background: url('/truu.png') 0 0 / 1024px 80px;
+      image-rendering: pixelated;
+    }
+
+    .frame-info { text-align: center; }
+    .frame-n {
+      display: block;
+      font-size: 10px;
+      color: #949494;
+      margin-bottom: 3px;
+    }
+    .frame-s { font-size: 12px; }
+
+    /* ── Sheet ── */
+    .sheet-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .sheet-img {
+      image-rendering: pixelated;
+      display: block;
+      width: 512px;
+      height: 40px;
+      max-width: 100%;
+      border: 1px solid #949494;
+      flex-shrink: 0;
+    }
+    .sheet-meta { font-size: 11px; }
+
+    /* ── Lineage ── */
+    .lineage {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+    .lineage-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .lineage-img { image-rendering: pixelated; display: block; }
+    .lineage-lbl { font-size: 11px; }
+    .lineage-arrow { font-size: 18px; margin-top: -14px; }
+
+    /* ── Timeline + Mario ── */
+    .origin-row {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .mario-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mario-img {
+      display: block;
+      image-rendering: pixelated;
+      max-width: 220px;
+      border: 1px solid #949494;
+    }
+    .mario-cap { font-size: 11px; }
+
+    .timeline { display: flex; flex-direction: column; }
+    .tl-row {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 20px;
+      padding: 11px 0;
+      border-bottom: 1px solid #949494;
+    }
+    .tl-year { font-size: 12px; color: #949494; }
+    .tl-event { font-size: 13px; }
+
+    /* ── Code ── */
+    .code {
+      background: #000;
+      border: 1px solid #949494;
+      padding: 24px 28px;
+      font-size: 12px;
+      line-height: 1.85;
+      overflow-x: auto;
+      white-space: pre;
+      margin: 28px 0;
+    }
+    .cw { color: #f0f0f0; }
+    .cb { color: #f0f0f0; }
+    .cd { color: #949494; }
+
+    /* ── Tables ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin: 28px 0;
+    }
+    .data-table th {
+      text-align: left;
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #949494;
+      padding: 0 20px 10px 0;
+      border-bottom: 1px solid #949494;
+    }
+    .data-table td {
+      padding: 12px 20px 12px 0;
+      border-bottom: 1px solid #949494;
+      vertical-align: top;
+    }
+    .data-table td:first-child { color: #f0f0f0; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Stats ── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: #949494;
+      border: 1px solid #949494;
+      margin: 32px 0;
+    }
+    .stat { background: #000; padding: 28px 24px; }
+    .stat-n {
+      display: block;
+      font-size: 32px;
+      font-weight: 700;
+      color: #f0f0f0;
+      line-height: 1;
+      margin-bottom: 10px;
+      letter-spacing: -0.01em;
+    }
+    .stat-d { font-size: 11px; line-height: 1.5; }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .frames-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats { grid-template-columns: 1fr; }
+      .hero { flex-direction: column; }
+      .origin-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div id="hero-sprite"></div>
+    <div class="hero-text">
+      <h1>Sprites</h1>
+    </div>
+  </div>
+
+  <!-- Frames -->
+  <h2>8 frames &middot; 128 &times; 10 px &middot; 1 HTTP request</h2>
+  <div class="frames-grid">
+    <div class="frame-cell">
+      <div class="frame-img" style="background-position-x:0"></div>
+      <div class="frame-info"><span class="frame-n">00</span><span class="frame-s">Idle</span></div>
+    </div>
+    <div class="frame-cell">
+      <div class="frame-img" style="background-position-x:-128px"></div>
+      <div class="frame-info"><span class="frame-n">01</span><span class="frame-s">Looking NE</span></div>
+    </div>
+    <div class="frame-cell">
+      <div class="frame-img" style="background-position-x:-256px"></div>
+      <div class="frame-info"><span class="frame-n">02</span><span class="frame-s">Looking SE</span></div>
+    </div>
+    <div class="frame-cell">
+      <div class="frame-img" style="background-position-x:-384px"></div>
+      <div class="frame-info"><span class="frame-n">03</span><span class="frame-s">Looking SW</span></div>
+    </div>
+    <div class="frame-cell">
+      <div class="frame-img" style="background-position-x:-512px"></div>
+      <div class="frame-info"><span class="frame-n">04</span><span class="frame-s">Looking NW</span></div>
+    </div>
+    <div class="frame-cell">
+      <div class="frame-img" style="background-position-x:-640px"></div>
+      <div class="frame-info"><span class="frame-n">05</span><span class="frame-s">Happy</span></div>
+    </div>
+    <div class="frame-cell">
+      <div class="frame-img" style="background-position-x:-768px"></div>
+      <div class="frame-info"><span class="frame-n">06</span><span class="frame-s">Sad</span></div>
+    </div>
+    <div class="frame-cell">
+      <div class="frame-img" style="background-position-x:-896px"></div>
+      <div class="frame-info"><span class="frame-n">07</span><span class="frame-s">Angry</span></div>
+    </div>
+  </div>
+
+  <div class="sheet-row">
+    <img src="/truu.png" class="sheet-img" alt="Sprite sheet">
+    <span class="sheet-meta">native &middot; 1024 &times; 80 px rendered &middot; ~400 bytes</span>
+  </div>
+
+  <hr class="rule">
+
+  <!-- Origin -->
+  <h2>Origin</h2>
+  <div class="lineage">
+    <div class="lineage-item">
+      <img src="/clawd.png" class="lineage-img" width="80" height="50" alt="clawd">
+      <span class="lineage-lbl">clawd &mdash; Claude Code</span>
+    </div>
+    <span class="lineage-arrow">&rarr;</span>
+    <div class="lineage-item">
+      <div class="lineage-img" style="width:80px;height:50px;background:url('/truu.png') 0 0/640px 50px;image-rendering:pixelated;"></div>
+      <span class="lineage-lbl">spinoff &mdash; Justin Hong</span>
+    </div>
+  </div>
+
+  <div class="origin-row">
+    <div class="mario-wrap">
+      <img src="/mario.webp" class="mario-img" alt="Super Mario Bros. sprite sheet">
+      <span class="mario-cap">Super Mario Bros. (1985)</span>
+    </div>
+    <div class="timeline">
+      <div class="tl-row"><span class="tl-year">1977</span><span class="tl-event">Texas Instruments coins <em>sprite</em> &mdash; GPU-composited bitmaps, CPU never touches framebuffer</span></div>
+      <div class="tl-row"><span class="tl-year">1983</span><span class="tl-event">NES sprite table &mdash; 64 objects, 8&times;8 or 8&times;16 px, positioned independently</span></div>
+      <div class="tl-row"><span class="tl-year">1985</span><span class="tl-event">Super Mario Bros. &mdash; all walk, jump, and death frames in one 256-byte pattern table</span></div>
+      <div class="tl-row"><span class="tl-year">2004</span><span class="tl-event">Dave Shea&rsquo;s CSS Sprites &mdash; background-position for web icons, Google &amp; Amazon adopt within 2 years</span></div>
+      <div class="tl-row"><span class="tl-year">2026</span><span class="tl-event">McMaster-Carr, this site &mdash; still in production</span></div>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <!-- Technique -->
+  <h2>The technique</h2>
+  <div class="code"><span class="cd">/* Frame selection — compositor thread only, no layout, no paint */</span>
+<span class="cw">const</span> FRAME_W = <span class="cb">128</span>;
+sprite.style.backgroundPositionX = -(frame * FRAME_W) + <span class="cb">'px'</span>;
+
+<span class="cd">/* Quadrant tracking */</span>
+<span class="cw">const</span> dx = e.clientX - (rect.left + rect.width  / <span class="cb">2</span>);
+<span class="cw">const</span> dy = e.clientY - (rect.top  + rect.height / <span class="cb">2</span>);
+frame = dx >= <span class="cb">0</span> ? (dy <= <span class="cb">0</span> ? <span class="cb">1</span> : <span class="cb">2</span>) : (dy > <span class="cb">0</span> ? <span class="cb">3</span> : <span class="cb">4</span>);
+
+<span class="cd">/* CSS */</span>
+.character {
+  width: <span class="cb">128px</span>;  height: <span class="cb">80px</span>;
+  background: url(<span class="cb">'/sprite.png'</span>) <span class="cb">0 0</span> / <span class="cb">1024px 80px</span>;
+  image-rendering: pixelated;
+}</div>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Operation</th><th>Thread</th><th>Cost</th><th>Triggers</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>background-position change</td><td>Compositor</td><td class="mono">&lt;0.1ms</td><td>Nothing</td></tr>
+      <tr><td>src swap (&lt;img&gt;)</td><td>Main + compositor</td><td class="mono">~2&ndash;8ms</td><td>Decode, paint</td></tr>
+      <tr><td>canvas drawImage()</td><td>Main</td><td class="mono">~1&ndash;4ms</td><td>Paint</td></tr>
+      <tr><td>CSS class swap</td><td>Main + compositor</td><td class="mono">~0.5&ndash;2ms</td><td>Style, paint</td></tr>
+    </tbody>
+  </table>
+
+  <hr class="rule">
+
+  <!-- McMaster -->
+  <h2>mcmaster.com</h2>
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-n">&lt;300ms</span>
+      <span class="stat-d">Time to first meaningful paint</span>
+    </div>
+    <div class="stat">
+      <span class="stat-n">~100</span>
+      <span class="stat-d">Lighthouse performance score</span>
+    </div>
+    <div class="stat">
+      <span class="stat-n">24&times;</span>
+      <span class="stat-d">Speed advantage over median e-commerce LCP</span>
+    </div>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Site</th><th>Stack</th><th>Median LCP (mobile)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://www.mcmaster.com/" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;text-underline-offset:3px;">mcmaster.com</a></td>
+        <td>Pre-rendered HTML, CSS sprites, no framework</td>
+        <td class="mono">&lt;300ms</td>
+      </tr>
+      <tr>
+        <td>Top-10 e-commerce</td>
+        <td>Optimized bundles, CDN, some SSR</td>
+        <td class="mono">~2,800ms</td>
+      </tr>
+      <tr>
+        <td>Median e-commerce</td>
+        <td>JS framework, lazy assets, analytics</td>
+        <td class="mono">~7,200ms</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+</body>
+</html>

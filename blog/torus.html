@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
+  <script src="/favicon.js"></script>
+  <title>Torus</title>
+  <meta name="description" content="Torus knots — the T(p,q) family, parametric form, and an interactive silhouette text-wrap specimen.">
+  <meta name="author" content="Justin Hong">
+  <meta property="og:title" content="T(p,q) — Justin Hong">
+  <meta property="og:type" content="article">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      color: #949494;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+    }
+
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 72px 36px 120px;
+    }
+
+    .rule {
+      border: none;
+      border-top: 1px solid #949494;
+      margin: 64px 0;
+    }
+
+    /* ── Section label ── */
+    h2 {
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      color: #949494;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    /* ── Catalog grid ── */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: #949494;
+      border: 1px solid #949494;
+    }
+
+    .catalog-cell {
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px 18px;
+      gap: 14px;
+    }
+
+    .catalog-canvas { display: block; }
+
+    .catalog-info { text-align: center; }
+    .catalog-n {
+      display: block;
+      font-size: 13px;
+      color: #f0f0f0;
+      margin-bottom: 3px;
+    }
+    .catalog-cross { font-size: 11px; }
+
+    /* ── Equation block ── */
+    .code {
+      background: #000;
+      border: 1px solid #949494;
+      padding: 24px 28px;
+      font-size: 12px;
+      line-height: 1.85;
+      overflow-x: auto;
+      white-space: pre;
+      margin: 28px 0;
+    }
+    .cw { color: #f0f0f0; }
+    .cd { color: #949494; }
+
+    /* ── Stage: knot + text-wrap ── */
+    #stage {
+      position: relative;
+      font-family: 'JetBrains Mono', ui-monospace, 'Courier New', monospace;
+      font-size: 15px;
+      color: #949494;
+    }
+
+    #knot {
+      position: absolute;
+      display: block;
+      pointer-events: auto;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .ln {
+      position: absolute;
+      white-space: nowrap;
+      line-height: 1.7;
+    }
+
+    /* ── Data table ── */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin: 28px 0;
+    }
+    .data-table th {
+      text-align: left;
+      font-weight: 400;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #949494;
+      padding: 0 20px 10px 0;
+      border-bottom: 1px solid #949494;
+    }
+    .data-table td {
+      padding: 12px 20px 12px 0;
+      border-bottom: 1px solid #949494;
+      vertical-align: top;
+    }
+    .data-table td:first-child { color: #f0f0f0; }
+
+
+    /* ── Infinite pan ── */
+    #pan-frame {
+      width: 100%;
+      height: 520px;
+      border: 1px solid #949494;
+      overflow: hidden;
+      margin-top: 28px;
+    }
+    #pan-frame canvas {
+      display: block;
+      cursor: grab;
+    }
+    #pan-frame canvas.dragging {
+      cursor: grabbing;
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 640px) {
+      .catalog-grid { grid-template-columns: repeat(2, 1fr); }
+      #knot { display: none; }
+      .ln { position: static !important; display: block; white-space: normal !important; width: auto !important; left: auto !important; top: auto !important; }
+      #stage { height: auto !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- Hero text -->
+  <h1 style="font-size:clamp(40px,6vw,72px);font-weight:700;color:#f0f0f0;line-height:0.9;letter-spacing:-0.02em;margin-bottom:64px;text-align:right;">Torus</h1>
+
+  <!-- Iterations -->
+  <h2>8 knots &middot; T(p,q) &middot; coprime integers</h2>
+  <div id="catalog-grid" class="catalog-grid"></div>
+
+  <hr class="rule">
+
+  <!-- Specimen -->
+  <h2>Specimen &middot; drag to reposition</h2>
+  <div id="stage">
+    <canvas id="knot"></canvas>
+  </div>
+
+  <hr class="rule">
+
+  <!-- Randomness -->
+  <h2>Randomness</h2>
+  <div class="code"><span class="cd">/* Field — each cell seeded by its grid coordinate */</span>
+<span class="cw">function</span> hash(col, row) {
+  <span class="cw">let</span> h = (Math.imul(col, <span class="cw">2654435761</span>) ^ Math.imul(row, <span class="cw">2246822519</span>)) >>> <span class="cw">0</span>;
+  h = Math.imul(h ^ (h >>> <span class="cw">16</span>), <span class="cw">0x45d9f3b</span>) >>> <span class="cw">0</span>;
+  <span class="cw">return</span> h;
+}
+
+<span class="cd">/* Coprime constraint — q must be coprime with p and q &gt; p */</span>
+<span class="cw">const</span> p = P_MIN + Math.floor(rand() * (P_MAX &minus; P_MIN + <span class="cw">1</span>));
+<span class="cw">const</span> q = (p + <span class="cw">1</span>) + Math.floor(rand() * (Q_MAX &minus; p));
+<span class="cd">// gcd(p,q) = 1 by construction when p+1..Q_MAX are coprime with p</span></div>
+
+  <hr class="rule">
+
+  <!-- Parameters -->
+  <h2>Parameters</h2>
+  <div class="code"><span class="cd">/* Geometry parameters */</span>
+<span class="cw">new</span> THREE.TorusKnotGeometry(
+  <span class="cw">radius</span>         = <span class="cw">2.5</span>,   <span class="cd">// torus major radius</span>
+  <span class="cw">tube</span>           = <span class="cw">0.78</span>,  <span class="cd">// tube thickness</span>
+  <span class="cw">tubularSegments</span> = <span class="cw">256</span>,  <span class="cd">// smoothness along the path</span>
+  <span class="cw">radialSegments</span>  = <span class="cw">32</span>,   <span class="cd">// cross-section polygon sides</span>
+  <span class="cw">p</span>, <span class="cw">q</span>                     <span class="cd">// winding numbers</span>
+)
+
+<span class="cd">/* Crossing number — minimum self-intersections in a 2D projection */</span>
+<span class="cw">c</span>(p,q) = min(p(q&minus;1), q(p&minus;1))</div>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Parameter</th><th>Range (field)</th><th>Effect</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>p</td><td>2 &ndash; 5</td><td>Longitudinal winds around torus axis</td></tr>
+      <tr><td>q</td><td>p+1 &ndash; 11</td><td>Meridional winds through torus hole</td></tr>
+      <tr><td>hue</td><td>0 &ndash; 1</td><td>HSL base color, saturation 0.88, lightness 0.52</td></tr>
+      <tr><td>tube</td><td>0.55 &ndash; 0.95</td><td>Tube thickness — thicker = bulkier silhouette</td></tr>
+      <tr><td>rotation axes</td><td>&minus;1 &ndash; 1</td><td>Per-knot x/y rotation weights, fixed at load</td></tr>
+    </tbody>
+  </table>
+
+  <hr class="rule">
+
+  <!-- Concept -->
+  <div class="code"><span class="cd">/* Parametric form — t &isin; [0, 2&pi;) */</span>
+<span class="cw">x</span>(t) = (2 + cos(<span class="cw">q</span>&middot;t)) &middot; cos(<span class="cw">p</span>&middot;t)
+<span class="cw">y</span>(t) = (2 + cos(<span class="cw">q</span>&middot;t)) &middot; sin(<span class="cw">p</span>&middot;t)
+<span class="cw">z</span>(t) =  sin(<span class="cw">q</span>&middot;t)
+
+<span class="cd">/* Crossing number */</span>
+<span class="cw">c</span>(p,q) = min(p(q&minus;1), q(p&minus;1))</div>
+
+  <hr class="rule">
+
+  <!-- Infinite pan -->
+  <h2>Field &middot; drag to explore</h2>
+  <div id="pan-frame"></div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// ── Catalog renderer ──────────────────────────────────────────────────────
+(function () {
+  const CATALOG = [
+    { p: 2, q: 3, crossings: 3  },
+    { p: 2, q: 5, crossings: 5  },
+    { p: 2, q: 7, crossings: 7  },
+    { p: 2, q: 9, crossings: 9  },
+    { p: 3, q: 5, crossings: 10 },
+    { p: 3, q: 7, crossings: 14 },
+    { p: 4, q: 7, crossings: 21 },
+    { p: 4, q: 9, crossings: 28 },
+  ];
+
+  const CELL = 160;
+  const grid = document.getElementById('catalog-grid');
+
+  CATALOG.forEach(({ p, q, crossings }, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'catalog-cell';
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'catalog-canvas';
+    canvas.style.width  = CELL + 'px';
+    canvas.style.height = CELL + 'px';
+    cell.appendChild(canvas);
+
+    const info = document.createElement('div');
+    info.className = 'catalog-info';
+    info.innerHTML =
+      `<span class="catalog-n">T(${p},${q})</span>` +
+      `<span class="catalog-cross">${crossings} crossings</span>`;
+    cell.appendChild(info);
+    grid.appendChild(cell);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.setSize(CELL, CELL);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(18.57, 1, 0.1, 100);
+    camera.position.set(0, 1.5, 28);
+    camera.lookAt(0, 0, 0);
+
+    scene.add(new THREE.Mesh(
+      new THREE.TorusKnotGeometry(2.5, 0.78, 256, 32, p, q),
+      new THREE.MeshPhysicalMaterial({
+        color:              i === CATALOG.length - 1
+                              ? new THREE.Color(0xf0f0f0)
+                              : new THREE.Color().setHSL(i / CATALOG.length, 0.72, 0.52),
+        roughness:          0.11,
+        metalness:          0.14,
+        clearcoat:          0.92,
+        clearcoatRoughness: 0.07,
+      })
+    ));
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+    const key = new THREE.DirectionalLight(0xffffff, 3.5);
+    key.position.set(5, 8, 10);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0x6688ff, 1.2);
+    fill.position.set(-6, -2, 5);
+    scene.add(fill);
+
+    const knot = scene.children.find(c => c.isMesh);
+    const rx = (Math.random() * 2 - 1);
+    const ry = (Math.random() * 2 - 1);
+    const speed = 0.00028 + Math.random() * 0.00018;
+
+    (function animate() {
+      requestAnimationFrame(animate);
+      const t = performance.now() * speed;
+      knot.rotation.x = rx * t;
+      knot.rotation.y = ry * t;
+      renderer.render(scene, camera);
+    }());
+  });
+}());
+</script>
+
+<script>
+// ── Specimen renderer (random T(p,q)) ────────────────────────────────────
+(function () {
+  const CATALOG = [
+    { p: 2, q: 3 }, { p: 2, q: 5 }, { p: 2, q: 7 }, { p: 2, q: 9 },
+    { p: 3, q: 5 }, { p: 3, q: 7 }, { p: 4, q: 7 }, { p: 4, q: 9 },
+  ];
+  const { p, q } = CATALOG[Math.floor(Math.random() * CATALOG.length)];
+  const hue = Math.random();
+
+  const canvas = document.getElementById('knot');
+  const SIZE   = 240;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(SIZE, SIZE);
+  canvas.style.width  = SIZE + 'px';
+  canvas.style.height = SIZE + 'px';
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(18.57, 1, 0.1, 100);
+  camera.position.set(0, 1.5, 28);
+  camera.lookAt(0, 0, 0);
+
+  scene.add(new THREE.Mesh(
+    new THREE.TorusKnotGeometry(2.5, 0.78, 256, 32, p, q),
+    new THREE.MeshPhysicalMaterial({
+      color:              new THREE.Color().setHSL(hue, 0.88, 0.52),
+      roughness:          0.11,
+      metalness:          0.14,
+      clearcoat:          0.92,
+      clearcoatRoughness: 0.07,
+    })
+  ));
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+  const key = new THREE.DirectionalLight(0xffffff, 4.0);
+  key.position.set(5, 8, 10);
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0x6688ff, 1.5);
+  fill.position.set(-8, -2, 5);
+  scene.add(fill);
+
+  renderer.render(scene, camera);
+  window._knotCam = camera;
+
+  // Build per-CSS-row silhouette from rendered pixels
+  const ratio     = renderer.getPixelRatio();
+  const physSize  = Math.round(SIZE * ratio);
+  const offscreen = document.createElement('canvas');
+  offscreen.width = offscreen.height = physSize;
+  const ctx2d = offscreen.getContext('2d');
+  ctx2d.drawImage(canvas, 0, 0);
+  const px = ctx2d.getImageData(0, 0, physSize, physSize).data;
+
+  const ALPHA_THRESH = 10;
+  const silhouette = [];
+  for (let cssY = 0; cssY < SIZE; cssY++) {
+    const r0 = Math.round(cssY * ratio);
+    const r1 = Math.round((cssY + 1) * ratio);
+    let left = SIZE, right = -1;
+    for (let pr = r0; pr < r1; pr++) {
+      for (let pc = 0; pc < physSize; pc++) {
+        if (px[(pr * physSize + pc) * 4 + 3] > ALPHA_THRESH) {
+          const cssX = pc / ratio;
+          if (cssX < left)  left  = cssX;
+          if (cssX > right) right = cssX;
+        }
+      }
+    }
+    silhouette[cssY] = right >= 0
+      ? { left: Math.floor(left), right: Math.ceil(right) }
+      : null;
+  }
+  window._knotSilhouette = silhouette;
+
+  // Animate specimen rotation (silhouette stays fixed from initial render)
+  const specMesh = scene.children.find(c => c.isMesh);
+  const sRx = (Math.random() * 2 - 1) * 0.5;
+  const sRy = (Math.random() > 0.5 ? 1 : -1) * (0.6 + Math.random() * 0.4);
+  const sSpeed = 0.00025;
+  (function animate() {
+    requestAnimationFrame(animate);
+    const t = performance.now() * sSpeed;
+    specMesh.rotation.x = sRx * t;
+    specMesh.rotation.y = sRy * t;
+    renderer.render(scene, camera);
+  }());
+}());
+</script>
+
+<script type="module">
+import { prepareWithSegments, layoutNextLine } from 'https://esm.sh/@chenglou/pretext@0.0.4';
+
+const stage   = document.getElementById('stage');
+const knot    = document.getElementById('knot');
+
+const KNOT_SIZE = 240;
+const H_PAD     = 14;
+const V_PAD     = 0;
+const LINE_H    = 26;
+const PARA_GAP  = 20;
+const MIN_SLOT  = 40;
+const FONT      = '15px "JetBrains Mono", ui-monospace, "Courier New", monospace';
+
+let knotX = 0, knotY = 0, isDragging = false;
+
+const PARAGRAPHS = [
+  `A torus knot T(p,q) is a closed curve on the surface of a torus. The integers p\u00a0and\u00a0q are coprime \u2014 gcd(p,q)\u00a0=\u00a01 \u2014 and describe how the curve winds: p\u00a0times longitudinally through the hole, q\u00a0times meridionally around the tube. The canonical form enforces q\u00a0>\u00a0p to avoid counting T(p,q) and T(q,p) as distinct knots, since they are topologically equivalent by a reflection of the torus.`,
+
+  `The winding numbers control visual density. T(2,3) is the trefoil \u2014 three arcs, three crossings, the rotational symmetry of an equilateral triangle. A T(3,5) is more elaborate: five-fold symmetric, with a denser lattice of crossings. What stays constant: at any reasonable rendering size, crossings remain individually legible and the form reads as a single continuous path.`,
+
+  `The same self-occlusion that makes the knot interesting topologically makes it useful for studying light. Where the tube passes behind itself, shadow boundaries form \u2014 sharp under hard directional light, soft under broad hemisphere fill. The geometry that produces the self-intersecting projection also makes it maximally informative for light-source characterization.`,
+];
+
+function knotIntervalForBand(knotX, knotY, bandTop, bandBottom, hPad, vPad) {
+  const rowStart = Math.floor(bandTop  - vPad - knotY);
+  const rowEnd   = Math.ceil (bandBottom + vPad - knotY);
+  const sil      = window._knotSilhouette;
+  let left = Infinity, right = -Infinity;
+  for (let row = Math.max(0, rowStart); row <= Math.min(KNOT_SIZE - 1, rowEnd); row++) {
+    const s = sil[row];
+    if (!s) continue;
+    if (s.left  < left)  left  = s.left;
+    if (s.right > right) right = s.right;
+  }
+  if (right === -Infinity) return null;
+  return { left: knotX + left - hPad, right: knotX + right + hPad };
+}
+
+let preps = null;
+
+async function init() {
+  await document.fonts.ready;
+  preps = PARAGRAPHS.map(t => prepareWithSegments(t, FONT));
+  doLayout();        // first pass — establishes stage height
+  doLayout();        // second pass — centers knot with correct height
+}
+
+function doLayout() {
+  if (!preps) return;
+  const t0     = performance.now();
+  const stageW = stage.offsetWidth;
+
+  if (!isDragging) {
+    knotX = 0;
+    knotY = Math.max(0, Math.round(stage.offsetHeight / 2 - KNOT_SIZE / 2) + LINE_H * 1);
+  }
+  knot.style.left = knotX + 'px';
+  knot.style.top  = knotY + 'px';
+
+  const lines = [];
+  let y = 0, nNarrow = 0, nFull = 0;
+
+  for (const prep of preps) {
+    let cursor = { segmentIndex: 0, graphemeIndex: 0 };
+    while (true) {
+      const blocked = knotIntervalForBand(knotX, knotY, y, y + LINE_H, H_PAD, V_PAD);
+      if (blocked === null) {
+        const line = layoutNextLine(prep, cursor, stageW);
+        if (!line) break;
+        lines.push({ x: 0, y, w: stageW, text: line.text });
+        cursor = line.end;
+        nFull++;
+      } else {
+        const leftW  = Math.max(0, Math.floor(blocked.left));
+        const rightW = Math.max(0, Math.floor(stageW - blocked.right));
+        const rightX = Math.ceil(blocked.right);
+        const leftOk  = leftW  >= MIN_SLOT;
+        const rightOk = rightW >= MIN_SLOT;
+        if (!leftOk && !rightOk) { y += LINE_H; if (y > 9000) break; continue; }
+        if (leftOk) {
+          const line = layoutNextLine(prep, cursor, leftW);
+          if (!line) break;
+          lines.push({ x: 0, y, w: leftW, text: line.text });
+          cursor = line.end; nNarrow++;
+          if (rightOk) {
+            const rLine = layoutNextLine(prep, cursor, rightW);
+            if (rLine) { lines.push({ x: rightX, y, w: rightW, text: rLine.text }); cursor = rLine.end; nNarrow++; }
+          }
+        } else {
+          const line = layoutNextLine(prep, cursor, rightW);
+          if (!line) break;
+          lines.push({ x: rightX, y, w: rightW, text: line.text });
+          cursor = line.end; nNarrow++;
+        }
+      }
+      y += LINE_H;
+    }
+    y += PARA_GAP;
+  }
+
+  const ms = (performance.now() - t0).toFixed(2);
+  stage.querySelectorAll('.ln').forEach(el => el.remove());
+  const frag = document.createDocumentFragment();
+  for (const l of lines) {
+    const span = document.createElement('span');
+    span.className = 'ln';
+    span.style.cssText = `left:${l.x}px;top:${l.y}px;width:${l.w}px`;
+    span.textContent = l.text;
+    frag.appendChild(span);
+  }
+  stage.appendChild(frag);
+  stage.style.height = Math.max(y, KNOT_SIZE + knotY) + 'px';
+}
+
+let raf, rafDrag = null, dragOffsetX = 0, dragOffsetY = 0;
+
+function clampKnot(x, y) {
+  return {
+    x: Math.max(0, Math.min(stage.offsetWidth  - KNOT_SIZE, x)),
+    y: Math.max(0, Math.min(stage.offsetHeight - KNOT_SIZE, y)),
+  };
+}
+
+function onDragStart(clientX, clientY) {
+  const rect = knot.getBoundingClientRect();
+  const cssX = clientX - rect.left;
+  const cssY = clientY - rect.top;
+  const row = Math.floor(cssY);
+  const s = window._knotSilhouette[Math.max(0, Math.min(KNOT_SIZE - 1, row))];
+  if (!s || cssX < s.left || cssX > s.right) return;
+  isDragging = true;
+  dragOffsetX = cssX;
+  dragOffsetY = cssY;
+  knot.style.cursor = 'grabbing';
+}
+
+function onDragMove(clientX, clientY) {
+  if (!isDragging || rafDrag) return;
+  rafDrag = requestAnimationFrame(() => {
+    rafDrag = null;
+    if (!isDragging) return;
+    const sr = stage.getBoundingClientRect();
+    const c = clampKnot(clientX - sr.left - dragOffsetX, clientY - sr.top - dragOffsetY);
+    knotX = c.x; knotY = c.y;
+    doLayout();
+  });
+}
+
+function onDragEnd() { isDragging = false; rafDrag = null; knot.style.cursor = 'grab'; }
+
+knot.addEventListener('mousedown', e => { e.preventDefault(); onDragStart(e.clientX, e.clientY); });
+window.addEventListener('mousemove', e => onDragMove(e.clientX, e.clientY));
+window.addEventListener('mouseup', onDragEnd);
+knot.addEventListener('touchstart', e => { e.preventDefault(); onDragStart(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+window.addEventListener('touchmove', e => { if (!isDragging) return; e.preventDefault(); onDragMove(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+window.addEventListener('touchend', onDragEnd);
+window.addEventListener('touchcancel', onDragEnd);
+window.addEventListener('resize', () => {
+  cancelAnimationFrame(raf);
+  if (rafDrag) { cancelAnimationFrame(rafDrag); rafDrag = null; }
+  isDragging = false;
+  knot.style.cursor = 'grab';
+  raf = requestAnimationFrame(doLayout);
+});
+
+init();
+</script>
+
+<script>
+// ── Infinite pan canvas ───────────────────────────────────────────────────
+(function () {
+  function hash(col, row) {
+    let h = (Math.imul(col, 2654435761) ^ Math.imul(row, 2246822519)) >>> 0;
+    h = Math.imul(h ^ (h >>> 16), 0x45d9f3b) >>> 0;
+    h = Math.imul(h ^ (h >>> 16), 0x45d9f3b) >>> 0;
+    return (h ^ (h >>> 16)) >>> 0;
+  }
+  function makeRand(seed) {
+    return () => {
+      seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = t + Math.imul(t ^ (t >>> 7), 61 | t) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  const frame = document.getElementById('pan-frame');
+  const W = frame.clientWidth;
+  const H = 520;
+
+  const canvas = document.createElement('canvas');
+  frame.appendChild(canvas);
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.setClearColor(0x000000, 1);
+  renderer.setScissorTest(true);
+  const dpr = renderer.getPixelRatio();
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.set(3, 4, 24);
+  camera.lookAt(0, 0, 0);
+
+  const geoCache = new Map();
+  function getGeo(p, q) {
+    const key = `${p},${q}`;
+    if (!geoCache.has(key)) geoCache.set(key, new THREE.TorusKnotGeometry(2.5, 0.78, 128, 32, p, q));
+    return geoCache.get(key);
+  }
+
+  const knot = new THREE.Mesh(getGeo(2, 3), new THREE.MeshPhysicalMaterial({ color: 0xffffff }));
+  scene.add(knot);
+
+  const ambLight = new THREE.AmbientLight(0xffffff, 0.3);
+  scene.add(ambLight);
+
+  const MAX_L = 4;
+  const dirLights = Array.from({ length: MAX_L }, () => { const l = new THREE.DirectionalLight(0xffffff, 0); scene.add(l); return l; });
+  const ptLights  = Array.from({ length: MAX_L }, () => { const l = new THREE.PointLight(0xffffff, 0, 60, 1.5); scene.add(l); return l; });
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0);
+  scene.add(hemi);
+
+  const P_MIN = 2, P_MAX = 5, Q_MAX = 9;
+  const LPOS = 15;
+
+  let panX = 0, panY = 0, velX = 0, velY = 0, dragging = false, lastMX = 0, lastMY = 0;
+
+  canvas.addEventListener('mousedown', e => {
+    dragging = true; lastMX = e.clientX; lastMY = e.clientY; velX = velY = 0;
+    canvas.classList.add('dragging');
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    velX = lastMX - e.clientX; velY = lastMY - e.clientY;
+    panX += velX; panY += velY;
+    lastMX = e.clientX; lastMY = e.clientY;
+  });
+  window.addEventListener('mouseup', () => { dragging = false; canvas.classList.remove('dragging'); });
+  canvas.addEventListener('touchstart', e => {
+    dragging = true; lastMX = e.touches[0].clientX; lastMY = e.touches[0].clientY; velX = velY = 0;
+  }, { passive: true });
+  canvas.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    velX = lastMX - e.touches[0].clientX; velY = lastMY - e.touches[0].clientY;
+    panX += velX; panY += velY;
+    lastMX = e.touches[0].clientX; lastMY = e.touches[0].clientY;
+  }, { passive: true });
+  window.addEventListener('touchend', () => { dragging = false; });
+
+  let t = 0;
+  (function animate() {
+    requestAnimationFrame(animate);
+    t += 0.004;
+
+    if (!dragging) { panX += velX; panY += velY; velX *= 0.92; velY *= 0.92; }
+
+    const cellW = W / 4;
+    const cellH = cellW;
+
+    renderer.setScissorTest(false);
+    renderer.clear();
+    renderer.setScissorTest(true);
+
+    const colStart = Math.floor(panX / cellW);
+    const colEnd   = Math.ceil((panX + W) / cellW);
+    const rowStart = Math.floor(panY / cellH);
+    const rowEnd   = Math.ceil((panY + H) / cellH);
+
+    for (let row = rowStart; row < rowEnd; row++) {
+      for (let col = colStart; col < colEnd; col++) {
+        const sx = col * cellW - panX;
+        const sy = row * cellH - panY;
+
+        const scx  = Math.max(0, sx),          scx2  = Math.min(W, sx + cellW);
+        const scy  = Math.max(0, sy),           scy2  = Math.min(H, sy + cellH);
+        if (scx2 <= scx || scy2 <= scy) continue;
+
+        renderer.setViewport(sx * dpr, (H - sy - cellH) * dpr, cellW * dpr, cellH * dpr);
+        renderer.setScissor(scx * dpr, (H - scy2) * dpr, (scx2 - scx) * dpr, (scy2 - scy) * dpr);
+
+        const rand = makeRand(hash(col, row));
+        const v = {
+          objHue: rand(), objSat: rand(), objL: rand(),
+          rough: rand(), metal: rand(), cc: rand(), ccR: rand(),
+          geoP: rand(), geoQ: rand(),
+          lType: rand(), nL: rand(),
+          rY: rand(), rSign: rand(), rX: rand(), rAmp: rand(), rPhase: rand(),
+          ambHue: rand(), ambSat: rand(), ambL: rand(), ambInt: rand(),
+          skyH: rand(), skyS: rand(), skyL: rand(),
+          gndH: rand(), gndS: rand(), gndL: rand(), hemiInt: rand(),
+          l: Array.from({ length: MAX_L }, () => ({ h: rand(), s: rand(), l: rand(), i: rand(), px: rand(), py: rand(), pz: rand() })),
+        };
+
+        const p = P_MIN + Math.floor(v.geoP * (P_MAX - P_MIN + 1));
+        const q = (p + 1) + Math.floor(v.geoQ * (Q_MAX - p));
+        knot.geometry = getGeo(p, q);
+
+        const mat = knot.material;
+        mat.color.setHSL(v.objHue, 0.4 + v.objSat * 0.3, 0.38 + v.objL * 0.18);
+        mat.roughness = 0.2 + v.rough * 0.4;
+        mat.metalness = 0.05 + v.metal * 0.35;
+        mat.clearcoat = 0.4 + v.cc * 0.6;
+        mat.clearcoatRoughness = v.ccR * 0.3;
+
+        ambLight.color.setHSL(v.ambHue, v.ambSat * 0.3, v.ambL * 0.5);
+        ambLight.intensity = 0.25 + v.ambInt * 0.35;
+
+        knot.rotation.y = t * v.rY * (v.rSign < 0.5 ? 1 : -1);
+        knot.rotation.x = Math.sin(t * v.rX + v.rPhase * Math.PI * 2) * v.rAmp * 0.6;
+
+        const lType = Math.floor(v.lType * 3);
+        const nLights = Math.floor(v.nL * MAX_L) + 1;
+        for (let i = 0; i < MAX_L; i++) { dirLights[i].intensity = 0; ptLights[i].intensity = 0; }
+        hemi.intensity = 0;
+        if (lType === 2) {
+          hemi.color.setHSL(v.skyH, v.skyS, v.skyL);
+          hemi.groundColor.setHSL(v.gndH, v.gndS, v.gndL);
+          hemi.intensity = v.hemiInt * 0.6;
+        }
+        const pool = lType === 1 ? ptLights : dirLights;
+        for (let i = 0; i < nLights; i++) {
+          const li = v.l[i];
+          pool[i].color.setHSL(li.h, li.s, li.l);
+          pool[i].intensity = 0.8 + li.i * 3.0;
+          pool[i].position.set((li.px - 0.5) * LPOS * 2, (li.py - 0.5) * LPOS * 2, li.pz * LPOS);
+        }
+
+        camera.aspect = 1;
+        camera.updateProjectionMatrix();
+        renderer.render(scene, camera);
+      }
+    }
+  }());
+}());
+</script>
+</body>
+</html>

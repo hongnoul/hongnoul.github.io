@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
   <script src="/favicon.js"></script>
   <title>Justin Hong</title>
   <meta name="description" content="Justin Hong — Founding Engineer at TrustAI. Writing on UI/UX and software.">
@@ -20,22 +20,383 @@
 </head>
 <body>
   <div id="bg-text">
-    <p><strong>Justin Hong</strong></p>
-    <p>Founding Engineer @ <a href="https://trytrust.ai" target="_blank" rel="noopener" id="trustai-link">TrustAI</a></p>
-    <p>Boston, MA</p>
+    <div id="bg-fill"></div>
+    <div class="home-block">
+      <div class="home-card">
+        <div id="truu" style="width:128px;height:80px;background:url('/truu.png') 0 0/1024px 80px;image-rendering:pixelated;pointer-events:auto;flex-shrink:0;"></div>
+        <div class="home-lines">
+          <p class="home-name"><strong>Justin Hong</strong><span class="home-tag"> UI/UX</span></p>
+          <p class="home-role">Founding Engineer &middot; <a href="https://trytrust.ai" id="trustai-link">TrustAI</a></p>
+          <p class="home-loc">Boston, MA</p>
+        </div>
+      </div>
 
-    <div id="social-links">
-      <a href="/resume/">Resume</a>
-      <span class="social-sep">&middot;</span>
-      <a href="/blog/">Writing</a>
-      <span class="social-sep">&middot;</span>
-      <a href="https://linkedin.com/in/hongnoul" target="_blank" rel="noopener">LinkedIn</a>
-      <span class="social-sep">&middot;</span>
-      <a href="https://github.com/hongnoul" target="_blank" rel="noopener">GitHub</a>
+
+<div class="term-section">
+        <div class="term-rule"></div>
+        <div class="term-row">
+          <span class="term-prompt">❯</span>
+          <div class="term-input-wrap">
+            <input class="term-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus>
+            <span class="term-cursor"></span>
+          </div>
+        </div>
+        <div class="term-rule"></div>
+        <div class="term-hint" id="term-hint">? for shortcuts</div>
+      </div>
+
+      <!-- Mobile navigation — giant pixel buttons, only shown on mobile -->
+      <div class="mobile-nav" id="mobile-nav">
+        <a href="https://github.com/hongnoul" target="_blank" rel="noopener" class="mobile-btn">/github</a>
+        <a href="https://linkedin.com/in/hongnoul" target="_blank" rel="noopener" class="mobile-btn">/linkedin</a>
+        <a href="/resume/" target="_blank" rel="noopener" class="mobile-btn">/resume</a>
+        <a href="#" class="mobile-btn" id="mobile-work-btn">/work</a>
+      </div>
+
+      <!-- Full-width sprite shown below buttons on mobile -->
+      <div id="truu-mobile" style="background:url('/truu.png') 0 0/800% auto;image-rendering:pixelated;"></div>
     </div>
   </div>
-  <canvas id="c"></canvas>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="/scene.js"></script>
+
+  <script>
+    const truu = document.getElementById('truu');
+    const truuMobile = document.getElementById('truu-mobile');
+    const homeBlock = document.querySelector('.home-block');
+    const FRAME_PX = 128;
+    function setTruuFrame(px) {
+      truu.style.backgroundPositionX = px;
+    }
+    let hovered = false;
+    let clicked = false;
+    let clickTimer = null;
+    let clickCount = 0;
+    let clickCountTimer = null;
+
+    truu.addEventListener('mouseenter', () => {
+      hovered = true;
+      if (!clicked) setTruuFrame(-(5 * FRAME_PX) + 'px');
+    });
+    truu.addEventListener('mouseleave', () => { hovered = false; });
+    truu.addEventListener('click', () => {
+      clickCount++;
+      clearTimeout(clickCountTimer);
+      clickCountTimer = setTimeout(() => { clickCount = 0; }, 600);
+
+      clicked = true;
+      const frame = clickCount >= 3 ? 7 : 0;
+      const duration = clickCount >= 3 ? 500 : 200;
+      setTruuFrame(-(frame * FRAME_PX) + 'px');
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => {
+        clicked = false;
+        setTruuFrame(hovered ? -(5 * FRAME_PX) + 'px' : '0px');
+      }, duration);
+    });
+
+    // Invisible background fill — makes the whole page drag-selectable
+    const bgFill = document.getElementById('bg-fill');
+    const charRuler = document.createElement('span');
+    charRuler.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font-family:"JetBrains Mono",ui-monospace,"Courier New",monospace;font-size:23px;';
+    charRuler.textContent = ' ';
+    document.body.appendChild(charRuler);
+
+    function fillBg() {
+      const charW = charRuler.offsetWidth || 14;
+      const cols = Math.ceil(window.innerWidth  / charW) + 1;
+      const rows = Math.ceil(window.innerHeight / 23)    + 1;
+      const line = ' '.repeat(cols);
+      bgFill.textContent = (line + '\n').repeat(rows);
+    }
+    fillBg();
+    window.addEventListener('resize', fillBg);
+
+    // Block cursor — tracks caret position by measuring typed text width
+    const termInput  = document.querySelector('.term-input');
+    const termCursor = document.querySelector('.term-cursor');
+    const ruler = document.createElement('span');
+    ruler.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:inherit;font-size:23px;font-family:"JetBrains Mono",ui-monospace,"Courier New",monospace;';
+    document.body.appendChild(ruler);
+
+    function syncCursor() {
+      const pos = termInput.selectionStart ?? termInput.value.length;
+      ruler.textContent = termInput.value.slice(0, pos);
+      termCursor.style.transform = 'translateX(' + ruler.offsetWidth + 'px)';
+    }
+    const termHint = document.getElementById('term-hint');
+    const COMMANDS = [
+      { label: '/github',   href: 'https://github.com/hongnoul',                       target: '_blank'  },
+      { label: '/linkedin', href: 'https://linkedin.com/in/hongnoul',                  target: '_blank'  },
+      { label: '/resume',   href: '/resume/',                                          target: '_blank'  },
+      { label: '/work',     href: '#',                                                 target: '_self'   },
+    ];
+
+    function renderCommands(list) {
+      return list.map((c, i) =>
+        `<span${i === 0 ? ' class="term-cmd-top"' : ''}>${c.label}</span>`
+      ).join('');
+    }
+
+    let shortcutsOpen = false;
+    let writingOpen = false;
+    let ctrlCWarning = false;
+    let ctrlCWarningTimer = null;
+    let errCount = 0;
+    let errCountTimer = null;
+
+    function showCtrlCWarning() {
+      ctrlCWarning = true;
+      termHint.textContent = 'Press Ctrl-C again to aggravate';
+      termHint.classList.remove('term-hint--open');
+      clearTimeout(ctrlCWarningTimer);
+      ctrlCWarningTimer = setTimeout(() => {
+        ctrlCWarning = false;
+        syncHint();
+      }, 1000);
+    }
+
+    const POSTS = [
+      { title: 'Sprites',                                              href: '/blog/sprites.html',           date: 'Apr 2026', cat: 'UI/UX'       },
+      { title: 'Torus', href: '/blog/torus.html', date: 'Mar 2025', cat: 'UI/UX'   },
+    ];
+
+    function showWritingTable() {
+      let html = '<span class="term-writing-dot">●</span><table class="term-writing-table">';
+      POSTS.forEach(p => {
+        html += '<tr><td><a href="' + p.href + '" class="term-table-link">' + p.title + '</a></td>'
+              + '<td class="term-table-meta">' + p.date + '</td>'
+              + '<td class="term-table-meta">' + p.cat  + '</td></tr>';
+      });
+      html += '</table>';
+      termHint.innerHTML = html;
+      termHint.querySelectorAll('.term-table-link').forEach(a => {
+        a.addEventListener('click', e => {
+          e.preventDefault();
+          if (e.ctrlKey || e.metaKey) window.open(a.href, '_blank', 'noopener');
+        });
+      });
+      termHint.classList.add('term-hint--table');
+      termHint.classList.remove('term-hint--open');
+      homeBlock.classList.add('writing-mode');
+      homeBlock.addEventListener('transitionend', function onWritingEnd(e) {
+        if (e.propertyName !== 'transform') return;
+        homeBlock.removeEventListener('transitionend', onWritingEnd);
+        if (!writingOpen) return;
+        clicked = true;
+        clearTimeout(clickTimer);
+        [2, 3, 2, 3, 5, 1].forEach((frame, i) => {
+          setTimeout(() => {
+            setTruuFrame(-(frame * FRAME_PX) + 'px');
+          }, i * 300);
+        });
+        clickTimer = setTimeout(() => {
+          clicked = false;
+          setTruuFrame(hovered ? -(5 * FRAME_PX) + 'px' : '0px');
+        }, 1800);
+      });
+    }
+
+    function syncHint() {
+      if (writingOpen || ctrlCWarning) return;
+      const q = termInput.value.trim().toLowerCase();
+      termHint.classList.remove('term-hint--table');
+      homeBlock.classList.remove('writing-mode');
+      if (shortcutsOpen) {
+        termHint.innerHTML = renderCommands(COMMANDS);
+        termHint.classList.add('term-hint--open');
+      } else if (q) {
+        const matches = COMMANDS.filter(c => c.label.includes(q));
+        if (matches.length) {
+          termHint.innerHTML = renderCommands(matches);
+          termHint.classList.add('term-hint--open');
+        } else {
+          termHint.textContent = '';
+          termHint.classList.remove('term-hint--open');
+        }
+      } else {
+        termHint.textContent = '? for shortcuts';
+        termHint.classList.remove('term-hint--open');
+      }
+    }
+
+    termInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const val = termInput.value.trim();
+        if (val === '/work') {
+          writingOpen = true;
+          termInput.value = '';
+          syncCursor();
+          showWritingTable();
+          return;
+        }
+        const match = COMMANDS.find(c => c.label === val);
+        if (match) {
+          match.target === '_blank'
+            ? window.open(match.href, '_blank', 'noopener')
+            : window.location.href = match.href;
+        } else if (val) {
+          if (val.startsWith('/')) {
+            const parts = val.slice(1).split(' ');
+            const cmd = parts[0];
+            const arg = parts.slice(1).join(' ');
+            if (arg) {
+              const prefix = '● Args from unknown shortcut: ';
+              let truncArg = arg;
+              ruler.textContent = prefix + truncArg;
+              while (ruler.offsetWidth > termInput.offsetWidth && truncArg.length > 0) {
+                truncArg = truncArg.slice(0, -1);
+                ruler.textContent = prefix + truncArg + '…';
+              }
+              const display = truncArg.length < arg.length ? prefix + truncArg + '…' : prefix + arg;
+              termHint.innerHTML = '<span class="term-arg-output">' + display + '</span>';
+            } else {
+              termHint.innerHTML = '<span class="term-err-icon">└</span><span class="term-unknown-msg"> Unknown shortcut: ' + cmd + '</span>';
+            }
+          } else {
+            termHint.innerHTML = '<span class="term-err-icon">└</span><span class="term-err-msg"> API error: Rate limit reached</span>';
+          }
+          termHint.classList.remove('term-hint--open');
+          errCount++;
+          clearTimeout(errCountTimer);
+          errCountTimer = setTimeout(() => { errCount = 0; }, 1000);
+          const errFrame = errCount >= 3 ? 7 : 6;
+          setTruuFrame(-(errFrame * FRAME_PX) + 'px');
+        }
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        const q = termInput.value.trim().toLowerCase();
+        const list = shortcutsOpen ? COMMANDS : (q ? COMMANDS.filter(c => c.label.includes(q)) : []);
+        if (list.length) {
+          termInput.value = list[0].label;
+          shortcutsOpen = false;
+          syncHint();
+          syncCursor();
+        }
+      } else if (e.key === '?') {
+        e.preventDefault();
+        shortcutsOpen = !shortcutsOpen;
+        syncHint();
+      } else if (e.key === 'Escape') {
+        shortcutsOpen = false;
+        writingOpen = false;
+        ctrlCWarning = false;
+        clearTimeout(ctrlCWarningTimer);
+        termInput.value = '';
+        syncHint();
+        syncCursor();
+      } else if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        if (termInput.value) {
+          shortcutsOpen = false;
+          writingOpen = false;
+          ctrlCWarning = false;
+          clearTimeout(ctrlCWarningTimer);
+          termInput.value = '';
+          syncHint();
+          syncCursor();
+        } else if (ctrlCWarning) {
+          setTruuFrame(-(7 * FRAME_PX) + 'px');
+          clicked = true;
+          clearTimeout(clickTimer);
+          clickTimer = setTimeout(() => {
+            clicked = false;
+            setTruuFrame(hovered ? -(5 * FRAME_PX) + 'px' : '0px');
+          }, 500);
+        } else {
+          showCtrlCWarning();
+        }
+      }
+    });
+    termInput.addEventListener('input', () => {
+      ruler.textContent = termInput.value;
+      while (termInput.value.length > 0 && ruler.offsetWidth > termInput.offsetWidth) {
+        termInput.value = termInput.value.slice(0, -1);
+        ruler.textContent = termInput.value;
+      }
+      shortcutsOpen = false; writingOpen = false; ctrlCWarning = false; clearTimeout(ctrlCWarningTimer); syncHint(); syncCursor();
+    });
+    termInput.addEventListener('keyup',   syncCursor);
+    termInput.addEventListener('click',   syncCursor);
+    termInput.addEventListener('select',  syncCursor);
+    syncCursor();
+    syncHint();
+
+    // TrustAI link — ctrl+click only
+    // /work shortcut link — show table instead of navigating
+    termHint.addEventListener('click', e => {
+      const a = e.target.closest('a');
+      if (a && a.textContent.trim() === '/work') {
+        e.preventDefault();
+        writingOpen = true;
+        termInput.value = '';
+        syncCursor();
+        showWritingTable();
+      }
+    });
+
+    document.getElementById('trustai-link').addEventListener('click', e => {
+      e.preventDefault();
+      const isMobile = window.matchMedia('(max-width: 1024px)').matches;
+      if (e.ctrlKey || e.metaKey || isMobile) window.open('https://trytrust.ai', '_blank', 'noopener');
+    });
+
+    // Keep input always active
+    let mouseIsDown = false;
+    document.addEventListener('mousedown', () => { mouseIsDown = true;  });
+    document.addEventListener('mouseup',   () => { mouseIsDown = false; });
+
+    // Suppress refocus during mousedown so drag selection can form
+    termInput.addEventListener('blur', () => {
+      if (!mouseIsDown) setTimeout(() => termInput.focus(), 0);
+    });
+    // Plain click (no drag) — browser fires click only if mouse didn't move
+    document.addEventListener('click', () => termInput.focus());
+    // Typing after a drag selection refocuses
+    document.addEventListener('keydown', () => {
+      if (document.activeElement !== termInput) termInput.focus();
+    });
+    window.addEventListener('focus', () => termInput.focus());
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) termInput.focus();
+    });
+
+    // Mobile /work button
+    const mobileWorkBtn = document.getElementById('mobile-work-btn');
+    if (mobileWorkBtn) {
+      mobileWorkBtn.addEventListener('click', e => {
+        e.preventDefault();
+        if (!window.matchMedia('(max-width: 1024px)').matches) {
+          writingOpen = true;
+          showWritingTable();
+          return;
+        }
+        // Mobile: replace /work with article name buttons
+        const nav = document.getElementById('mobile-nav');
+        POSTS.forEach(p => {
+          const a = document.createElement('a');
+          a.className = 'mobile-btn';
+          a.textContent = p.title;
+          a.href = p.href;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          nav.insertBefore(a, mobileWorkBtn);
+        });
+        nav.removeChild(mobileWorkBtn);
+      });
+    }
+
+    // 1=NE(right-up)  2=SE(right-down)  3=SW(left-down)  4=NW(left-up)
+    document.addEventListener('mousemove', e => {
+      if (hovered || clicked) return;
+      const rect = truu.getBoundingClientRect();
+      const dx = e.clientX - (rect.left + rect.width  / 2);
+      const dy = e.clientY - (rect.top  + rect.height / 2);
+      let frame;
+      if      (dx >= 0 && dy <= 0) frame = 1; // NE
+      else if (dx >= 0 && dy >  0) frame = 2; // SE
+      else if (dx <  0 && dy >  0) frame = 3; // SW
+      else                         frame = 4; // NW
+      setTruuFrame(-(frame * FRAME_PX) + 'px');
+    });
+  </script>
 </body>
 </html>
