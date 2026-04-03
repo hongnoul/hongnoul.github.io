@@ -26,6 +26,10 @@ const P_MIN = 2, P_MAX = 5;
 const Q_MAX = 9;
 const geoCache = new Map();
 
+// Pages can set window.SCENE_CONFIG before loading this script to opt into
+// alternate rendering modes without changing the default behaviour.
+const SCENE_CFG = window.SCENE_CONFIG || {};
+
 function getGeometry(p, q) {
   const key = `${p},${q}`;
   if (!geoCache.has(key)) {
@@ -198,7 +202,9 @@ let t = 0;
 
       // Ambient
       ambientLight.color.setHSL(v.ambHue, v.ambSat, v.ambL);
-      ambientLight.intensity = v.ambInt * AMB_INT_MAX;
+      ambientLight.intensity = SCENE_CFG.vividColors
+        ? 0.35 + v.ambInt * AMB_INT_MAX
+        : v.ambInt * AMB_INT_MAX;
 
       // Geometry: p ∈ [P_MIN, P_MAX], q ∈ [p+1, Q_MAX]
       const p = P_MIN + Math.floor(v.geoP * (P_MAX - P_MIN + 1));
@@ -207,21 +213,36 @@ let t = 0;
 
       // Material
       const mat = knot.material;
-      mat.color.setHSL(v.objHue, v.objSat, v.objL);
-      mat.roughness          = v.roughness;
-      mat.metalness          = v.metalness;
-      mat.emissive.setHSL(v.emHue, v.emSat, v.emL);
-      mat.emissiveIntensity  = v.emInt * EM_INT_MAX;
-      mat.clearcoat          = v.clearcoat;
-      mat.clearcoatRoughness = v.ccRough;
+      if (SCENE_CFG.vividColors) {
+        mat.color.setHSL(v.objHue, 0.72 + v.objSat * 0.28, 0.46 + v.objL * 0.18);
+        mat.roughness          = v.roughness * 0.4;
+        mat.metalness          = 0.05 + v.metalness * 0.35;
+        mat.emissive.setHSL(v.emHue, v.emSat, v.emL);
+        mat.emissiveIntensity  = v.emInt * 0.06;
+        mat.clearcoat          = 0.4 + v.clearcoat * 0.6;
+        mat.clearcoatRoughness = v.ccRough * 0.3;
+      } else {
+        mat.color.setHSL(v.objHue, v.objSat, v.objL);
+        mat.roughness          = v.roughness;
+        mat.metalness          = v.metalness;
+        mat.emissive.setHSL(v.emHue, v.emSat, v.emL);
+        mat.emissiveIntensity  = v.emInt * EM_INT_MAX;
+        mat.clearcoat          = v.clearcoat;
+        mat.clearcoatRoughness = v.ccRough;
+      }
 
       // Rotation
-      const rotSpeedY = v.rotY * ROT_SPEED_MAX * (v.rotSign < 0.5 ? 1 : -1);
-      const rotSpeedX = v.rotX * ROT_SPEED_MAX;
-      const rotAmpX   = v.rotAmp * ROT_AMP_MAX;
-      const rotPhaseX = v.rotPhase * Math.PI * 2;
-      knot.rotation.y = t * rotSpeedY;
-      knot.rotation.x = Math.sin(t * rotSpeedX + rotPhaseX) * rotAmpX;
+      if (SCENE_CFG.staticPoses) {
+        knot.rotation.y = v.rotPhase * Math.PI * 2;
+        knot.rotation.x = (v.rotAmp - 0.5) * 1.2;
+      } else {
+        const rotSpeedY = v.rotY * ROT_SPEED_MAX * (v.rotSign < 0.5 ? 1 : -1);
+        const rotSpeedX = v.rotX * ROT_SPEED_MAX;
+        const rotAmpX   = v.rotAmp * ROT_AMP_MAX;
+        const rotPhaseX = v.rotPhase * Math.PI * 2;
+        knot.rotation.y = t * rotSpeedY;
+        knot.rotation.x = Math.sin(t * rotSpeedX + rotPhaseX) * rotAmpX;
+      }
 
       // Lights
       const lightType = Math.floor(v.lightType * 3);
@@ -243,7 +264,7 @@ let t = 0;
       for (let i = 0; i < numLights; i++) {
         const li = v.l[i];
         pool[i].color.setHSL(li.hue, li.sat, li.l);
-        pool[i].intensity = li.int * LIGHT_INT_MAX;
+        pool[i].intensity = SCENE_CFG.vividColors ? 1.2 + li.int * LIGHT_INT_MAX : li.int * LIGHT_INT_MAX;
         pool[i].position.set(
           (li.px - 0.5) * LIGHT_POS_HALF * 2,
           (li.py - 0.5) * LIGHT_POS_HALF * 2,

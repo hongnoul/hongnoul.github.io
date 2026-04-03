@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(rsync -av --exclude='.git' --exclude='vercel.json' C:/hongnoul/jhong/ hongnoul.github.io/)",
+      "Bash(cp -r C:/hongnoul/jhong/. /tmp/hongnoul.github.io/)",
+      "Bash(rm -f /tmp/hongnoul.github.io/vercel.json)",
+      "Bash(gh repo:*)",
+      "Bash(winget install:*)",
+      "Bash(export PATH=\"$PATH:/c/Program Files/GitHub CLI\")",
+      "Bash(gh --version)",
+      "Bash(cmd.exe /c \"where gh\")",
+      "Bash(cmd.exe /c \"gh --version\")",
+      "Bash(cmd.exe /c \"where gh & gh --version\" 2>&1)",
+      "Bash(powershell.exe -Command \"Get-Command gh -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source; \\(Get-Item 'C:\\\\Program Files\\\\GitHub CLI\\\\gh.exe' -ErrorAction SilentlyContinue\\).FullName\")",
+      "Bash(powershell.exe -Command \"Get-ChildItem 'C:\\\\Program Files\\\\GitHub CLI' -ErrorAction SilentlyContinue\")",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:somnai-dreams.github.io)",
+      "Bash(bun install:*)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(identify C:/hongnoul/jhong/truu.png)",
+      "Bash(python3 -c \"from PIL import Image; img=Image.open\\('C:/hongnoul/jhong/clawd.png'\\); print\\(img.size\\)\")",
+      "Bash(python -c \"from PIL import Image; img=Image.open\\('C:/hongnoul/jhong/clawd.png'\\); print\\(img.size\\)\")",
+      "Bash(node:*)",
+      "Bash(python3:*)",
+      "Bash(mkdir -p C:/hongnoul/hongnoul.github.io/work)",
+      "Bash(cp C:/hongnoul/hongnoul.github.io/blog/torus.html C:/hongnoul/hongnoul.github.io/work/torus.html)",
+      "Bash(cp C:/hongnoul/hongnoul.github.io/blog/sprites.html C:/hongnoul/hongnoul.github.io/work/sprites.html)",
+      "Bash(cp C:/hongnoul/hongnoul.github.io/blog/lighting-iteration.html C:/hongnoul/hongnoul.github.io/work/lighting-iteration.html)",
+      "Bash(rm C:/hongnoul/hongnoul.github.io/blog/torus.html C:/hongnoul/hongnoul.github.io/blog/sprites.html C:/hongnoul/hongnoul.github.io/blog/lighting-iteration.html)",
+      "Bash(mv C:/hongnoul/hongnoul.github.io/blog/gateway-arch C:/hongnoul/hongnoul.github.io/work/gateway-arch)",
+      "Bash(rmdir C:/hongnoul/hongnoul.github.io/blog)",
+      "Bash(grep:*)",
+      "Bash(find:*)"
+    ]
+  }
+}

@@ -1,5 +1,8 @@
 {
   "scripts": {
     "dev": "bunx vite"
+  },
+  "dependencies": {
+    "@chenglou/pretext": "^0.0.4"
   }
 }

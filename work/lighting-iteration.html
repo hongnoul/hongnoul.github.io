@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="/style.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -16,19 +15,169 @@
   <title>A Randomized Illumination Grid for Material Exploration — Justin Hong</title>
   <meta name="description" content="An infinite pannable grid of seeded-random lighting and material configurations for developing perceptual intuition about surface quality.">
   <meta name="author" content="Justin Hong">
-  <link rel="canonical" href="https://hongnoul.github.io/blog/lighting-iteration.html">
+  <link rel="canonical" href="https://hongnoul.github.io/work/lighting-iteration.html">
   <meta property="og:title" content="A Randomized Illumination Grid for Material Exploration — Justin Hong">
   <meta property="og:description" content="An infinite pannable grid of seeded-random lighting and material configurations for developing perceptual intuition about surface quality.">
-  <meta property="og:url" content="https://hongnoul.github.io/blog/lighting-iteration.html">
+  <meta property="og:url" content="https://hongnoul.github.io/work/lighting-iteration.html">
   <meta property="og:type" content="article">
   <meta name="twitter:card" content="summary">
   <meta name="twitter:title" content="A Randomized Illumination Grid for Material Exploration — Justin Hong">
   <meta name="twitter:description" content="An infinite pannable grid of seeded-random lighting and material configurations for developing perceptual intuition about surface quality.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      background: #000;
+      font-family: 'Inter', sans-serif;
+    }
+
+    canvas#c {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .post-page {
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 8px 40px rgba(0,0,0,0.08);
+      border-radius: 2px;
+      max-width: 816px;
+      margin: 48px auto;
+      padding: 80px 96px 100px;
+      min-height: calc(100vh - 96px);
+    }
+
+    .post-body h1 {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+      margin: 0 0 16px;
+      color: #111;
+    }
+
+    .post-body .authors {
+      font-size: 13px;
+      text-align: center;
+      color: #333;
+      margin: 0 0 4px;
+    }
+
+    .post-body .affiliation {
+      font-size: 11px;
+      text-align: center;
+      color: #111;
+      margin: 0 0 40px;
+    }
+
+    .post-body .abstract {
+      margin: 32px 0 40px;
+      padding: 0 16px;
+      border-left: 3px solid #eee;
+    }
+
+    .post-body .abstract-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #111;
+      margin: 0 0 6px;
+    }
+
+    .post-body .abstract p {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #444;
+      margin: 0;
+      text-align: left;
+    }
+
+    .post-body p {
+      font-size: 15px;
+      line-height: 1.8;
+      color: #222;
+      margin: 0 0 18px;
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    .post-body { counter-reset: section; }
+
+    .post-body h2 {
+      counter-increment: section;
+      font-size: 13px;
+      font-weight: 700;
+      color: #111;
+      letter-spacing: 0;
+      margin: 40px 0 14px;
+    }
+
+    .post-body h2::before { content: counter(section) ". "; }
+
+    .post-body h2.no-counter { counter-increment: none; }
+    .post-body h2.no-counter::before { content: none; }
+
+    .post-body .katex-display { margin: 24px 0; overflow-x: auto; }
+
+    .post-body .eq-row {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+    }
+    .post-body .eq-row > div {
+      flex: 1;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    .post-body .eq-row .katex-display { margin: 0; overflow: visible; }
+    .post-body .eq-num {
+      font-size: 13px;
+      color: #888;
+      padding-left: 16px;
+      white-space: nowrap;
+    }
+
+    .post-body sup {
+      font-size: 10px;
+      font-weight: 600;
+      color: #888;
+    }
+
+    .post-body hr {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 48px 0 36px;
+    }
+
+    .references {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.7;
+      padding-left: 20px;
+    }
+    .references li { margin-bottom: 8px; }
+
+    @media (max-width: 860px) {
+      .post-page {
+        padding: 48px 28px 72px;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+  </style>
 </head>
 <body>
   <canvas id="c"></canvas>
 
-<div class="post-page">
+  <div class="post-page">
     <div class="post-body">
 
       <h1>A Randomized Illumination Grid for Material Exploration</h1>
@@ -98,7 +247,7 @@
     </div>
   </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="/scene.js"></script>
 </body>
 </html>
