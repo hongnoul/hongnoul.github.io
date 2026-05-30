@@ -1,0 +1,116 @@
+{
+  "name": "Justin Hong",
+  "contact": [
+    { "text": "namyang@mit.edu", "href": "mailto:namyang@mit.edu" },
+    { "text": "(617) 256-8414" },
+    { "text": "linkedin.com/in/hongnoul", "href": "https://linkedin.com/in/hongnoul" },
+    { "text": "U.S. Citizen" }
+  ],
+  "sections": [
+    {
+      "title": "Education",
+      "entries": [
+        {
+          "org": "Massachusetts Institute of Technology",
+          "loc": "Cambridge, MA",
+          "role": "BS in Computer Science and Engineering (GPA: 4.3)",
+          "date": "Expected May 2027",
+          "bullets": [
+            "*Relevant Coursework:* Data Structures & Algorithms, Software Construction, Web Design",
+            "*Activities:* MIT Undergraduate Research Opportunities Program, Walker Memorial Basement Radio 88.1FM, MIT Live"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Work & Leadership Experience",
+      "entries": [
+        {
+          "org": "TrustAI Labs (YCombinator S26)",
+          "loc": "San Francisco, CA",
+          "role": "Founding Engineer & Designer",
+          "date": "November 2025 -- Present",
+          "bullets": [
+            "Own end-to-end frontend of the product, prototyping features and delivering polished, production-ready interfaces",
+            "Built and maintain the full marketing site and interactive product demos used in investor and customer-facing presentations",
+            "Defined visual identity and design system including logo; responsible for all brand, motion, and interaction decisions"
+          ]
+        },
+        {
+          "org": "ROK Army",
+          "loc": "Yeoncheon, South Korea",
+          "role": "Squad Leader & Personnel Administration Specialist",
+          "date": "July 2024 -- Jan 2026",
+          "bullets": [
+            "Created advanced Excel macros to automate reports, minimizing errors in high-stakes administrative workflows",
+            "Served as squad leader in a top-ranked infantry platoon (1st of 48) in CQB room-clearing competition"
+          ]
+        },
+        {
+          "org": "MIT Political History Department",
+          "loc": "Cambridge, MA",
+          "role": "Frontend Developer",
+          "date": "December 2023 -- February 2024",
+          "bullets": [
+            "Developed a server-side rendered digital exhibition platform with Next.js, improving accessibility and SEO",
+            "Collaborated with MIT History faculty to launch a digital archive of activist murals, increased visibility to 1,000+ users"
+          ]
+        },
+        {
+          "org": "EAN Design Consulting Group",
+          "loc": "Seoul, South Korea",
+          "role": "Architectural Design Intern",
+          "date": "August 2021",
+          "bullets": [
+            "Produced high-fidelity architectural renderings for a commercial flagship project, enhancing client engagement and improving proposal clarity using Enscape and iterative design reviews",
+            "Conducted site research and prepared financial and ROI reports, integrating statistical analysis to support data-informed client planning and long-term investment decisions"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Technical Projects",
+      "entries": [
+        {
+          "org": "Boston Tech Week Hackathon, FreightDesk",
+          "date": "May 2026",
+          "bullets": [
+            "Architected repo partitions (web / worker / db) and built full Next.js storefront with voice-first mic launcher (Web Speech API) and customer complaint inbox in a 2-hour build sprint",
+            "Designed plan-approve-execute UX for an autonomous freight-exception agent on Cloudflare Workers (Subconscious reasoning, Baseten vision/ASR); live SSE trace surfaces draft carrier, customer, and AR messages"
+          ]
+        },
+        {
+          "org": "Cursor Boston Sports Hack, FieldBack",
+          "date": "May 2026",
+          "bullets": [
+            "Owned full Next.js 16 frontend for an ACL-injury triage app: coach dashboard with three-sport rosters of 60+ athletes, body-silhouette injury visualization, structured check-in flow, and role-based login routing",
+            "Integrated FastAPI backend running MediaPipe pose extraction and RAG-grounded rehab retrieval to turn short video + text intake into severity and urgency bands"
+          ]
+        },
+        {
+          "org": "Amazon Nova AI Hackathon, Cadabra",
+          "date": "February -- March 2026",
+          "bullets": [
+            "Built a Chrome extension personalizing Amazon search rankings in real time using AI-inferred behavioral profiles",
+            "Engineered full-stack: TypeScript Lambda on AWS API Gateway, DynamoDB profile persistence, DOM reranking with AI-generated explanation badges"
+          ]
+        },
+        {
+          "org": "MIT Bitcoin Hackathon",
+          "date": "February 2024",
+          "bullets": [
+            "Developed a tokenized property deed system and live marketplace prototype, leading a team of 5+ to explore trust, ownership, and verification in digital marketplaces",
+            "Built frontend with real-time transaction UI; presented to panel of judges at MIT Bitcoin Expo"
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Honors & Awards",
+      "list": [
+        "Educational Broadcasting System (EBS) Janghak Quiz Competition Winner (2023)",
+        "Cheongshim International Academy Valedictorian (2023)"
+      ]
+    }
+  ]
+}
