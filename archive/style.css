@@ -199,6 +199,8 @@ body {
   text-underline-offset: 3px;
 }
 
+.term-table-role { color: #c8c8c8; }
+
 .term-table-meta { color: #f0f0f0; white-space: nowrap; }
 
 .term-row {

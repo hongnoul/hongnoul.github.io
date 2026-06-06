@@ -1,8 +1,8 @@
 {
   "scripts": {
     "dev": "bunx vite",
-    "build:resume": "bun scripts/build-resume.mjs",
-    "build:og": "bun scripts/gen-og.mjs"
+    "build:resume": "bun archive/scripts/build-resume.mjs",
+    "build:og": "bun archive/scripts/gen-og.mjs"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.4"
