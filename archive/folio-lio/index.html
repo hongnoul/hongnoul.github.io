@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Folio brand exploration — the Nari/Lio trials</title>
+  <meta name="description" content="Frozen process archive: nineteen trials, 156 birds, and the decision chain that produced Lio, the Folio brand mark.">
+  <meta name="robots" content="noindex">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #141414;
+      --border: #262626;
+      --text: #d4d4d4;
+      --dim: #8a8a8a;
+      --bright: #fafafa;
+      --accent: #fde047;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--text); }
+    body {
+      font: 400 16px/1.65 system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+      padding: 48px 20px 96px;
+    }
+    main { max-width: 860px; margin: 0 auto; }
+    h1 { color: var(--bright); font-size: 2rem; line-height: 1.2; margin: 0 0 8px; }
+    h2 { color: var(--bright); font-size: 1.3rem; margin: 56px 0 12px; }
+    h3 { color: var(--bright); font-size: 1.05rem; margin: 36px 0 8px; }
+    p { margin: 0 0 14px; }
+    a { color: var(--accent); }
+    code {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 5px; padding: 1px 6px; font-size: 0.85em;
+    }
+    .meta { color: var(--dim); font-size: 0.9rem; margin-bottom: 32px; }
+    .note {
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 18px; margin: 20px 0 32px;
+      font-size: 0.95rem;
+    }
+    .note strong { color: var(--bright); }
+    figure { margin: 20px 0 8px; }
+    figure img { width: 100%; height: auto; display: block; border-radius: 10px; }
+    figcaption { color: var(--dim); font-size: 0.85rem; margin-top: 8px; }
+    .hero { display: flex; align-items: center; gap: 24px; margin: 28px 0 8px; }
+    .hero img { width: 132px; height: 132px; flex-shrink: 0; }
+    .hero p { color: var(--dim); font-size: 0.95rem; margin: 0; }
+    .toc { columns: 2; gap: 32px; padding-left: 20px; margin: 0 0 8px; font-size: 0.95rem; }
+    .toc li { margin-bottom: 4px; }
+    .toc a { color: var(--text); text-decoration-color: var(--border); }
+    ul { padding-left: 22px; }
+    li { margin-bottom: 6px; }
+    footer { color: var(--dim); font-size: 0.85rem; margin-top: 72px; border-top: 1px solid var(--border); padding-top: 20px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>The Nari/Lio trials</h1>
+  <p class="meta">Process archive of the Folio brand-mark exploration &middot; frozen 2026-07-09</p>
+
+  <div class="note">
+    <p><strong>Naming.</strong> This exploration ran under the product's working name <strong>Writing Lab</strong>, and the bird was called <strong>Nari</strong> throughout. On 2026-07-09 the product was renamed <strong>Folio</strong> and the mascot <strong>Lio</strong>. This document keeps the era-accurate names in the narrative; the tile captions and accessibility labels in the sheets come from the live data tables, which were renamed with the brand, so they say Lio.</p>
+    <p style="margin:0"><strong>Status.</strong> This is a frozen record, not a guideline. The rules that came out of this process live in the Folio design system (the Lio page); the exploration data itself remains in the site repo as append-only tables in <code>components/bird-variants.ts</code>. The sheets below are static rest-pose renders of the exact live components, exported by <code>scripts/gen-lio-archive.tsx</code>.</p>
+  </div>
+
+  <div class="hero">
+    <img src="assets/final-mark.svg" alt="The final mark: Bead, a lemon bird with an amber beak, round amber blush, ink mortarboard with red tassel, on a porcelain-to-silver gradient squircle">
+    <p>Where it ends: <strong>Bead</strong>, trial 18, column 2. A lemon bird with an amber wedge beak, one wide anime eye, round amber blush, and an ink mortarboard with a red tassel, standing feet-to-frame on a porcelain-to-silver squircle. 155 other birds auditioned for this job.</p>
+  </div>
+
+  <h2 id="contents">Contents</h2>
+  <ol class="toc">
+    <li><a href="#origin">Origin: the rig before the brand</a></li>
+    <li><a href="#method">Method: constraint stacking</a></li>
+    <li><a href="#t1">Trial 1: six directions</a></li>
+    <li><a href="#t2">Trial 2: remixes</a></li>
+    <li><a href="#t3">Trial 3: fresh schemes</a></li>
+    <li><a href="#t4">Trial 4: detail pass</a></li>
+    <li><a href="#t5">Trial 5: twelve kitchens</a></li>
+    <li><a href="#t6">Trial 6: first graduates</a></li>
+    <li><a href="#t7">Trial 7: all graduates</a></li>
+    <li><a href="#t8">Trial 8: eye experiments</a></li>
+    <li><a href="#t9">Trial 9: no rules</a></li>
+    <li><a href="#t10">Trial 10: lawless, continued</a></li>
+    <li><a href="#t11">Trial 11: the giant pin</a></li>
+    <li><a href="#t12">Trial 12: sacred schemes</a></li>
+    <li><a href="#t13">Trial 13: shades of yellow</a></li>
+    <li><a href="#t14">Trial 14: backgrounds only</a></li>
+    <li><a href="#t15">Trial 15: the merge</a></li>
+    <li><a href="#t16">Trial 16: position ladder</a></li>
+    <li><a href="#t17">Trial 17: beak study</a></li>
+    <li><a href="#t18">Trial 18: blush study</a></li>
+    <li><a href="#t19">Trial 19: Marine study</a></li>
+    <li><a href="#final">The final spec</a></li>
+    <li><a href="#cast">What happened to the cast</a></li>
+  </ol>
+
+  <h2 id="origin">Origin: the rig before the brand</h2>
+  <p>Nari did not start as a logo. The bird was ported from the Writing Lab app repo (<code>components/auth/bird.tsx</code>), where it lived on the auth screen as a small interactive companion: the body and beak morph between three artist poses (facing right, up, and left) to follow the cursor, the pupil glides toward it inside a travel budget, the beak opens on hover, the eye blinks on a CSS cycle, and the toes fidget on randomized schedules. There was never a master illustration file. The geometry in <code>bird-poses.ts</code> is the source of truth, the beak is rebuilt every frame as a constant-width wedge, and every image of the bird anywhere is a render of that rig.</p>
+  <p>That fact shaped the whole exploration: every candidate below is the same live component with different parameters, not a set of drawings. The variant type accumulated knobs as the trials demanded them: gradient pair and direction, placement transform, five hat styles (toque, paper, beret, bandana, mortarboard) with worn or perched fits, seven eye styles (standard, anime, star, heart, ring, lash, happy) with a parametric size, six cheek patterns, fangs, sleepy lids (flat and arched), sticker outlines, a goo blur filter, stretches, tilts, and mirrors. The trial tables are append-only; nothing was ever deleted, which is why this archive could be rendered from the live data years of iterations later.</p>
+
+  <h2 id="method">Method: constraint stacking</h2>
+  <p>The nineteen trials follow a rhythm: open wide, pick favorites, remix them, then alternate between adding constraints (pins) and deliberately removing all of them (lawless rounds) to check that the pinned choices still beat the field. The endgame is a sequence of single-variable studies: position, then beak color, then blush, each run with everything else frozen. Six tiles per row became the standard sample size; big questions got two or three rows.</p>
+
+  <h2 id="t1">Trial 1: six directions</h2>
+  <p>The opening spread, and the round that set the frame for everything after it: a 120-unit squircle with a 32-unit corner radius, a two-stop vertical gradient, and one live bird inside. Six directions: a shadow silhouette (Nocturne), a sleepy pink blush with fangs (Blush), an outlined skull sticker (Haunt), a toque-wearing chef on gold (Chef), a giant cropped one-eye tile (Eclipse), and a warm ember gradient (Ember). Eclipse's oversized crop and the gradient-squircle style itself are the two ideas from this round that survive to the end.</p>
+  <figure>
+    <img src="assets/core.svg" alt="Trial 1 sheet: six tiles" loading="lazy">
+    <figcaption>Trial 1. The gradient-squircle mascot-icon style is set here.</figcaption>
+  </figure>
+
+  <h2 id="t2">Trial 2: remixes</h2>
+  <p>Three favorites emerged from trial 1: Blush, Haunt, and Chef. Trial 2 gave each two palette and mood remixes, same interactive bird, restyled. This is the first appearance of the pick-then-vary loop that runs through the whole process.</p>
+  <figure>
+    <img src="assets/remix.svg" alt="Trial 2 sheet: six remix tiles" loading="lazy">
+    <figcaption>Trial 2. Two takes each on Blush, Haunt, and Chef.</figcaption>
+  </figure>
+
+  <h2 id="t3">Trial 3: fresh schemes</h2>
+  <p>The same three favorites rerun in colorways no earlier tile had used: Rouge (the blush design), Ghost (the haunt sticker), and Saffron (the chef, now in non-orange kitchens). Mechanically, this is where the hat learned to ride the head: anchored to the head-top vertex so it tips with the pose instead of floating. Saffron's golden-chef-on-marine-blue scheme from this round comes back sixteen trials later as the subject of trial 19.</p>
+  <figure>
+    <img src="assets/trial3.svg" alt="Trial 3 sheet: six tiles in fresh colorways" loading="lazy">
+    <figcaption>Trial 3. Vertical gradients throughout; these became the reference for calm, on-brand backdrops.</figcaption>
+  </figure>
+
+  <h2 id="t4">Trial 4: detail pass</h2>
+  <p>The trial 3 palettes held still while the details were refined: the sleepy blush lid arches instead of cutting flat across the eye (a livelier, amused squint), the haunt sticker outline slims to 2.5 units, and the chef hat is worn into the head rather than perched on it, with a quick random jiggle on hover and a lift while the beak opens. The worn fit and the jiggle stayed in the rig permanently.</p>
+  <figure>
+    <img src="assets/trial4.svg" alt="Trial 4 sheet: six refined tiles" loading="lazy">
+    <figcaption>Trial 4. Same palettes as trial 3, refined mechanics.</figcaption>
+  </figure>
+
+  <h2 id="t5">Trial 5: twelve kitchens</h2>
+  <p>Chef was the strongest single direction, so it got an exhaustive round: twelve tiles covering alternative kitchen palettes, hat styles and colors, bird heights (tall, short, grand, smol, via non-uniform placement scales), eye colors, cheeks, and one sleepy cook. This is the round that proved a single concept could not carry the mark alone; the chef reads as a campaign character, not an identity.</p>
+  <figure>
+    <img src="assets/trial5.svg" alt="Trial 5 sheet: twelve chef tiles" loading="lazy">
+    <figcaption>Trial 5. Chef, exhaustively.</figcaption>
+  </figure>
+
+  <h2 id="t6">Trial 6: first graduates</h2>
+  <p>The pivotal round. Blush reran in deliberately untouched palettes, and alongside it a new hat style appeared: the graduation cap, a skull-cap base under a mortarboard rhombus with a gold tassel. Two straight scholars and two blush graduates. The mortarboard is the first element that says what the product is (writing, learning, craft) rather than just being charming, and from here on it never leaves the bird's head.</p>
+  <figure>
+    <img src="assets/trial6.svg" alt="Trial 6 sheet: blush colorways and the first graduates" loading="lazy">
+    <figcaption>Trial 6. The graduation cap appears.</figcaption>
+  </figure>
+
+  <h2 id="t7">Trial 7: all graduates</h2>
+  <p>Every bird graduates. Three backgrounds were pinned from earlier favorites (Saffron's ember orange, Marine's blue, Tomato's red), with two birds per background, one light and one contrasting, in fresh bird and cap colorways. The pinned-background discipline introduced here becomes the standard way later trials isolate a variable.</p>
+  <figure>
+    <img src="assets/trial7.svg" alt="Trial 7 sheet: six graduates on three pinned backgrounds" loading="lazy">
+    <figcaption>Trial 7. Backgrounds pinned, birds explore.</figcaption>
+  </figure>
+
+  <h2 id="t8">Trial 8: eye experiments</h2>
+  <p>Same three pinned scenes, this time with their original birds (Saffron's golden chick, Marine's gold, Tomato's white), every one in a mortarboard, and only the eyes changing: star, heart, anime, ring, lash, happy. The anime eye, oversized with a double catchlight, is the clear winner in hindsight; it becomes a fixed constraint from trial 13 onward, and the whole set survives in the design system as the sanctioned range of how far the eye may stray in campaign work.</p>
+  <figure>
+    <img src="assets/trial8.svg" alt="Trial 8 sheet: six eye styles" loading="lazy">
+    <figcaption>Trial 8. Only the eyes change.</figcaption>
+  </figure>
+
+  <h2 id="t9">Trial 9: no rules</h2>
+  <p>With the mortarboard as the single fixed point, every knob in the system was cross-combined: giant crops, goo blur, sticker outlines, stretches, tilted placements, monochrome, line-art, fangs, shaped pupils, two-hue gradients. Lawless rounds like this one are checks against local maxima: if an unconstrained bird beats the refined ones, the refinement is wrong.</p>
+  <figure>
+    <img src="assets/trial9.svg" alt="Trial 9 sheet: twelve unconstrained tiles" loading="lazy">
+    <figcaption>Trial 9. Everything at once, on purpose.</figcaption>
+  </figure>
+
+  <h2 id="t10">Trial 10: lawless, continued</h2>
+  <p>Three more rows of the same, with new tricks: diagonal gradients, colored tassels, a mirrored bird that looks away, a tiny bird, an extra-tall stretch, a goo-plus-outline smudge, and a white-to-black gradient. Nothing here won, but the round earned a place in the guidelines as the reference for campaign energy: diagonals and stretches are quoted in campaign art and kept off product surfaces.</p>
+  <figure>
+    <img src="assets/trial10.svg" alt="Trial 10 sheet: eighteen lawless tiles" loading="lazy">
+    <figcaption>Trial 10. The largest single round: eighteen birds.</figcaption>
+  </figure>
+
+  <h2 id="t11">Trial 11: the giant pin</h2>
+  <p>The first constraint added back after the lawless rounds: every bird sits in Eclipse's giant cropped pose from trial 1, in a mortarboard. Palettes, eyes, fangs, goo, outlines, and tassels stay wild. The giant crop reads confident at any size, and pinning it made the remaining variables much easier to judge.</p>
+  <figure>
+    <img src="assets/trial11.svg" alt="Trial 11 sheet: twelve giant-cropped tiles" loading="lazy">
+    <figcaption>Trial 11. Everything wild except the pose.</figcaption>
+  </figure>
+
+  <h2 id="t12">Trial 12: sacred schemes</h2>
+  <p>Constraints stack: mortarboard, the giant pose, and the three beloved color schemes from trials 7 and 8 (ember orange with a golden bird, marine blue with gold, tomato red with white), with both background and bird pinned per scheme and four wild takes on each. Only the schemes are sacred; the details keep churning.</p>
+  <figure>
+    <img src="assets/trial12.svg" alt="Trial 12 sheet: twelve tiles across three pinned schemes" loading="lazy">
+    <figcaption>Trial 12. Four takes per scheme.</figcaption>
+  </figure>
+
+  <h2 id="t13">Trial 13: shades of yellow</h2>
+  <p>A single bird from trial 12, Butterball, becomes the muse. Fixed: anime eye, mortarboard, giant pose, and a yellow bird, with each tile trying a different shade of yellow while the backgrounds roam free. This is the moment the identity stops being a contest between characters and becomes a search for the exact final bird.</p>
+  <figure>
+    <img src="assets/trial13.svg" alt="Trial 13 sheet: twelve yellow birds" loading="lazy">
+    <figcaption>Trial 13. Butterball, in every yellow.</figcaption>
+  </figure>
+
+  <h2 id="t14">Trial 14: backgrounds only</h2>
+  <p>One row. The bird is now fully assembled from the winners: Mecha's cap (ink-navy board, red tassel) on Butterball's lemon body with the anime eye and the giant pose. A rig fix landed here too: worn caps no longer sink into the oversized anime eye (the worn drop is clamped), so the cap still rides, lifts, and jiggles without colliding. Only the backgrounds explore.</p>
+  <figure>
+    <img src="assets/trial14.svg" alt="Trial 14 sheet: six backgrounds under one bird" loading="lazy">
+    <figcaption>Trial 14. The bird is settled; the world around it is not.</figcaption>
+  </figure>
+
+  <h2 id="t15">Trial 15: the merge</h2>
+  <p>Porcelain (the last tile of trial 10's lawless rows) was reduced to its essentials. Similar colors merged: the beak joins the body yellow, the pupil joins the ink of the feet and board, the sclera joins the porcelain white, leaving exactly four colors: yellow, ink, red, porcelain. The eye became fully parametric (<code>eyeScale</code>), and each tile paired a different bird position with a different eye size. The palette merge is the single most consequential decision after the mortarboard; the final mark's entire color story is set here, except for one thing trial 17 walks back.</p>
+  <figure>
+    <img src="assets/trial15.svg" alt="Trial 15 sheet: six four-color tiles" loading="lazy">
+    <figcaption>Trial 15. Position times eye size, in four colors.</figcaption>
+  </figure>
+
+  <h2 id="t16">Trial 16: position ladder</h2>
+  <p>Peek's eye (anime catchlights at standard 1.0 size) and the Porcelain identity fixed; six tiles walk a ladder of position adjustments from centered toward the giant crop, ending with two small nudges of the giant itself (a shift and a tilt). <strong>Close</strong> won: the bird at 1.55 scale with its feet grazing the bottom edge, big enough to feel present, small enough to keep the whole silhouette. This ladder survives in the design system as the sanctioned set of tile crops.</p>
+  <figure>
+    <img src="assets/trial16.svg" alt="Trial 16 sheet: six positions from centered to giant" loading="lazy">
+    <figcaption>Trial 16. Close, second tile, becomes the mark's crop.</figcaption>
+  </figure>
+
+  <h2 id="t17">Trial 17: beak study</h2>
+  <p>Position pinned to Close; the beak breaks back out of the merged palette with six colors distinct from the lemon body: amber, coral, ink, scarlet, rose, teal. <strong>Amber</strong> won, partially reversing trial 15's merge. The lesson recorded at the time: four colors is right for the identity, but the beak disappearing into the body cost the face its structure, and amber restores it while staying inside the bird's warm family.</p>
+  <figure>
+    <img src="assets/trial17.svg" alt="Trial 17 sheet: six beak colors" loading="lazy">
+    <figcaption>Trial 17. Amber wins.</figcaption>
+  </figure>
+
+  <h2 id="t18">Trial 18: blush study</h2>
+  <p>Beak fixed to amber, position still Close, Porcelain identity throughout. Six cheek patterns, colored only from the two accents already on the bird (tassel red or beak amber): oval, round, lines, dots, crescent, dash. <strong>Bead</strong>, the round amber blush dots, became the mark. This is the last aesthetic decision in the mainline; everything after is verification.</p>
+  <figure>
+    <img src="assets/trial18.svg" alt="Trial 18 sheet: six blush patterns" loading="lazy">
+    <figcaption>Trial 18. Bead, second tile, is the final mark.</figcaption>
+  </figure>
+
+  <h2 id="t19">Trial 19: Marine study</h2>
+  <p>A portability check rather than a redesign: the finalized Bead configuration ported to trial 3's golden-chef-on-marine scheme, with the scheme pinned and six takes on how much of Bead's ink survives the move (board and feet in deep marine, ink, or toque white; blush in orange or tassel red; plus one tile keeping the finalized lemon bird with only the background swapped). The mark held up, which is what allowed campaign recolors to become a sanctioned practice instead of a feared one.</p>
+  <figure>
+    <img src="assets/trial19.svg" alt="Trial 19 sheet: six Marine ports of the final mark" loading="lazy">
+    <figcaption>Trial 19. Bead visits Marine.</figcaption>
+  </figure>
+
+  <h2 id="final">The final spec</h2>
+  <p>The mark is Bead (trial 18, column 2) with one addition made after the trials: <code>capBehind</code>. On up-facing poses the finalized mark's cap sinks behind the body, as if slung behind the back, instead of colliding with the beak; the trial 18 tile itself stays as authored, because the tables are append-only. In data terms:</p>
+  <ul>
+    <li>Body <code>#fde047</code> (lemon), beak <code>#f59e0b</code> (amber), feet, board, and pupil <code>#0f172a</code> (ink), sclera and background top <code>#ffffff</code> (porcelain), background bottom <code>#cbd5e1</code> (silver), tassel <code>#ef4444</code> (red).</li>
+    <li>Anime eye at standard size (1.0) with the double catchlight.</li>
+    <li>Round blush dots in beak amber.</li>
+    <li>Worn mortarboard, grad style, ink board, red tassel.</li>
+    <li>Placement <code>translate(12.96 -184.90) scale(1.55)</code>: the Close crop, feet grazing the frame.</li>
+  </ul>
+  <p>The bird was renamed from Nari to Lio with the Folio rebrand on 2026-07-09. Nothing about the mark changed in the rename; only the words around it.</p>
+
+  <h2 id="cast">What happened to the cast</h2>
+  <p>All 156 birds remain live in the site repo. The design system's Lio page keeps them in a collapsed archive section as campaign reference (a spooky-season Haunt, a cooking-feature Saffron), with the rule that product surfaces use Lio only. The load-bearing rows were promoted into the guidelines themselves: trial 18 as the sanctioned blush range, trial 8 as the eye range, trial 16 as the sanctioned crops, and trials 3 and 10 as the reference for brand versus campaign gradients. This document is the only place the process is narrated; the design system states the results and nothing else.</p>
+
+  <footer>
+    <p>Generated from the append-only variant tables in the inkwell-atlas repo (<code>components/bird-variants.ts</code>) by <code>scripts/gen-lio-archive.tsx</code>: each tile is the live BirdIcon component server-rendered at its rest pose. Frozen 2026-07-09.</p>
+  </footer>
+</main>
+</body>
+</html>
