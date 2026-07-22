@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>clawd logs — Justin Hong</title>
+  <title>clawd logs - Justin Hong</title>
   <meta name="description" content="Every prompt I've typed at Claude Code, pulled from ~/.claude/projects.">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <meta name="robots" content="noindex">
@@ -108,7 +108,7 @@
 <body>
   <main class="page">
     <h1>clawd</h1>
-    <p>Every prompt I've typed at Claude Code, pulled from <code>~/.claude/projects/*.jsonl</code> at build time. No tool results, no model output — just what I asked for.</p>
+    <p>Every prompt I've typed at Claude Code, pulled from <code>~/.claude/projects/*.jsonl</code> at build time. No tool results, no model output - just what I asked for.</p>
     <button class="open-btn" id="open">open logs</button>
     <div class="meta" id="meta">loading…</div>
   </main>
@@ -126,7 +126,7 @@
       </div>
       <div class="list" id="list"></div>
       <div class="footer-note">
-        <span>generated <span id="gen">—</span></span>
+        <span>generated <span id="gen">-</span></span>
         <span>rebuild: <code>bun archive/scripts/build-clawd.mjs</code></span>
       </div>
     </div>
@@ -233,7 +233,7 @@
       // auto-open if hash present
       if (location.hash === '#open') openModal();
     }).catch(err => {
-      $('meta').textContent = 'failed to load index.json — run `bun archive/scripts/build-clawd.mjs`';
+      $('meta').textContent = 'failed to load index.json - run `bun archive/scripts/build-clawd.mjs`';
       console.error(err);
     });
   </script>

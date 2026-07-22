@@ -7,17 +7,17 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
   <script src="/archive/favicon.js"></script>
   <title>Justin Hong</title>
-  <meta name="description" content="Justin Hong — Founding Engineer at TrustAI. Writing on UI/UX and software.">
+  <meta name="description" content="Justin Hong - Founding Engineer at TrustAI. Writing on UI/UX and software.">
   <meta name="author" content="Justin Hong">
   <link rel="canonical" href="https://hongnoul.github.io/archive/">
   <meta property="og:title" content="Justin Hong">
-  <meta property="og:description" content="Justin Hong — Founding Engineer at TrustAI. Writing on UI/UX and software.">
+  <meta property="og:description" content="Justin Hong - Founding Engineer at TrustAI. Writing on UI/UX and software.">
   <meta property="og:url" content="https://hongnoul.github.io/archive/">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://hongnoul.github.io/archive/og/index.svg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Justin Hong">
-  <meta name="twitter:description" content="Justin Hong — Founding Engineer at TrustAI. Writing on UI/UX and software.">
+  <meta name="twitter:description" content="Justin Hong - Founding Engineer at TrustAI. Writing on UI/UX and software.">
   <meta name="twitter:image" content="https://hongnoul.github.io/archive/og/index.svg">
 </head>
 <body>
@@ -47,7 +47,7 @@
         <div class="term-hint" id="term-hint">? for shortcuts</div>
       </div>
 
-      <!-- Mobile navigation — giant pixel buttons, only shown on mobile -->
+      <!-- Mobile navigation - giant pixel buttons, only shown on mobile -->
       <div class="mobile-nav" id="mobile-nav">
         <a href="https://github.com/hongnoul" target="_blank" rel="noopener" class="mobile-btn">/github</a>
         <a href="https://linkedin.com/in/hongnoul" target="_blank" rel="noopener" class="mobile-btn">/linkedin</a>
@@ -95,7 +95,7 @@
       }, duration);
     });
 
-    // Invisible background fill — makes the whole page drag-selectable
+    // Invisible background fill - makes the whole page drag-selectable
     const bgFill = document.getElementById('bg-fill');
     const charRuler = document.createElement('span');
     charRuler.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font-family:"JetBrains Mono",ui-monospace,"Courier New",monospace;font-size:23px;';
@@ -112,7 +112,7 @@
     fillBg();
     window.addEventListener('resize', fillBg);
 
-    // Block cursor — tracks caret position by measuring typed text width
+    // Block cursor - tracks caret position by measuring typed text width
     const termInput  = document.querySelector('.term-input');
     const termCursor = document.querySelector('.term-cursor');
     const ruler = document.createElement('span');
@@ -324,8 +324,8 @@
     syncCursor();
     syncHint();
 
-    // TrustAI link — ctrl+click only
-    // /experience shortcut link — show table instead of navigating
+    // TrustAI link - ctrl+click only
+    // /experience shortcut link - show table instead of navigating
     termHint.addEventListener('click', e => {
       const a = e.target.closest('a');
       if (a && a.textContent.trim() === '/experience') {
@@ -352,7 +352,7 @@
     termInput.addEventListener('blur', () => {
       if (!mouseIsDown) setTimeout(() => termInput.focus(), 0);
     });
-    // Plain click (no drag) — browser fires click only if mouse didn't move
+    // Plain click (no drag) - browser fires click only if mouse didn't move
     document.addEventListener('click', () => termInput.focus());
     // Typing after a drag selection refocuses
     document.addEventListener('keydown', () => {

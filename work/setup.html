@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Setup — a desktop built around agents, not apps — 홍승우</title>
+  <title>Setup - a desktop built around agents, not apps - 홍승우</title>
   <meta name="description" content="niri's scrollable tiling, jcode as the primary interface to the machine, hwatu for free visual verification. A tour of a keyboard-driven, agent-first Linux desktop.">
   <meta name="author" content="홍승우">
   <link rel="canonical" href="https://hongnoul.github.io/work/setup.html">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-  <meta property="og:title" content="Setup — a desktop built around agents, not apps">
+  <meta property="og:title" content="Setup - a desktop built around agents, not apps">
   <meta property="og:description" content="niri's scrollable tiling, jcode as the primary interface to the machine, hwatu for free visual verification.">
   <meta property="og:url" content="https://hongnoul.github.io/work/setup.html">
   <meta property="og:type" content="article">
@@ -201,7 +201,7 @@
 </head>
 <body>
 
-  <a class="corner" href="/" aria-label="홍승우 — home">
+  <a class="corner" href="/" aria-label="홍승우 - home">
     <img src="/j.svg" alt="" width="42" height="26">
   </a>
 
@@ -241,7 +241,7 @@
       <div class="strip" id="strip">
         <div class="strip__bar">
           <div class="strip__dots" aria-hidden="true"><i></i><i></i><i></i></div>
-          <span class="strip__title">the strip — drag, or focus a column</span>
+          <span class="strip__title">the strip - drag, or focus a column</span>
           <div class="strip__keys">
             <button class="strip__key" id="kLeft"  type="button" aria-label="Focus column left">alt+h</button>
             <button class="strip__key" id="kRight" type="button" aria-label="Focus column right">alt+l</button>
@@ -308,7 +308,7 @@
       <table>
         <thead><tr><th>chord</th><th>opens</th></tr></thead>
         <tbody>
-          <tr><td class="key">alt+;</td><td>jcode in <code>~</code> — the &ldquo;anything&rdquo; session</td></tr>
+          <tr><td class="key">alt+;</td><td>jcode in <code>~</code> - the &ldquo;anything&rdquo; session</td></tr>
           <tr><td class="key">alt+'</td><td>jcode in the current main project</td></tr>
           <tr><td class="key">alt+shift+'</td><td>jcode in self-dev mode, on its own source</td></tr>
           <tr><td class="key">alt+`</td><td>jump to the oldest agent waiting for input</td></tr>
@@ -316,19 +316,19 @@
         </tbody>
       </table>
       <p class="tbl-note">
-        The bindings live between managed markers in <code>config.kdl</code> —
+        The bindings live between managed markers in <code>config.kdl</code> -
         jcode rewrites that block itself when its build or hotkeys change.
       </p>
       <p>
         The pattern that falls out: I don&rsquo;t context-switch between
         projects, I <em>visit</em> agents. <code>alt+`</code> is the closest
-        thing to an inbox — it jumps the viewport to whichever column is blocked
+        thing to an inbox - it jumps the viewport to whichever column is blocked
         on me, oldest first. The strip holds the state; I supply judgment and
         move on.
       </p>
       <p>
         The self-dev session deserves a note: jcode routinely modifies its own
-        harness — hotkeys, tools, the compositor config it runs under. My
+        harness - hotkeys, tools, the compositor config it runs under. My
         <code>~/.config/niri/</code> has a dozen timestamped
         <code>config.kdl.bak-jcode-hotkeys-*</code> files, which is what it looks
         like when the agent edits its own environment and leaves an undo trail.
@@ -360,9 +360,9 @@
       <h2>Why this shape</h2>
       <ul class="decisions">
         <li><b>Columns, not workspaces.</b><span>Workspaces are places you have to remember. A strip is a sequence you scroll. With 4-6 agents running, spatial order (oldest work leftward) beats naming things.</span></li>
-        <li><b>The WM is the tab manager.</b><span>hwatu has no tabs and jcode sessions have no session switcher — every unit of work is a window, and niri is the single manager for all of them. One abstraction, everywhere.</span></li>
+        <li><b>The WM is the tab manager.</b><span>hwatu has no tabs and jcode sessions have no session switcher - every unit of work is a window, and niri is the single manager for all of them. One abstraction, everywhere.</span></li>
         <li><b>Agents get first-class citizenship.</b><span>Window rules, focus etiquette, and launch hotkeys are designed for processes that open windows while I'm not looking. The human default (steal focus, animate, notify) is wrong when the &ldquo;user&rdquo; is a daemon.</span></li>
-        <li><b>Config the agent can edit.</b><span>niri's KDL config is plain text with obvious structure. That's not just nice for me — it means jcode can safely patch its own hotkeys, with backups, without a settings UI in the way.</span></li>
+        <li><b>Config the agent can edit.</b><span>niri's KDL config is plain text with obvious structure. That's not just nice for me - it means jcode can safely patch its own hotkeys, with backups, without a settings UI in the way.</span></li>
         <li><b>Everything keyboard, nothing modal.</b><span>No dock, no alt-tab overlay, no drag-to-tile. The hands stay on the row where the prompts are typed.</span></li>
       </ul>
     </section>
@@ -372,7 +372,7 @@
       <ul class="stack">
         <li><b>compositor</b><span>niri (Wayland, scrollable tiling)</span></li>
         <li><b>terminal</b><span>kitty, spawned at 1/4-width columns</span></li>
-        <li><b>agent</b><span>jcode — daily driver + self-dev harness</span></li>
+        <li><b>agent</b><span>jcode - daily driver + self-dev harness</span></li>
         <li><b>browser</b><span>hwatu for verification, agent-driven</span></li>
         <li><b>bar</b><span>waybar with a custom niri workspace ticker</span></li>
         <li><b>launcher</b><span>jofi (alt+space)</span></li>
@@ -391,7 +391,7 @@
         <a href="https://hongnoul.github.io/hwatu/">hwatu</a>
       </div>
       <p class="colophon">
-        Dated <b>July 2026</b> on purpose — a setup is a snapshot, not a promise.
+        Dated <b>July 2026</b> on purpose - a setup is a snapshot, not a promise.
         Written, and visually verified, by a jcode agent running in column two.
       </p>
     </section>

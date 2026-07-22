@@ -43,7 +43,7 @@ function extractPrompt(line) {
     // Claude Code writes python-style single-quoted dicts. Try JSON first, then a loose eval.
     try { msg = JSON.parse(msg); }
     catch {
-      // Fallback: yank content via regex — only accept if content is a quoted string.
+      // Fallback: yank content via regex - only accept if content is a quoted string.
       const m = msg.match(/'content':\s*'((?:[^'\\]|\\.)*)'/);
       if (!m) return null;
       return m[1].replace(/\\'/g, "'").replace(/\\n/g, '\n');

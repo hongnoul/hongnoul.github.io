@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
   <script src="/archive/favicon.js"></script>
-  <title>T(p,q) Torus Knots — Justin Hong</title>
-  <meta name="description" content="Torus knots — the T(p,q) family, parametric form, and an interactive silhouette text-wrap specimen.">
+  <title>T(p,q) Torus Knots - Justin Hong</title>
+  <meta name="description" content="Torus knots - the T(p,q) family, parametric form, and an interactive silhouette text-wrap specimen.">
   <meta name="author" content="Justin Hong">
   <link rel="canonical" href="https://hongnoul.github.io/archive/work/torus.html">
-  <meta property="og:title" content="T(p,q) Torus Knots — Justin Hong">
+  <meta property="og:title" content="T(p,q) Torus Knots - Justin Hong">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://hongnoul.github.io/archive/work/torus.html">
-  <meta property="og:description" content="Torus knots — the T(p,q) family, parametric form, and an interactive silhouette text-wrap specimen.">
+  <meta property="og:description" content="Torus knots - the T(p,q) family, parametric form, and an interactive silhouette text-wrap specimen.">
   <meta property="og:image" content="https://hongnoul.github.io/archive/og/torus.svg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="T(p,q) Torus Knots — Justin Hong">
-  <meta name="twitter:description" content="Torus knots — the T(p,q) family, parametric form, and an interactive silhouette text-wrap specimen.">
+  <meta name="twitter:title" content="T(p,q) Torus Knots - Justin Hong">
+  <meta name="twitter:description" content="Torus knots - the T(p,q) family, parametric form, and an interactive silhouette text-wrap specimen.">
   <meta name="twitter:image" content="https://hongnoul.github.io/archive/og/torus.svg">
   <style>
     /* cross-document view transition: smooth root cross-fade to/from the
@@ -195,14 +195,14 @@
 
   <!-- Randomness -->
   <h2>Randomness</h2>
-  <div class="code"><span class="cd">/* Field — each cell seeded by its grid coordinate */</span>
+  <div class="code"><span class="cd">/* Field - each cell seeded by its grid coordinate */</span>
 <span class="cw">function</span> hash(col, row) {
   <span class="cw">let</span> h = (Math.imul(col, <span class="cw">2654435761</span>) ^ Math.imul(row, <span class="cw">2246822519</span>)) >>> <span class="cw">0</span>;
   h = Math.imul(h ^ (h >>> <span class="cw">16</span>), <span class="cw">0x45d9f3b</span>) >>> <span class="cw">0</span>;
   <span class="cw">return</span> h;
 }
 
-<span class="cd">/* Coprime constraint — q must be coprime with p and q &gt; p */</span>
+<span class="cd">/* Coprime constraint - q must be coprime with p and q &gt; p */</span>
 <span class="cw">const</span> p = P_MIN + Math.floor(rand() * (P_MAX &minus; P_MIN + <span class="cw">1</span>));
 <span class="cw">const</span> q = (p + <span class="cw">1</span>) + Math.floor(rand() * (Q_MAX &minus; p));
 <span class="cd">// gcd(p,q) = 1 by construction when p+1..Q_MAX are coprime with p</span></div>
@@ -220,7 +220,7 @@
   <span class="cw">p</span>, <span class="cw">q</span>                     <span class="cd">// winding numbers</span>
 )
 
-<span class="cd">/* Crossing number — minimum self-intersections in a 2D projection */</span>
+<span class="cd">/* Crossing number - minimum self-intersections in a 2D projection */</span>
 <span class="cw">c</span>(p,q) = min(p(q&minus;1), q(p&minus;1))</div>
 
   <table class="data-table">
@@ -231,7 +231,7 @@
       <tr><td>p</td><td>2 &ndash; 5</td><td>Longitudinal winds around torus axis</td></tr>
       <tr><td>q</td><td>p+1 &ndash; 11</td><td>Meridional winds through torus hole</td></tr>
       <tr><td>hue</td><td>0 &ndash; 1</td><td>HSL base color, saturation 0.88, lightness 0.52</td></tr>
-      <tr><td>tube</td><td>0.55 &ndash; 0.95</td><td>Tube thickness — thicker = bulkier silhouette</td></tr>
+      <tr><td>tube</td><td>0.55 &ndash; 0.95</td><td>Tube thickness - thicker = bulkier silhouette</td></tr>
       <tr><td>rotation axes</td><td>&minus;1 &ndash; 1</td><td>Per-knot x/y rotation weights, fixed at load</td></tr>
     </tbody>
   </table>
@@ -239,7 +239,7 @@
   <hr class="rule">
 
   <!-- Concept -->
-  <div class="code"><span class="cd">/* Parametric form — t &isin; [0, 2&pi;) */</span>
+  <div class="code"><span class="cd">/* Parametric form - t &isin; [0, 2&pi;) */</span>
 <span class="cw">x</span>(t) = (2 + cos(<span class="cw">q</span>&middot;t)) &middot; cos(<span class="cw">p</span>&middot;t)
 <span class="cw">y</span>(t) = (2 + cos(<span class="cw">q</span>&middot;t)) &middot; sin(<span class="cw">p</span>&middot;t)
 <span class="cw">z</span>(t) =  sin(<span class="cw">q</span>&middot;t)
@@ -446,11 +446,11 @@ const FONT      = '15px "JetBrains Mono", ui-monospace, "Courier New", monospace
 let knotX = 0, knotY = 0, isDragging = false;
 
 const PARAGRAPHS = [
-  `A torus knot T(p,q) is a closed curve on the surface of a torus. The integers p\u00a0and\u00a0q are coprime \u2014 gcd(p,q)\u00a0=\u00a01 \u2014 and describe how the curve winds: p\u00a0times longitudinally through the hole, q\u00a0times meridionally around the tube. The canonical form enforces q\u00a0>\u00a0p to avoid counting T(p,q) and T(q,p) as distinct knots, since they are topologically equivalent by a reflection of the torus.`,
+  `A torus knot T(p,q) is a closed curve on the surface of a torus. The integers p\u00a0and\u00a0q are coprime - gcd(p,q)\u00a0=\u00a01 - and describe how the curve winds: p\u00a0times longitudinally through the hole, q\u00a0times meridionally around the tube. The canonical form enforces q\u00a0>\u00a0p to avoid counting T(p,q) and T(q,p) as distinct knots, since they are topologically equivalent by a reflection of the torus.`,
 
-  `The winding numbers control visual density. T(2,3) is the trefoil \u2014 three arcs, three crossings, the rotational symmetry of an equilateral triangle. A T(3,5) is more elaborate: five-fold symmetric, with a denser lattice of crossings. What stays constant: at any reasonable rendering size, crossings remain individually legible and the form reads as a single continuous path.`,
+  `The winding numbers control visual density. T(2,3) is the trefoil - three arcs, three crossings, the rotational symmetry of an equilateral triangle. A T(3,5) is more elaborate: five-fold symmetric, with a denser lattice of crossings. What stays constant: at any reasonable rendering size, crossings remain individually legible and the form reads as a single continuous path.`,
 
-  `The same self-occlusion that makes the knot interesting topologically makes it useful for studying light. Where the tube passes behind itself, shadow boundaries form \u2014 sharp under hard directional light, soft under broad hemisphere fill. The geometry that produces the self-intersecting projection also makes it maximally informative for light-source characterization.`,
+  `The same self-occlusion that makes the knot interesting topologically makes it useful for studying light. Where the tube passes behind itself, shadow boundaries form - sharp under hard directional light, soft under broad hemisphere fill. The geometry that produces the self-intersecting projection also makes it maximally informative for light-source characterization.`,
 ];
 
 function knotIntervalForBand(knotX, knotY, bandTop, bandBottom, hPad, vPad) {
@@ -473,8 +473,8 @@ let preps = null;
 async function init() {
   await document.fonts.ready;
   preps = PARAGRAPHS.map(t => prepareWithSegments(t, FONT));
-  doLayout();        // first pass — establishes stage height
-  doLayout();        // second pass — centers knot with correct height
+  doLayout();        // first pass - establishes stage height
+  doLayout();        // second pass - centers knot with correct height
 }
 
 function doLayout() {

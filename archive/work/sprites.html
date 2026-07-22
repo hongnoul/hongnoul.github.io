@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width">
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
   <script src="/archive/favicon.js"></script>
-  <title>CSS Sprites — Justin Hong</title>
+  <title>CSS Sprites - Justin Hong</title>
   <meta name="description" content="CSS sprite sheets, McMaster-Carr's sub-300ms load times, and a pixel character spun off from Claude Code's clawd.">
   <meta name="author" content="Justin Hong">
   <link rel="canonical" href="https://hongnoul.github.io/archive/work/sprites.html">
-  <meta property="og:title" content="CSS Sprites — Justin Hong">
+  <meta property="og:title" content="CSS Sprites - Justin Hong">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://hongnoul.github.io/archive/work/sprites.html">
   <meta property="og:description" content="CSS sprite sheets, McMaster-Carr's sub-300ms load times, and a pixel character spun off from Claude Code's clawd.">
   <meta property="og:image" content="https://hongnoul.github.io/archive/og/sprites.svg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="CSS Sprites — Justin Hong">
+  <meta name="twitter:title" content="CSS Sprites - Justin Hong">
   <meta name="twitter:description" content="CSS sprite sheets, McMaster-Carr's sub-300ms load times, and a pixel character spun off from Claude Code's clawd.">
   <meta name="twitter:image" content="https://hongnoul.github.io/archive/og/sprites.svg">
   <style>
@@ -321,12 +321,12 @@
   <div class="lineage">
     <div class="lineage-item">
       <img src="/archive/clawd.png" class="lineage-img" width="80" height="50" alt="clawd">
-      <span class="lineage-lbl">clawd &mdash; Claude Code</span>
+      <span class="lineage-lbl">clawd - Claude Code</span>
     </div>
     <span class="lineage-arrow">&rarr;</span>
     <div class="lineage-item">
       <div class="lineage-img" style="width:80px;height:50px;background:url('/archive/truu.png') 0 0/640px 50px;image-rendering:pixelated;"></div>
-      <span class="lineage-lbl">spinoff &mdash; Justin Hong</span>
+      <span class="lineage-lbl">spinoff - Justin Hong</span>
     </div>
   </div>
 
@@ -336,11 +336,11 @@
       <span class="mario-cap">Super Mario Bros. (1985)</span>
     </div>
     <div class="timeline">
-      <div class="tl-row"><span class="tl-year">1977</span><span class="tl-event">Texas Instruments coins <em>sprite</em> &mdash; GPU-composited bitmaps, CPU never touches framebuffer</span></div>
-      <div class="tl-row"><span class="tl-year">1983</span><span class="tl-event">NES sprite table &mdash; 64 objects, 8&times;8 or 8&times;16 px, positioned independently</span></div>
-      <div class="tl-row"><span class="tl-year">1985</span><span class="tl-event">Super Mario Bros. &mdash; all walk, jump, and death frames in one 256-byte pattern table</span></div>
-      <div class="tl-row"><span class="tl-year">2004</span><span class="tl-event">Dave Shea&rsquo;s CSS Sprites &mdash; background-position for web icons, Google &amp; Amazon adopt within 2 years</span></div>
-      <div class="tl-row"><span class="tl-year">2026</span><span class="tl-event">McMaster-Carr, this site &mdash; still in production</span></div>
+      <div class="tl-row"><span class="tl-year">1977</span><span class="tl-event">Texas Instruments coins <em>sprite</em> - GPU-composited bitmaps, CPU never touches framebuffer</span></div>
+      <div class="tl-row"><span class="tl-year">1983</span><span class="tl-event">NES sprite table - 64 objects, 8&times;8 or 8&times;16 px, positioned independently</span></div>
+      <div class="tl-row"><span class="tl-year">1985</span><span class="tl-event">Super Mario Bros. - all walk, jump, and death frames in one 256-byte pattern table</span></div>
+      <div class="tl-row"><span class="tl-year">2004</span><span class="tl-event">Dave Shea&rsquo;s CSS Sprites - background-position for web icons, Google &amp; Amazon adopt within 2 years</span></div>
+      <div class="tl-row"><span class="tl-year">2026</span><span class="tl-event">McMaster-Carr, this site - still in production</span></div>
     </div>
   </div>
 
@@ -348,7 +348,7 @@
 
   <!-- Technique -->
   <h2>The technique</h2>
-  <div class="code"><span class="cd">/* Frame selection — compositor thread only, no layout, no paint */</span>
+  <div class="code"><span class="cd">/* Frame selection - compositor thread only, no layout, no paint */</span>
 <span class="cw">const</span> FRAME_W = <span class="cb">128</span>;
 sprite.style.backgroundPositionX = -(frame * FRAME_W) + <span class="cb">'px'</span>;
 

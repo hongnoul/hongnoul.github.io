@@ -149,7 +149,7 @@
     body.menu-open .logo .sprite { transform: translateX(-304.8px); }
 
     /* ================================================================
-       layout — portfolio deck style: a big header wordmark, category
+       layout - portfolio deck style: a big header wordmark, category
        tab buttons, a horizontally fanned row of overlapping project
        cards (drag to browse), and an About + Sort section below.
        ================================================================ */
@@ -449,13 +449,13 @@
     }
 
     /* intro skip: reloads and returns from internal pages get no curtain, no
-       logo glide, and an already-settled deck — the intro only plays on a
+       logo glide, and an already-settled deck - the intro only plays on a
        fresh entry. */
     body.intro-skip .curtain { display: none; }
     body.intro-skip .logo { animation: none; filter: invert(0); transition: none; }
     body.intro-skip .card { animation: none; opacity: 1; }
 
-    /* reduced motion: no curtain, no glide — logo rests in the corner instantly,
+    /* reduced motion: no curtain, no glide - logo rests in the corner instantly,
        cards appear without animation */
     @media (prefers-reduced-motion: reduce) {
       .curtain { display: none; }
@@ -513,7 +513,7 @@
     <div class="about-content">
       <h2 class="about-title">About</h2>
       <p class="about-text">
-        홍승우 — MIT.<br>
+        홍승우 - MIT.<br>
         <a href="mailto:namyang@mit.edu">namyang@mit.edu</a><br>
         <a href="https://github.com/hongnoul" rel="me">github.com/hongnoul</a> ·
         <a href="https://linkedin.com/in/hongnoul" rel="me">linkedin.com/in/hongnoul</a> ·
@@ -534,49 +534,49 @@
        href (the card opens it in a new tab on click). Add an entry here and it
        appears in the deck. */
     const projects = [
-      { title: 'hwatu — 13 ms browser for coding agents', mode: 'work',
+      { title: 'hwatu - 13 ms browser for coding agents', mode: 'work',
         tags: ['systems', 'ai'], img: '/hwatu_docs_thumb.png',
         href: 'https://hongnoul.github.io/hwatu/',
         description: 'A daemon-based WebKit browser that makes visual ' +
           'verification nearly free for AI agents: 13 ms median window spawn, ' +
           'headless-by-default under agent harnesses, JSON-over-socket ' +
           'protocol. Rust + WebKitGTK 6. 2026.' },
-      { title: 'TrustAI — auto.trytrust.ai', mode: 'work',
+      { title: 'TrustAI - auto.trytrust.ai', mode: 'work',
         tags: ['web', 'design', 'ai'], img: '/trustai_auto_thumb.png',
         href: 'https://auto.trytrust.ai',
         description: 'TrustAI Labs (YC S26), founding engineer & designer. ' +
-          '"Your team\u2019s best instincts, automated" — the current product. ' +
+          '"Your team\u2019s best instincts, automated" - the current product. ' +
           'Own the end-to-end frontend, interactive demos, and the full visual ' +
           'identity and design system.' },
-      { title: 'Folio — design system', mode: 'work',
+      { title: 'Folio - design system', mode: 'work',
         tags: ['web', 'design', 'ai'], img: '/folio_design_thumb.png',
         href: 'https://wl.trytrust.ai/design/character/lio',
         description: 'The design system and harness behind Folio, TrustAI\u2019s ' +
           'CEFR-aligned writing platform: the Lio character and its nine ' +
           'emotional states, semantic color tokens, motion choreography, ' +
-          'surface physics, and a primitives kit — all documented as living ' +
+          'surface physics, and a primitives kit - all documented as living ' +
           'brand guidelines.' },
-      { title: 'TrustAI — Agent Risk Assessment', mode: 'work',
+      { title: 'TrustAI - Agent Risk Assessment', mode: 'work',
         tags: ['web', 'design'], img: '/trustai_thumb.png',
         description: 'Pre-pivot product: maps what every ERP AI agent can reach ' +
           'and wreck, then verifies it\u2019s under control. Built the marketing ' +
           'site and product demos used in investor and customer presentations.' },
-      { title: 'Groundwork — Ripple Designathon', mode: 'hackathons',
+      { title: 'Groundwork - Ripple Designathon', mode: 'hackathons',
         tags: ['web', 'design'], img: '/groundwork_poster.jpg',
         description: 'A civic social platform where people share, celebrate, and ' +
           'inspire community service. React 19 / Bun front end with Leaflet event ' +
           'maps and a Flask + Firestore back end. Apr 2026.' },
-      { title: 'Cadabra — Amazon Nova Hackathon', mode: 'hackathons',
+      { title: 'Cadabra - Amazon Nova Hackathon', mode: 'hackathons',
         tags: ['extension', 'ai'], img: '/cadabra_nova.png',
         description: 'A Chrome extension that personalizes Amazon search rankings ' +
           'in real time from AI-inferred behavioral profiles. TypeScript Lambda on ' +
           'AWS API Gateway with DynamoDB persistence. Feb 2026.' },
-      { title: 'Freight Agent — Subconscious Hackathon', mode: 'hackathons',
+      { title: 'Freight Agent - Subconscious Hackathon', mode: 'hackathons',
         tags: ['ai', 'web'],
         description: 'Plan-approve-execute UX for an autonomous freight-exception ' +
           'agent on Cloudflare Workers, plus a voice-first Next.js storefront ' +
           'built in a 2-hour sprint. May 2026.' },
-      { title: 'ACL Triage — Cursor Hackathon', mode: 'hackathons',
+      { title: 'ACL Triage - Cursor Hackathon', mode: 'hackathons',
         tags: ['ai', 'web'],
         description: 'Next.js 16 coach dashboard for ACL-injury triage: 60+ athlete ' +
           'rosters, body-silhouette injury mapping, MediaPipe pose extraction and ' +
@@ -584,9 +584,9 @@
       { title: 'MIT Activist Murals Archive', mode: 'work',
         tags: ['web'],
         description: 'Server-side rendered digital exhibition platform built with ' +
-          'Next.js for the MIT Political History Department — a digital archive of ' +
+          'Next.js for the MIT Political History Department - a digital archive of ' +
           'activist murals reaching 1,000+ users. 2023–24.' },
-      { title: 'Deed — MIT Bitcoin Hackathon', mode: 'hackathons',
+      { title: 'Deed - MIT Bitcoin Hackathon', mode: 'hackathons',
         tags: ['web'],
         description: 'Tokenized property deed system and live marketplace prototype ' +
           'with a real-time transaction UI. Led a team of 5+, presented at MIT ' +
@@ -596,25 +596,25 @@
         href: '/archive/work/torus.html',
         description: 'The T(p,q) family, parametric form, and an interactive ' +
           'silhouette text-wrap specimen.' },
-      { title: 'Setup — a desktop built around agents', mode: 'studies',
+      { title: 'Setup - a desktop built around agents', mode: 'studies',
         tags: ['systems', 'ai'], img: '/work/setup-strip-demo.svg',
         href: '/work/setup.html',
         description: 'niri\u2019s scrollable tiling gives every coding agent its ' +
           'own column on an infinite strip, jcode is the primary interface to ' +
           'the machine, and hwatu makes verification free. A tour of an ' +
           'agent-first Linux desktop, as of Jul 2026.' },
-      { title: 'j3d — Software 3D Renderer', mode: 'studies',
+      { title: 'j3d - Software 3D Renderer', mode: 'studies',
         tags: ['3d'], img: '/j3d_thumb.png',
         href: '/archive/work/j3d.html',
         description: 'A from-scratch 3D renderer study.' },
       { title: 'Lighting Iteration', mode: 'studies',
         tags: ['3d'], img: '/lighting_thumb.png',
         href: '/archive/work/lighting-iteration.html',
-        description: 'Iterating on lighting models — a visual walkthrough.' },
+        description: 'Iterating on lighting models - a visual walkthrough.' },
       { title: 'Sprites', mode: 'studies',
         tags: ['design'], img: '/sprites_thumb.png',
         href: '/archive/',
-        description: 'Sprite studies — including the 4-frame logo transition used ' +
+        description: 'Sprite studies - including the 4-frame logo transition used ' +
           'in this site\u2019s corner mark. Opens the archived original site with ' +
           'its terminal-style frontend.' },
     ];
@@ -773,8 +773,8 @@
     applyFilter();
 
     /* ---- corner menu toggle (kept) ----
-       The corner logo doubles as the menu button. Clicking it — or Enter/Space
-       while focused — toggles the nav links. Escape / outside click closes. */
+       The corner logo doubles as the menu button. Clicking it - or Enter/Space
+       while focused - toggles the nav links. Escape / outside click closes. */
     (function () {
       const logo = document.querySelector('.logo');
       const menu = document.getElementById('site-menu');

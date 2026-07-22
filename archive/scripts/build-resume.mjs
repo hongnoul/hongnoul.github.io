@@ -46,7 +46,7 @@ writeFileSync(HTML, html, "utf8");
 
 console.log("done.");
 
-// — helpers ——————————————————————————————————————
+// - helpers --------------------------------------
 
 function replaceBetween(source, sentinel, body) {
   const start = `<!-- ${sentinel}:START -->`;

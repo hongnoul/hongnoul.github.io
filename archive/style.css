@@ -525,7 +525,7 @@ body {
   /* Hide desktop sprite on mobile */
   #truu { display: none !important; }
 
-  /* Full-width sprite below buttons — cycles through all frames */
+  /* Full-width sprite below buttons - cycles through all frames */
   #truu-mobile {
     display: block;
     width: 100%;

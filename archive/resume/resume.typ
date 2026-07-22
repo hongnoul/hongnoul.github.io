@@ -1,10 +1,10 @@
-// Resume template — source of truth for /resume/.
+// Resume template - source of truth for /resume/.
 // Content lives in resume.data.json; this file controls only layout/typography.
 // Build with: bun scripts/build-resume.mjs
 
 #let data = json("resume.data.json")
 
-#set document(title: data.name + " — Resume", author: data.name)
+#set document(title: data.name + " - Resume", author: data.name)
 #set page(paper: "us-letter", margin: (x: 0.65in, y: 0.5in))
 #set text(
   font: ("Libertinus Serif", "New Computer Modern", "FreeSerif"),
@@ -14,7 +14,7 @@
 #set par(leading: 0.5em, justify: false)
 #set list(marker: [•], indent: 0pt, body-indent: 6pt)
 
-// — Header —————————————————————————————————————————
+// - Header -----------------------------------------
 
 #let contact-item(c) = if "href" in c { link(c.href, c.text) } else { c.text }
 #let contact = data.contact.map(contact-item).join([~|~])
@@ -27,7 +27,7 @@
 
 #v(14pt, weak: false)
 
-// — Section / entry primitives ————————————————————
+// - Section / entry primitives --------------------
 
 #let section(title, body) = block(below: 11pt, breakable: false)[
   #text(size: 10pt, weight: 700, tracking: 0.6pt)[#upper(title)]
@@ -67,7 +67,7 @@
   ]
 ]
 
-// — Render ————————————————————————————————————————
+// - Render ----------------------------------------
 
 #for sec in data.sections {
   section(sec.title)[
