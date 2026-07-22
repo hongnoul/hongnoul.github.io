@@ -8,77 +8,661 @@
   <meta name="author" content="Justin Hong">
   <link rel="canonical" href="https://hongnoul.github.io/">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
   <meta property="og:title" content="Justin Hong">
   <meta property="og:description" content="Justin Hong.">
   <meta property="og:url" content="https://hongnoul.github.io/">
   <meta property="og:type" content="website">
-  <meta name="theme-color" content="#ff2400">
+  <meta name="theme-color" content="#fafafa">
   <style>
-    html, body { margin: 0; background: #fff; }
-    body {
-      min-height: 100svh;
-      display: flex;
-      align-items: center;   /* both pieces vertically centered */
-      overflow: hidden;
+    /* Everett stand-in: Inter variable, self-hosted (preloaded in <head> so the
+       intro curtain hides the swap) */
+    @font-face {
+      font-family: "InterVariable";
+      src: url("/fonts/InterVariable.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    html, body { margin: 0; background: #fafafa; }
+    body { min-height: 100svh; overflow-x: hidden; color: #111;
+           font: 400 16px/1.4 "InterVariable", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    /* lock scroll while the intro plays; the script lifts this once the curtain wipes */
+    body.intro-lock { overflow: hidden; height: 100svh; }
+
+    /* one source of truth for the corner logo chrome (kept from the intro):
+       42px logo at left 30 / top 20. */
+    :root {
+      --corner-w: 42px;
+      --logo-h: calc(var(--corner-w) * 0.6);      /* aspect 50.8/84.67 */
+      --corner-left: 30px;
+      --corner-top: 20px;
     }
 
-    /* j.svg: scarlet square, flush left, maximum viewport height */
-    .j {
+    /* ---- intro (kept) ----
+       A black curtain covers the page; the logo sits centered on it, glides to
+       the top-left corner (scaling 1.2 → 1), then the curtain wipes up to
+       reveal the page. Pure CSS timeline. */
+
+    .curtain {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: #000;
+    }
+    body.revealed .curtain {
+      animation: curtain-up 1.2s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+    }
+    @keyframes curtain-up {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-100%); }
+    }
+
+    /* the logo: corner is the resting state; the glide animates FROM dead-center. */
+    .logo {
+      position: fixed;
+      top: var(--corner-top);
+      left: var(--corner-left);
+      z-index: 60;
+      width: var(--corner-w);
+      height: auto;
       display: block;
-      flex: none;
-      height: min(100svh, 100vw);
-      width: auto;
-      background: #ff2400;
+      transform-origin: top left;
+      animation: logo-glide 1.8s cubic-bezier(0.65, 0, 0.35, 1) 1s both;
+      filter: invert(1);   /* white while on the black curtain */
+    }
+    body.revealed .logo {
+      filter: invert(0);
+      transition: filter 0.5s cubic-bezier(0.33, 1, 0.68, 1) 1s;
     }
 
-    /* white area to the right of the j */
-    .area {
-      flex: 1 1 auto;
-      min-width: 0;
+    .logo { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .logo:focus { outline: none; }
+    .logo:focus-visible { outline: 2px solid #898989; outline-offset: 3px; }
+    /* ---- sprite hover transition (kept) ----
+       The logo SVG is a 4-frame horizontal strip; on hover it steps through the
+       frames to the two-bar menu mark. */
+    .logo .sprite { transition: transform 0.18s steps(4, jump-none); }
+    .logo:hover .sprite { transform: translateX(-304.8px); }
+    .pop { transform-box: view-box; transform-origin: 42.333px 25.4px; }
+    .logo:hover .pop { animation: pop 0.2s ease; }
+    @keyframes pop { 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+    @keyframes logo-glide {
+      from {
+        transform: translate(calc(50vw - var(--corner-left)), calc(50svh - var(--corner-top)))
+                   translate(-50%, -50%) scale(1.2);
+      }
+      to {
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    /* ---- corner menu (kept) ----
+       Clicking the logo slides out a small white container of nav links. */
+    .menu {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 48;
+      background: #fff;
+      box-sizing: border-box;
+      padding: calc(var(--corner-top) + var(--logo-h) + clamp(8px, 1.5vh, 14px))
+               clamp(14px, 1.6vw, 22px) clamp(16px, 3vh, 28px) var(--corner-left);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(3px, 0.6vh, 6px);
+      transform: translateX(-100%);
+      transition: transform 0.13s cubic-bezier(0.33, 1, 0.68, 1);
+      pointer-events: none;
+    }
+    body.menu-open .menu { transform: translateX(0); pointer-events: auto; }
+
+    .menu__link {
+      display: block;
+      color: #898989;
+      text-decoration: none;
+      font-size: clamp(12px, 0.95vw, 14px);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+    .menu__link:hover, .menu__link:focus-visible { color: #ff2400; outline: none; }
+    body.menu-open .logo .sprite { transform: translateX(-304.8px); }
+
+    /* ================================================================
+       layout — portfolio deck style: a big header wordmark, category
+       tab buttons, a horizontally fanned row of overlapping project
+       cards (drag to browse), and an About + Sort section below.
+       ================================================================ */
+
+    * { box-sizing: border-box; }
+
+    /* hide scrollbars, the deck is dragged not scrolled */
+    body { -ms-overflow-style: none; scrollbar-width: none; }
+    body::-webkit-scrollbar { display: none; }
+
+    /* ---- header wordmark ----
+       Big name top-left, sitting clear of the corner logo. Fades in with the
+       reveal alongside everything else. */
+    .site-header {
+      padding: calc(var(--corner-top) + var(--logo-h) + 28px) 2rem 0.5rem;
+    }
+    .wordmark {
+      margin: 0;
+      font-size: clamp(2.4rem, 7vw, 5.5rem);
+      font-weight: 550;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: #000;
+      cursor: pointer;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wordmark:hover { transform: scale(1.04); }
+    .wordmark a { color: inherit; text-decoration: none; }
+
+    /* ---- main ---- */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem 2rem 2rem;
+    }
+    .works-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2.85rem;
+      width: 100%;
+    }
+
+    /* ---- category tab bar ---- */
+    .mode-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .mode-btn {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #000;
+      background: #fff;
+      border: 1px solid #000;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .mode-btn:hover { background: #f0f0f0; }
+    .mode-btn.active { background: #000; color: #fff; }
+
+    /* ---- fanned card deck ----
+       A single row of wide cards, each overlapping the previous like spread
+       playing cards. z-index runs front-to-back so the left edge of every card
+       stays visible; hover lifts a card to the top. The row is dragged
+       horizontally via a transform (see deck drag JS). */
+    .deck {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      width: 100%;
+      will-change: transform;
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      width: 600px;
+      flex-shrink: 0;
+      cursor: grab;
+      margin-left: -200px;
+      position: relative;
+      transition: transform 0.3s ease;
+      transform-origin: left center;
+      /* hidden under the curtain until .revealed, then a staggered rise-in */
+      opacity: 0;
+    }
+    body.revealed .card {
+      animation: card-in 0.7s cubic-bezier(0.33, 1, 0.68, 1) calc(var(--i) * 0.07s) both;
+    }
+    @keyframes card-in { from { opacity: 0; transform: translateY(14px); }
+                         to   { opacity: 1; transform: translateY(0); } }
+    .card:active { cursor: grabbing; }
+    .card:first-child { margin-left: 0; }
+    /* stacking: earlier cards sit on top (their left edges read as tabs) */
+    .card:nth-child(1) { z-index: 10; } .card:nth-child(2) { z-index: 9; }
+    .card:nth-child(3) { z-index: 8; }  .card:nth-child(4) { z-index: 7; }
+    .card:nth-child(5) { z-index: 6; }  .card:nth-child(6) { z-index: 5; }
+    .card:nth-child(7) { z-index: 4; }  .card:nth-child(8) { z-index: 3; }
+    .card:nth-child(9) { z-index: 2; }  .card:nth-child(10) { z-index: 1; }
+    .card:hover { z-index: 20; transform: scale(1.05) translateY(-10px); }
+
+    /* the file-folder tab label riding the top edge of each card */
+    .card__header {
+      display: flex;
+      align-items: stretch;
+      gap: 0.35rem;
+      align-self: flex-start;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .card__title {
+      font-size: 0.75rem;
+      color: #000;
+      background: #fff;
+      border: 1px solid #000;
+      border-bottom: none;
+      padding: 0.3rem 0.5rem;
+      white-space: nowrap;
+      width: fit-content;
+    }
+    .card__tag {
+      display: inline-block;
+      font-size: 0.6rem;
+      color: #000;
+      background: #fff;
+      border: 1px solid #000;
+      border-bottom: none;
+      padding: 0.3rem 0.4rem;
+      white-space: nowrap;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+    }
+    .card__thumb {
+      width: 100%;
+      aspect-ratio: 1980 / 1080;
+      overflow: hidden;
+      background: #e0e0e0;
+      border: 1px solid #000;
+      border-radius: 2px;
+      position: relative;
+    }
+    .card__thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* text placeholder for entries without art yet */
+    .card__thumb--empty {
       display: flex;
       align-items: center;
       justify-content: center;
+      color: #999;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    /* short description revealed under the tab bar inside the thumb on hover */
+    .card__desc {
+      position: absolute;
+      inset: auto 0 0 0;
+      margin: 0;
+      padding: 0.9rem 1rem;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      color: #111;
+      background: rgba(255, 255, 255, 0.92);
+      border-top: 1px solid #000;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+    }
+    .card:hover .card__desc { opacity: 1; transform: translateY(0); }
+
+    .card[hidden] { display: none; }
+
+    /* ---- about + sort ---- */
+    .about-section {
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      display: flex;
+      gap: 4rem;
+      align-items: flex-start;
+    }
+    .about-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      flex: 1;
+    }
+    .about-title {
+      font-size: 1.5rem;
+      color: #000;
+      font-weight: 500;
+      margin: 0 0 0.5rem;
+    }
+    .about-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #000;
+      max-width: 800px;
+      margin: 0;
+    }
+    .about-text a { color: inherit; }
+    .about-text a:hover { color: #ff2400; }
+
+    .sort-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      min-width: 300px;
+    }
+    .sort-title {
+      font-size: 1.2rem;
+      color: #000;
+      font-weight: 500;
+      margin: 0 0 0.5rem;
+    }
+    .tag-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .sort-btn {
+      display: inline-block;
+      font-size: 0.75rem;
+      color: #000;
+      background: #fff;
+      border: 1px solid #000;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .sort-btn:hover { background: #f0f0f0; }
+    .sort-btn.active { background: #000; color: #fff; }
+
+    /* ---- mobile: the fan folds into a vertical shingle stack ---- */
+    @media (max-width: 768px) {
+      :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
+      .site-header { padding: calc(var(--corner-top) + var(--logo-h) + 20px) 1rem 0.35rem; }
+      .main-content { padding: 1rem; }
+      .works-wrap { gap: 2.15rem; }
+      .mode-btn { font-size: 0.9rem; padding: 0.4rem 0.8rem; }
+
+      .deck {
+        flex-direction: column;
+        align-items: center;
+        transform: none !important;
+      }
+      .card {
+        width: min(92%, 22.5rem);
+        margin-left: auto;
+        margin-right: auto;
+        cursor: pointer;
+        transform-origin: center top;
+      }
+      .deck > .card:not(:first-child) { margin-top: clamp(-4.25rem, -13vw, -2.75rem); }
+      .card:first-child { margin-top: 0.5rem; }
+      .card:last-child { margin-bottom: 2.5rem; }
+      .card:hover { transform: none; }
+      .card__header { width: 100%; }
+      .card__title { font-size: 0.7rem; }
+
+      .about-section { flex-direction: column; gap: 2rem; padding: 2rem 1rem; }
+      .sort-section { min-width: 100%; }
+    }
+    @media (max-width: 480px) {
+      .deck > .card { width: min(88%, 20.5rem); }
+      .site-header { padding-left: 0.75rem; padding-right: 0.75rem; }
+      .main-content { padding: 0.85rem 0.75rem 0.75rem; }
+      .deck > .card:not(:first-child) { margin-top: clamp(-4rem, -12vw, -2.5rem); }
+      .card:last-child { margin-bottom: 2rem; }
+      .card__title { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
+      .about-section { padding: 1.5rem 0.75rem; }
+      .about-title { font-size: 1.2rem; }
+      .about-text { font-size: 0.9rem; }
+      .sort-title { font-size: 1rem; }
+      .sort-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
     }
 
-    /* 3×3 grid; only cell 2 (top-center) and cell 8 (bottom-center) get
-       painted scarlet. The remaining 7 white cells are shaped like an H. */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      /* top row matches the j's stem height (118.53/203.2 = 58⅓% of the glyph);
-         bottom row stays a square (⅓); middle row is whatever's left. */
-      grid-template-rows: 42svh 1fr 33.333svh;
-      height: 100svh;        /* full viewport height: top cell hugs the top, bottom cell the bottom */
-      aspect-ratio: 1;
-    }
-    .grid span { background: #ff2400; }
-
-    /* outer → inner: cell 2 grows from the top edge down, cell 8 from the bottom edge up */
-    .grid .top {
-      grid-area: 1 / 2 / 2 / 3;
-      transform: scaleY(0); transform-origin: top;
-      animation: grow 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-    }
-    .grid .bottom {
-      grid-area: 3 / 2 / 4 / 3;
-      transform: scaleY(0); transform-origin: bottom;
-      animation: grow 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
-    }
-
-    @keyframes grow { to { transform: scaleY(1); } }
-
+    /* reduced motion: no curtain, no glide — logo rests in the corner instantly,
+       cards appear without animation */
     @media (prefers-reduced-motion: reduce) {
-      .grid span { animation: none; transform: none; }
+      .curtain { display: none; }
+      .logo .sprite { transition: none; }
+      .logo:hover .pop { animation: none; }
+      .logo { animation: none; filter: invert(0); }
+      .card, body.revealed .card { animation: none; opacity: 1; transform: none; }
+      .menu { transition: none; }
+      .wordmark, .wordmark:hover { transition: none; transform: none; }
     }
   </style>
 </head>
 <body>
-  <img class="j" src="/j.svg" alt="Justin Hong">
-  <div class="area">
-    <div class="grid" aria-hidden="true">
-      <span class="top"></span>
-      <span class="bottom"></span>
+  <div class="curtain" aria-hidden="true"></div>
+  <nav class="menu" id="site-menu" aria-label="Menu" aria-hidden="true">
+      <a class="menu__link" href="#work">Work</a>
+      <a class="menu__link" href="#about">About</a>
+  </nav>
+  <svg class="logo" width="320" height="192" viewBox="0 0 84.666692 50.799987"
+       xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0"
+       aria-label="Menu" aria-controls="site-menu" aria-expanded="false">
+    <!-- 4-frame transition sprite (logo -> two-bar menu), authored in
+         jhokxtransition.svg. The viewBox is one 84.67-wide frame, so only one
+         frame shows at a time. -->
+    <g class="pop">
+    <g class="sprite">
+      <g transform="translate(-423.33334,-999.06659)">
+        <path style="fill:#000;stroke-width:2" d="m 423.33334,1015.9999 16.93333,16.9334 H 457.2 v -16.9334 H 440.26667 L 423.33334,999.0666 H 457.2 l 16.93334,16.9333 h 16.93333 V 999.0666 H 508 v 50.8 h -16.93333 v -16.9333 h -16.93333 v 16.9333 h -33.86667 l -16.93333,-16.9333 z"/>
+        <path style="fill:#000;stroke-width:2" d="m 524.93333,999.0666 v 16.9333 H 558.8 v 16.9334 h -33.86667 l 16.93334,16.9333 H 609.6 v -50.8 h -16.93334 v 33.8667 h -16.93333 v -16.9334 L 558.8,999.0666 Z"/>
+        <path style="fill:#000;stroke-width:2" d="m 626.53333,999.0666 v 16.9333 h 50.8 v 16.9334 h -50.8 l 16.93333,16.9333 h 67.73333 v -16.9333 h -16.93334 v -16.9334 h 16.93334 v -16.9333 z"/>
+        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="999.06659"/>
+        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="1032.9332"/>
+      </g>
+    </g>
+    </g>
+  </svg>
+
+  <header class="site-header">
+    <h1 class="wordmark"><a href="/">Justin Hong</a></h1>
+  </header>
+
+  <main class="main-content" id="work">
+    <div class="works-wrap">
+      <div class="mode-bar" role="tablist" aria-label="Work categories">
+        <button class="mode-btn active" type="button" role="tab" aria-selected="true"  data-mode="all">All</button>
+        <button class="mode-btn"        type="button" role="tab" aria-selected="false" data-mode="hackathons">Hackathons</button>
+        <button class="mode-btn"        type="button" role="tab" aria-selected="false" data-mode="studies">Studies</button>
+      </div>
+      <div class="deck" id="deck" aria-label="Selected work"></div>
     </div>
-  </div>
+  </main>
+
+  <section class="about-section" id="about">
+    <div class="about-content">
+      <h2 class="about-title">About</h2>
+      <p class="about-text">
+        Justin Hong — MIT.<br>
+        <a href="mailto:namyang@mit.edu">namyang@mit.edu</a><br>
+        <a href="https://github.com/hongnoul" rel="me">github.com/hongnoul</a> ·
+        <a href="https://linkedin.com/in/hongnoul" rel="me">linkedin.com/in/hongnoul</a> ·
+        <a href="/archive/resume/resume.pdf">resume</a>
+      </p>
+    </div>
+    <div class="sort-section">
+      <h3 class="sort-title">Sort</h3>
+      <div class="tag-buttons" id="tag-buttons"></div>
+      <button class="sort-btn" id="sort-reset" type="button">Reset</button>
+    </div>
+  </section>
+
+  <script>
+    /* ---- work data ----
+       Each entry: title, category (mode-bar tab), tags (Sort buttons), an
+       optional thumbnail and a short description shown on hover. Add an entry
+       here and it appears in the deck. */
+    const projects = [
+      { title: 'Groundwork — Ripple Designathon', mode: 'hackathons',
+        tags: ['web', 'design'], img: '/groundwork_poster.jpg',
+        description: 'A civic social platform where people share, celebrate, and ' +
+          'inspire community service. React 19 / Bun front end with Leaflet event ' +
+          'maps and a Flask + Firestore back end. Apr 2026.' },
+      { title: 'Cadabra — Amazon Nova Hackathon', mode: 'hackathons',
+        tags: ['extension', 'ai'], img: '/cadabra_nova.png',
+        description: 'A Chrome extension that personalizes Amazon search rankings ' +
+          'in real time from AI-inferred behavioral profiles. TypeScript Lambda on ' +
+          'AWS API Gateway with DynamoDB persistence. Feb 2026.' },
+      /* placeholder entries — swap in real work as it lands */
+      { title: 'Index Grid',     mode: 'studies', tags: ['design'] },
+      { title: 'Field Notes',    mode: 'studies', tags: ['design'] },
+      { title: 'Monogram Study', mode: 'studies', tags: ['design'] },
+      { title: 'Type Specimen',  mode: 'studies', tags: ['design'] },
+    ];
+
+    const deck = document.getElementById('deck');
+    deck.innerHTML = projects.map((p, i) => `
+      <article class="card" style="--i:${i}" data-mode="${p.mode}" data-tags="${p.tags.join(',')}">
+        <div class="card__header">
+          <span class="card__title">${p.title}</span>
+          ${p.tags.map(t => `<span class="card__tag">${t}</span>`).join('')}
+        </div>
+        <div class="card__thumb ${p.img ? '' : 'card__thumb--empty'}">
+          ${p.img ? `<img src="${p.img}" alt="${p.title}" draggable="false">` : `<span>${p.title}</span>`}
+          ${p.description ? `<p class="card__desc">${p.description}</p>` : ''}
+        </div>
+      </article>`).join('');
+
+    /* ---- filtering ----
+       Mode tabs and Sort tags combine: a card shows when it matches the active
+       mode AND (no tag selected OR it carries the selected tag). Re-stagger the
+       reveal indexes after each filter so the rise-in stays tidy. */
+    const cards = [...deck.querySelectorAll('.card')];
+    let activeMode = 'all';
+    let activeTag = null;
+
+    function applyFilter() {
+      let vis = 0;
+      for (const c of cards) {
+        const okMode = activeMode === 'all' || c.dataset.mode === activeMode;
+        const okTag = !activeTag || c.dataset.tags.split(',').includes(activeTag);
+        const show = okMode && okTag;
+        c.hidden = !show;
+        if (show) c.style.setProperty('--i', vis++);
+      }
+      setOffset(0);   // rewind the drag position on every filter change
+    }
+
+    const modeBtns = [...document.querySelectorAll('.mode-btn')];
+    for (const b of modeBtns) b.addEventListener('click', () => {
+      activeMode = b.dataset.mode;
+      for (const x of modeBtns) {
+        x.classList.toggle('active', x === b);
+        x.setAttribute('aria-selected', String(x === b));
+      }
+      applyFilter();
+    });
+
+    /* Sort buttons are generated from the union of all card tags */
+    const tagWrap = document.getElementById('tag-buttons');
+    const allTags = [...new Set(projects.flatMap(p => p.tags))];
+    tagWrap.innerHTML = allTags.map(t => `<button class="sort-btn" type="button" data-tag="${t}">${t}</button>`).join('');
+    const tagBtns = [...tagWrap.querySelectorAll('.sort-btn')];
+    for (const b of tagBtns) b.addEventListener('click', () => {
+      activeTag = activeTag === b.dataset.tag ? null : b.dataset.tag;
+      for (const x of tagBtns) x.classList.toggle('active', x.dataset.tag === activeTag);
+      applyFilter();
+    });
+    document.getElementById('sort-reset').addEventListener('click', () => {
+      activeTag = null;
+      for (const x of tagBtns) x.classList.remove('active');
+      applyFilter();
+    });
+
+    /* ---- deck drag ----
+       Desktop: the fanned row is wider than the viewport, so dragging pans it
+       with a translateX clamped to the overflow. Pointer events cover mouse and
+       touch; a wheel handler maps vertical scroll over the deck to a pan too.
+       On mobile the CSS stacks the cards vertically and forces transform: none. */
+    let offset = 0;
+    function maxOffset() {
+      const over = deck.scrollWidth - deck.parentElement.clientWidth;
+      return Math.max(0, over);
+    }
+    function setOffset(x) {
+      offset = Math.min(0, Math.max(-maxOffset(), x));
+      deck.style.transform = `translateX(${offset}px)`;
+    }
+    let dragging = false, startX = 0, startOffset = 0, moved = false;
+    deck.addEventListener('pointerdown', (e) => {
+      if (matchMedia('(max-width: 768px)').matches) return;
+      dragging = true; moved = false;
+      startX = e.clientX; startOffset = offset;
+      deck.setPointerCapture(e.pointerId);
+    });
+    deck.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 4) moved = true;
+      setOffset(startOffset + dx);
+    });
+    const endDrag = () => { dragging = false; };
+    deck.addEventListener('pointerup', endDrag);
+    deck.addEventListener('pointercancel', endDrag);
+    /* suppress accidental clicks after a drag */
+    deck.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+    deck.addEventListener('wheel', (e) => {
+      if (matchMedia('(max-width: 768px)').matches) return;
+      if (maxOffset() === 0) return;
+      e.preventDefault();
+      setOffset(offset - (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY));
+    }, { passive: false });
+    addEventListener('resize', () => setOffset(offset));
+
+    applyFilter();
+
+    /* ---- corner menu toggle (kept) ----
+       The corner logo doubles as the menu button. Clicking it — or Enter/Space
+       while focused — toggles the nav links. Escape / outside click closes. */
+    (function () {
+      const logo = document.querySelector('.logo');
+      const menu = document.getElementById('site-menu');
+      if (!logo || !menu) return;
+
+      const setOpen = (open) => {
+        document.body.classList.toggle('menu-open', open);
+        logo.setAttribute('aria-expanded', String(open));
+        menu.setAttribute('aria-hidden', String(!open));
+      };
+      const isOpen = () => document.body.classList.contains('menu-open');
+      const toggle = () => setOpen(!isOpen());
+
+      logo.addEventListener('click', toggle);
+      logo.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+      menu.addEventListener('click', (e) => { if (e.target.closest('.menu__link')) setOpen(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) setOpen(false); });
+      document.addEventListener('click', (e) => {
+        if (isOpen() && !e.target.closest('.menu') && !e.target.closest('.logo')) setOpen(false);
+      });
+    })();
+
+    /* ---- intro (kept) ----
+       Hold the curtain for the logo glide, then reveal. The reveal toggles
+       `body.revealed`, which drives the curtain wipe, the logo recolor and the
+       cards' staggered rise-in. */
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const MIN_INTRO = 1850;
+
+    function reveal() {
+      document.body.classList.remove('intro-lock');
+      document.body.classList.add('revealed');
+    }
+
+    document.body.classList.add('intro-lock');
+    if (reduceMotion) reveal();
+    else setTimeout(reveal, MIN_INTRO);
+  </script>
 </body>
 </html>
