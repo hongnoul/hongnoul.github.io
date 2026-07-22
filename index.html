@@ -699,6 +699,12 @@
     for (const b of modeBtns) b.addEventListener('click', () => setMode(b.dataset.mode));
     for (const b of menuFilterBtns) b.addEventListener('click', () => setMode(b.dataset.mode));
 
+    /* dedicated pages link back with ?mode=work|hackathons|studies */
+    {
+      const m = new URLSearchParams(location.search).get('mode');
+      if (m && ['work', 'hackathons', 'studies'].includes(m)) setMode(m);
+    }
+
     /* Sort buttons are generated from the union of all card tags */
     const tagWrap = document.getElementById('tag-buttons');
     const allTags = [...new Set(projects.flatMap(p => p.tags))];

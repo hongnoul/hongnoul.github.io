@@ -51,12 +51,82 @@
 
     .wrap { max-width: 680px; margin: 0 auto; padding: 0 24px 140px; }
 
-    /* ---- top chrome: corner mark linking home ---- */
-    .corner {
-      position: fixed; top: 20px; left: 30px; z-index: 10;
-      width: 42px; display: block; line-height: 0;
+    /* ---- top chrome: the same corner logo + hamburger menu as the
+       homepage, so navigation chrome stays constant across pages. The
+       logo is the 4-frame sprite (logo -> two-bar menu) and toggles the
+       slide-out menu; sizing tracks the homepage's --corner-* vars. ---- */
+    :root {
+      --corner-w: 42px;
+      --logo-h: calc(var(--corner-w) * 0.6);   /* aspect 50.8/84.67 */
+      --corner-left: 30px;
+      --corner-top: 20px;
     }
-    .corner img { width: 100%; height: auto; display: block; }
+    .logo {
+      position: fixed;
+      top: var(--corner-top);
+      left: var(--corner-left);
+      z-index: 60;
+      width: var(--corner-w);
+      height: auto;
+      display: block;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .logo:focus { outline: none; }
+    .logo:focus-visible { outline: 2px solid #898989; outline-offset: 3px; }
+    .logo .sprite { transition: transform 0.18s steps(4, jump-none); }
+    .pop { transform-box: view-box; transform-origin: 42.333px 25.4px; }
+    @media (hover: hover) {
+      .logo:hover .sprite { transform: translateX(-304.8px); }
+      .logo:hover .pop { animation: pop 0.2s ease; }
+    }
+    @keyframes pop { 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+
+    .menu {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 48;
+      background: #fff;
+      box-sizing: border-box;
+      padding: calc(var(--corner-top) + var(--logo-h) + clamp(8px, 1.5vh, 14px))
+               clamp(14px, 1.6vw, 22px) clamp(16px, 3vh, 28px) var(--corner-left);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(3px, 0.6vh, 6px);
+      transform: translateX(-100%);
+      transition: transform 0.13s cubic-bezier(0.33, 1, 0.68, 1);
+      pointer-events: none;
+    }
+    body.menu-open .menu { transform: translateX(0); pointer-events: auto; }
+    .menu__link {
+      display: block;
+      color: #898989;
+      text-decoration: none;
+      font-size: clamp(12px, 0.95vw, 14px);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+    .menu__link:hover, .menu__link:focus-visible { color: #ff2400; outline: none; }
+    /* category links mirror the homepage: hidden on desktop (the homepage
+       shows its tab bar there), visible in the menu on mobile */
+    .menu__filter { display: none; }
+    body.menu-open .logo .sprite { transform: translateX(-304.8px); }
+    @media (max-width: 768px) {
+      :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
+      .menu__filter { display: block; }
+      .menu__link--work { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .logo .sprite { transition: none; }
+      .logo:hover .pop { animation: none; }
+      .menu { transition: none; }
+    }
 
     /* ---- header ---- */
     header { padding-top: 110px; margin-bottom: 72px; }
@@ -190,9 +260,31 @@
 </head>
 <body>
 
-  <a class="corner" href="/" aria-label="홍승우 - home">
-    <img src="/j.svg" alt="" width="42" height="26">
-  </a>
+  <nav class="menu" id="site-menu" aria-label="Menu" aria-hidden="true">
+      <a class="menu__link menu__link--work" href="/#work">Work</a>
+      <a class="menu__link menu__filter" href="/">All</a>
+      <a class="menu__link menu__filter" href="/?mode=work">Work</a>
+      <a class="menu__link menu__filter" href="/?mode=hackathons">Hackathons</a>
+      <a class="menu__link menu__filter" href="/?mode=studies">Studies</a>
+      <a class="menu__link" href="/#about">About</a>
+  </nav>
+  <svg class="logo" width="320" height="192" viewBox="0 0 84.666692 50.799987"
+       xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0"
+       aria-label="Menu" aria-controls="site-menu" aria-expanded="false">
+    <!-- same 4-frame transition sprite as the homepage (logo -> two-bar
+         menu); the viewBox is one 84.67-wide frame. -->
+    <g class="pop">
+    <g class="sprite">
+      <g transform="translate(-423.33334,-999.06659)">
+        <path style="fill:#000;stroke-width:2" d="m 423.33334,1015.9999 16.93333,16.9334 H 457.2 v -16.9334 H 440.26667 L 423.33334,999.0666 H 457.2 l 16.93334,16.9333 h 16.93333 V 999.0666 H 508 v 50.8 h -16.93333 v -16.9333 h -16.93333 v 16.9333 h -33.86667 l -16.93333,-16.9333 z"/>
+        <path style="fill:#000;stroke-width:2" d="m 524.93333,999.0666 v 16.9333 H 558.8 v 16.9334 h -33.86667 l 16.93334,16.9333 H 609.6 v -50.8 h -16.93334 v 33.8667 h -16.93333 v -16.9334 L 558.8,999.0666 Z"/>
+        <path style="fill:#000;stroke-width:2" d="m 626.53333,999.0666 v 16.9333 h 50.8 v 16.9334 h -50.8 l 16.93333,16.9333 h 67.73333 v -16.9333 h -16.93334 v -16.9334 h 16.93334 v -16.9333 z"/>
+        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="999.06659"/>
+        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="1032.9332"/>
+      </g>
+    </g>
+    </g>
+  </svg>
 
   <div class="wrap">
 
@@ -425,6 +517,31 @@
           obs.disconnect();
         }
       }, { threshold: 0.5 }).observe(view);
+    })();
+
+    /* ---- corner menu toggle (same behavior as the homepage) ---- */
+    (function () {
+      const logo = document.querySelector('.logo');
+      const menu = document.getElementById('site-menu');
+      if (!logo || !menu) return;
+
+      const setOpen = (open) => {
+        document.body.classList.toggle('menu-open', open);
+        logo.setAttribute('aria-expanded', String(open));
+        menu.setAttribute('aria-hidden', String(!open));
+      };
+      const isOpen = () => document.body.classList.contains('menu-open');
+      const toggle = () => setOpen(!isOpen());
+
+      logo.addEventListener('click', toggle);
+      logo.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+      menu.addEventListener('click', (e) => { if (e.target.closest('.menu__link')) setOpen(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) setOpen(false); });
+      document.addEventListener('click', (e) => {
+        if (isOpen() && !e.target.closest('.menu') && !e.target.closest('.logo')) setOpen(false);
+      });
     })();
 
     /* ---- scroll reveal ---- */
