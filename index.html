@@ -415,8 +415,10 @@
       .mode-bar { display: none; }
       .menu__filter { display: block; }
       .menu__link--work { display: none; }
-      .main-content { padding: calc(var(--corner-top) + var(--logo-h) + 20px) 1rem 1rem; }
-      .card { width: min(92%, 22.5rem); }
+      /* one shared gutter: everything lines up with the corner logo's left
+         edge (--corner-left), including the hamburger menu contents */
+      .main-content { padding: calc(var(--corner-top) + var(--logo-h) + 20px) var(--corner-left) 1rem; }
+      .card { width: 100%; }
       .mode-btn { font-size: 0.8rem; padding: 0.35rem 0.7rem; }
 
       .deck {
@@ -439,16 +441,14 @@
       .card__header { width: 100%; }
       .card__title { font-size: 0.7rem; }
 
-      .about-section { flex-direction: column; gap: 2rem; padding: 1rem 1rem 2rem; }
+      .about-section { flex-direction: column; gap: 2rem; padding: 1rem var(--corner-left) 2rem; }
       .sort-section { min-width: 100%; }
     }
     @media (max-width: 480px) {
-      .deck > .card { width: min(88%, 20.5rem); }
-      .main-content { padding-left: 0.75rem; padding-right: 0.75rem; }
       .deck { gap: 1rem; }
       .card:last-child { margin-bottom: 2rem; }
       .card__title { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
-      .about-section { padding: 1.5rem 0.75rem; }
+      .about-section { padding-top: 1.5rem; }
       .about-title { font-size: 1.2rem; }
       .about-text { font-size: 0.9rem; }
       .sort-title { font-size: 1rem; }
