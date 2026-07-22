@@ -505,11 +505,32 @@
        href (the card opens it in a new tab on click). Add an entry here and it
        appears in the deck. */
     const projects = [
-      { title: 'TrustAI Labs (YC S26)', mode: 'work',
+      { title: 'hwatu — 13 ms browser for coding agents', mode: 'work',
+        tags: ['systems', 'ai'], img: '/work/hwatu-spawn-demo.svg',
+        href: '/work/hwatu.html',
+        description: 'A daemon-based WebKit browser that makes visual ' +
+          'verification nearly free for AI agents: 13 ms median window spawn, ' +
+          'headless-by-default under agent harnesses, JSON-over-socket ' +
+          'protocol. Rust + WebKitGTK 6. 2026.' },
+      { title: 'TrustAI — auto.trytrust.ai', mode: 'work',
+        tags: ['web', 'design', 'ai'], img: '/trustai_auto_thumb.png',
+        href: 'https://auto.trytrust.ai',
+        description: 'TrustAI Labs (YC S26), founding engineer & designer. ' +
+          '"Your team\u2019s best instincts, automated" — the current product. ' +
+          'Own the end-to-end frontend, interactive demos, and the full visual ' +
+          'identity and design system.' },
+      { title: 'TrustAI Writing Lab', mode: 'work',
+        tags: ['web', 'ai'], img: '/trustai_harvard_thumb.png',
+        href: 'https://harvard.trytrust.ai',
+        description: 'CEFR-aligned AI support for English writing development — ' +
+          'K-12 through EAP. Next.js 16 / React 19, CEFR vocabulary + grammar ' +
+          'profiling, rubric-based teacher-moderated AI feedback, and learning ' +
+          'pathways.' },
+      { title: 'TrustAI — Agent Risk Assessment', mode: 'work',
         tags: ['web', 'design'], img: '/trustai_thumb.png',
-        description: 'Founding engineer & designer. Own the end-to-end frontend, ' +
-          'marketing site, interactive product demos, and the full visual ' +
-          'identity and design system. Mar 2026 – present.' },
+        description: 'Pre-pivot product: maps what every ERP AI agent can reach ' +
+          'and wreck, then verifies it\u2019s under control. Built the marketing ' +
+          'site and product demos used in investor and customer presentations.' },
       { title: 'Groundwork — Ripple Designathon', mode: 'hackathons',
         tags: ['web', 'design'], img: '/groundwork_poster.jpg',
         description: 'A civic social platform where people share, celebrate, and ' +
