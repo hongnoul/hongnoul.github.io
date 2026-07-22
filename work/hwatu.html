@@ -14,6 +14,7 @@
   <meta property="og:url" content="https://hongnoul.github.io/work/hwatu.html">
   <meta property="og:type" content="article">
   <meta name="theme-color" content="#fafafa">
+  <script>document.documentElement.classList.add('js');</script>
   <style>
     @font-face {
       font-family: "InterVariable";
@@ -158,11 +159,12 @@
     }
     .colophon b { color: #ff2400; font-weight: 550; }
 
-    /* ---- reveal on scroll ---- */
+    /* ---- reveal on scroll (JS-gated so content is never hidden without it) ---- */
     @media (prefers-reduced-motion: no-preference) {
-      .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.33,1,.68,1), transform .7s cubic-bezier(.33,1,.68,1); }
-      .reveal.in { opacity: 1; transform: none; }
+      html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.33,1,.68,1), transform .7s cubic-bezier(.33,1,.68,1); }
+      html.js .reveal.in { opacity: 1; transform: none; }
     }
+    @media print { html.js .reveal { opacity: 1 !important; transform: none !important; } }
 
     @media (max-width: 560px) {
       header { padding-top: 110px; }
@@ -283,7 +285,7 @@
         trivial from any language. The CLI is the same protocol with argv parsing:
       </p>
       <pre class="term"><span class="ps1">$ </span><span class="cmd">hwatu localhost:3000</span>
-<span class="out">3</span>                                <span class="out"># window id, headless by default under an agent</span>
+<span class="out">3</span>                <span class="out"># window id; headless under an agent</span>
 <span class="ps1">$ </span><span class="cmd">hwatu screenshot 3 /tmp/check.png</span>
 <span class="ps1">$ </span><span class="cmd">hwatu eval 3 'document.querySelector(".price").textContent'</span>
 <span class="out">"$1,299"</span>
@@ -336,10 +338,16 @@
       { fill: document.getElementById('fHwatu'),  time: document.getElementById('tHwatu'),  real: HWATU_MS,  win: true  },
       { fill: document.getElementById('fChrome'), time: document.getElementById('tChrome'), real: CHROME_MS, win: false },
     ];
-    let raf = null;
+    let raf = null, timer = null;
+
+    function stopDriver() {
+      if (raf) cancelAnimationFrame(raf);
+      if (timer) clearInterval(timer);
+      raf = null; timer = null;
+    }
 
     function runRace() {
-      if (raf) cancelAnimationFrame(raf);
+      stopDriver();
       btn.disabled = true;
       const t0 = performance.now();
       for (const l of lanes) {
@@ -348,6 +356,7 @@
         l.time.className = 'lane__time';
       }
       function frame(now) {
+        lastTick = performance.now();
         const elapsed = (now - t0) / SCALE;  /* simulated real ms */
         let allDone = true;
         for (const l of lanes) {
@@ -360,10 +369,16 @@
           }
           if (t < l.real) allDone = false;
         }
-        if (!allDone) raf = requestAnimationFrame(frame);
-        else { raf = null; btn.disabled = false; }
+        if (allDone) { stopDriver(); btn.disabled = false; }
+        else raf = requestAnimationFrame(frame);
       }
+      let lastTick = performance.now();
       raf = requestAnimationFrame(frame);
+      /* watchdog: if rAF frames aren't ticking (headless verification,
+         backgrounded tab), drive the animation off the wall clock instead */
+      timer = setInterval(() => {
+        if (performance.now() - lastTick > 90) frame(performance.now());
+      }, 100);
     }
     btn.addEventListener('click', runRace);
 
@@ -383,6 +398,11 @@
       for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    /* safety net: anything still unrevealed shortly after load (headless
+       capture, snapshot tools, odd viewports) reveals itself off-screen */
+    addEventListener('load', () => setTimeout(() => {
+      document.querySelectorAll('.reveal:not(.in)').forEach(el => el.classList.add('in'));
+    }, 2500));
   </script>
 </body>
 </html>
