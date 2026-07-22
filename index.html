@@ -472,6 +472,7 @@
     <div class="works-wrap">
       <div class="mode-bar" role="tablist" aria-label="Work categories">
         <button class="mode-btn active" type="button" role="tab" aria-selected="true"  data-mode="all">All</button>
+        <button class="mode-btn"        type="button" role="tab" aria-selected="false" data-mode="work">Work</button>
         <button class="mode-btn"        type="button" role="tab" aria-selected="false" data-mode="hackathons">Hackathons</button>
         <button class="mode-btn"        type="button" role="tab" aria-selected="false" data-mode="studies">Studies</button>
       </div>
@@ -500,9 +501,15 @@
   <script>
     /* ---- work data ----
        Each entry: title, category (mode-bar tab), tags (Sort buttons), an
-       optional thumbnail and a short description shown on hover. Add an entry
-       here and it appears in the deck. */
+       optional thumbnail, a short description shown on hover, and an optional
+       href (the card opens it in a new tab on click). Add an entry here and it
+       appears in the deck. */
     const projects = [
+      { title: 'TrustAI Labs (YC S26)', mode: 'work',
+        tags: ['web', 'design'], img: '/trustai_thumb.png',
+        description: 'Founding engineer & designer. Own the end-to-end frontend, ' +
+          'marketing site, interactive product demos, and the full visual ' +
+          'identity and design system. Mar 2026 – present.' },
       { title: 'Groundwork — Ripple Designathon', mode: 'hackathons',
         tags: ['web', 'design'], img: '/groundwork_poster.jpg',
         description: 'A civic social platform where people share, celebrate, and ' +
@@ -513,16 +520,50 @@
         description: 'A Chrome extension that personalizes Amazon search rankings ' +
           'in real time from AI-inferred behavioral profiles. TypeScript Lambda on ' +
           'AWS API Gateway with DynamoDB persistence. Feb 2026.' },
-      /* placeholder entries — swap in real work as it lands */
-      { title: 'Index Grid',     mode: 'studies', tags: ['design'] },
-      { title: 'Field Notes',    mode: 'studies', tags: ['design'] },
-      { title: 'Monogram Study', mode: 'studies', tags: ['design'] },
-      { title: 'Type Specimen',  mode: 'studies', tags: ['design'] },
+      { title: 'Freight Agent — Subconscious Hackathon', mode: 'hackathons',
+        tags: ['ai', 'web'],
+        description: 'Plan-approve-execute UX for an autonomous freight-exception ' +
+          'agent on Cloudflare Workers, plus a voice-first Next.js storefront ' +
+          'built in a 2-hour sprint. May 2026.' },
+      { title: 'ACL Triage — Cursor Hackathon', mode: 'hackathons',
+        tags: ['ai', 'web'],
+        description: 'Next.js 16 coach dashboard for ACL-injury triage: 60+ athlete ' +
+          'rosters, body-silhouette injury mapping, MediaPipe pose extraction and ' +
+          'RAG-grounded rehab retrieval. May 2026.' },
+      { title: 'MIT Activist Murals Archive', mode: 'work',
+        tags: ['web'],
+        description: 'Server-side rendered digital exhibition platform built with ' +
+          'Next.js for the MIT Political History Department — a digital archive of ' +
+          'activist murals reaching 1,000+ users. 2023–24.' },
+      { title: 'Deed — MIT Bitcoin Hackathon', mode: 'hackathons',
+        tags: ['web'],
+        description: 'Tokenized property deed system and live marketplace prototype ' +
+          'with a real-time transaction UI. Led a team of 5+, presented at MIT ' +
+          'Bitcoin Expo. Feb 2024.' },
+      { title: 'T(p,q) Torus Knots', mode: 'studies',
+        tags: ['3d', 'writing'], img: '/torus_thumb.png',
+        href: '/archive/work/torus.html',
+        description: 'The T(p,q) family, parametric form, and an interactive ' +
+          'silhouette text-wrap specimen.' },
+      { title: 'j3d — Software 3D Renderer', mode: 'studies',
+        tags: ['3d'], img: '/j3d_thumb.png',
+        href: '/archive/work/j3d.html',
+        description: 'A from-scratch 3D renderer study.' },
+      { title: 'Lighting Iteration', mode: 'studies',
+        tags: ['3d'], img: '/lighting_thumb.png',
+        href: '/archive/work/lighting-iteration.html',
+        description: 'Iterating on lighting models — a visual walkthrough.' },
+      { title: 'Sprites', mode: 'studies',
+        tags: ['design'], img: '/sprites_thumb.png',
+        href: '/archive/work/sprites.html',
+        description: 'Sprite studies — including the 4-frame logo transition used ' +
+          'in this site\u2019s corner mark.' },
     ];
 
     const deck = document.getElementById('deck');
     deck.innerHTML = projects.map((p, i) => `
-      <article class="card" style="--i:${i}" data-mode="${p.mode}" data-tags="${p.tags.join(',')}">
+      <article class="card" style="--i:${i}" data-mode="${p.mode}" data-tags="${p.tags.join(',')}"
+               ${p.href ? `data-href="${p.href}" role="link" tabindex="0"` : ''}>
         <div class="card__header">
           <span class="card__title">${p.title}</span>
           ${p.tags.map(t => `<span class="card__tag">${t}</span>`).join('')}
@@ -532,6 +573,17 @@
           ${p.description ? `<p class="card__desc">${p.description}</p>` : ''}
         </div>
       </article>`).join('');
+
+    /* cards with a data-href open their page on click (drags are suppressed by
+       the moved-flag capture handler below) or Enter while focused */
+    deck.addEventListener('click', (e) => {
+      const card = e.target.closest('.card[data-href]');
+      if (card) window.open(card.dataset.href, '_blank', 'noopener');
+    });
+    deck.addEventListener('keydown', (e) => {
+      const card = e.target.closest('.card[data-href]');
+      if (card && e.key === 'Enter') window.open(card.dataset.href, '_blank', 'noopener');
+    });
 
     /* ---- filtering ----
        Mode tabs and Sort tags combine: a card shows when it matches the active
