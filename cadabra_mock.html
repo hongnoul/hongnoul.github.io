@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cadabra — popup mockup</title>
+    <!-- A self-contained, static reproduction of the Cadabra extension popup
+         (github.com/hongnoul/cadabra · extension/popup.html), shown in its
+         logged-in/populated state. The real popup relies on chrome.* APIs and an
+         AWS backend; this is a no-network mockup for embedding on the site, with
+         only light vanilla interactivity (toggles, sliders, Auto/Manual, tooltips). -->
+    <style>
+      :root {
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --text: #0f1111;
+        --muted: #4a4012;
+        --accent: #ffd814;
+      }
+      html, body { background: var(--bg); }
+      body {
+        margin: 0;
+        width: 460px;
+        color: var(--text);
+        font-family: "Segoe UI", "SF Pro Text", system-ui, sans-serif;
+      }
+      .wrap { position: relative; padding: 8px; }
+      .card {
+        background: var(--panel);
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 8px;
+        margin: 0;
+        box-shadow: 0 2px 8px rgba(15, 17, 17, 0.04);
+      }
+      .cards-stack { display: grid; gap: 2px; }
+      .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .row-left { display: inline-flex; align-items: center; gap: 6px; }
+      .nova-group {
+        background: #fff6d5; border: 1px solid #efcf5d;
+        border-radius: 8px; padding: 6px; margin-bottom: 6px;
+      }
+      .nova-group-title {
+        margin: 0 0 8px; display: inline-flex; align-items: center; gap: 6px;
+        font-size: 11px; color: #5d4f0f; font-weight: 700;
+        letter-spacing: 0.02em; text-transform: uppercase;
+      }
+      .nova-title-logo { width: 14px; height: 14px; object-fit: contain; display: block; }
+      .nova-feature-row { padding: 0; }
+      .non-nova-feature-row { padding: 0 8px; }
+      .section-title {
+        margin: 4px 0 4px; font-size: 12px; color: #5d4f0f;
+        font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+      }
+      .profile { background: transparent; border: none; padding: 0; }
+      .auth-sub { font-size: 12px; color: #3a3210; margin: 4px 0 10px; }
+      .auth-name { font-weight: 800; font-size: 16px; line-height: 1.2; color: var(--text); }
+      .identity-row {
+        margin-bottom: 8px; padding: 6px 8px 6px 54px; min-height: 34px;
+        align-items: flex-end;
+      }
+      .profile-hero {
+        margin: 2px 8px 6px; font-size: 42px; line-height: 1; font-weight: 900;
+        letter-spacing: -0.02em; color: #0f1111; text-align: center;
+      }
+      .hero-confidence { margin: -2px 8px 6px; }
+      .hero-confidence-row {
+        display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px;
+      }
+      .confidence-fill { height: 100%; background: #0f1111; transition: width 0.35s ease; }
+      .signal-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; }
+      .signal-item { display: block; min-width: 0; }
+      .signal-label {
+        font-size: 10px; color: #5f520f; font-weight: 600;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .criterion-tip { position: relative; cursor: help; display: inline-block; }
+      .criteria-tooltip-floating {
+        position: fixed; z-index: 60; max-width: 180px; background: #0f1111;
+        color: #fff; border-radius: 6px; padding: 6px 7px; font-size: 10px;
+        line-height: 1.3; box-shadow: 0 8px 16px rgba(15, 17, 17, 0.25); pointer-events: none;
+      }
+      .signal-track { height: 4px; background: #0f1111; border-radius: 999px; overflow: hidden; margin-top: 2px; }
+      .signal-fill { height: 100%; background: #ffd814; transition: width 0.35s ease; }
+      .signal-value { font-size: 10px; text-align: right; color: #0f1111; font-weight: 700; margin-top: 1px; }
+      .snapshot-meta {
+        margin-top: 8px; display: flex; justify-content: flex-start; align-items: center;
+        gap: 6px; font-size: 11px; color: #5f520f;
+      }
+      .snapshot-meta strong { color: #0f1111; }
+      .mode-row { display: flex; gap: 10px; font-size: 12px; }
+      #cadabra-manual-sliders { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; margin-top: 6px; }
+      .slider-row label { display: flex; justify-content: space-between; font-size: 11px; color: #5f520f; }
+      input[type="range"] { width: 100%; accent-color: #ffd814; }
+      input[type="checkbox"] { width: 36px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+      .btn {
+        border: 1px solid #d9c56e; border-radius: 8px; padding: 8px 10px;
+        background: #fff7d9; cursor: pointer; font-size: 12px; font-weight: 700; color: #0f1111;
+      }
+      .btn.primary { border: none; border-radius: 16px; background: #ffd814; color: #111827; }
+      .btn.primary:hover { background: #ffce12; color: #0f1111; }
+      .hidden, #cadabra-manual-sliders.hidden { display: none; }
+      .brand-logo {
+        position: absolute; top: 18px; left: 22px; width: 34px; height: 34px;
+        object-fit: contain; margin: 0;
+      }
+      .disclaimer {
+        margin: 10px 8px 4px; font-size: 10px; line-height: 1.35;
+        color: #6b7280; text-align: center;
+      }
+    </style>
+  </head>
+  <body class="auth-logged-in">
+    <div class="wrap">
+      <img class="brand-logo" src="./cadabra_logo.svg" alt="Cadabra logo" />
+
+      <div class="row identity-row">
+        <p class="auth-sub" style="margin: 0;"><span class="auth-name">Justin Hong</span> is a…</p>
+        <button class="btn primary">Sign out</button>
+      </div>
+      <div class="profile-hero criterion-tip" data-tip="Cadabra's best-fit shopping archetype based on your aggregate behavior.">Pragmatic browser</div>
+      <div class="hero-confidence">
+        <div class="hero-confidence-row">
+          <div class="signal-label criterion-tip" data-tip="How certain Cadabra is about your current shopper profile.">Confidence</div>
+          <div class="signal-value">72%</div>
+        </div>
+        <div class="signal-track"><div class="confidence-fill" style="width: 72%"></div></div>
+      </div>
+
+      <div class="cards-stack">
+        <div class="card">
+          <div class="profile">
+            <div class="signal-grid">
+              <div class="signal-item">
+                <div class="signal-label criterion-tip" data-tip="Preference for items appearing near the top of search results.">Top</div>
+                <div class="signal-track"><div class="signal-fill" style="width: 64%"></div></div>
+                <div class="signal-value">64%</div>
+              </div>
+              <div class="signal-item">
+                <div class="signal-label criterion-tip" data-tip="How strongly lower price influences your decisions.">Price</div>
+                <div class="signal-track"><div class="signal-fill" style="width: 81%"></div></div>
+                <div class="signal-value">81%</div>
+              </div>
+              <div class="signal-item">
+                <div class="signal-label criterion-tip" data-tip="Tendency to optimize by size, quantity, or per-unit value.">Unit</div>
+                <div class="signal-track"><div class="signal-fill" style="width: 47%"></div></div>
+                <div class="signal-value">47%</div>
+              </div>
+              <div class="signal-item">
+                <div class="signal-label criterion-tip" data-tip="How carefully you evaluate options before choosing.">Diligence</div>
+                <div class="signal-track"><div class="signal-fill" style="width: 73%"></div></div>
+                <div class="signal-value">73%</div>
+              </div>
+              <div class="signal-item">
+                <div class="signal-label criterion-tip" data-tip="Likelihood of sticking with familiar brands.">Brand</div>
+                <div class="signal-track"><div class="signal-fill" style="width: 38%"></div></div>
+                <div class="signal-value">38%</div>
+              </div>
+              <div class="signal-item">
+                <div class="signal-label criterion-tip" data-tip="How often sponsored listings attract your attention.">Sponsored</div>
+                <div class="signal-track"><div class="signal-fill" style="width: 22%"></div></div>
+                <div class="signal-value">22%</div>
+              </div>
+              <div class="signal-item">
+                <div class="signal-label criterion-tip" data-tip="How quickly you act versus waiting before selecting.">Impulse</div>
+                <div class="signal-track"><div class="signal-fill" style="width: 31%"></div></div>
+                <div class="signal-value">31%</div>
+              </div>
+              <div class="signal-item">
+                <div class="signal-label criterion-tip" data-tip="Preference for safer, proven choices over uncertain ones.">Risk</div>
+                <div class="signal-track"><div class="signal-fill" style="width: 56%"></div></div>
+                <div class="signal-value">56%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="nova-group">
+            <p class="nova-group-title">
+              <img class="nova-title-logo" src="./cadabra_nova.png" alt="Nova logo" />
+              <span>Powered by Nova</span>
+            </p>
+            <div class="row nova-feature-row">
+              <span class="row-left">
+                <label for="m-enabled" class="criterion-tip" data-tip="Uses Nova to reorder results in real time based on your profile and query context.">AI reranking</label>
+              </span>
+              <input id="m-enabled" type="checkbox" checked />
+            </div>
+            <div class="snapshot-meta"><span>Duplicates hidden</span><strong>14</strong></div>
+            <div class="row nova-feature-row" style="margin-top: 8px;">
+              <span class="row-left">
+                <label for="m-deal-guard" class="criterion-tip" data-tip="Flags trust-value risk by comparing price, rating depth, and quality consistency signals.">Deal Guard</label>
+              </span>
+              <input id="m-deal-guard" type="checkbox" checked />
+            </div>
+            <div class="snapshot-meta"><span>Risky items flagged</span><strong>3</strong></div>
+          </div>
+          <div class="row non-nova-feature-row" style="margin-top: 8px;">
+            <label for="m-hide-sponsored">Hide sponsored</label>
+            <input id="m-hide-sponsored" type="checkbox" checked />
+          </div>
+          <div class="row non-nova-feature-row" style="margin-top: 8px;">
+            <label for="m-hide-clutter">Hide clutter sections</label>
+            <input id="m-hide-clutter" type="checkbox" checked />
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Ranking Control</div>
+          <div class="mode-row">
+            <label><input type="radio" name="m-rank-mode" value="auto" checked /> Auto</label>
+            <label><input type="radio" name="m-rank-mode" value="manual" /> Manual</label>
+          </div>
+          <div id="cadabra-manual-sliders" class="hidden">
+            <div class="slider-row">
+              <label for="s-price">Price <span>60</span></label>
+              <input id="s-price" type="range" min="0" max="100" step="10" value="60" />
+            </div>
+            <div class="slider-row">
+              <label for="s-reviews">Reviews <span>40</span></label>
+              <input id="s-reviews" type="range" min="0" max="100" step="10" value="40" />
+            </div>
+            <div class="slider-row">
+              <label for="s-rating">Rating <span>70</span></label>
+              <input id="s-rating" type="range" min="0" max="100" step="10" value="70" />
+            </div>
+            <div class="slider-row">
+              <label for="s-brand">Brand <span>30</span></label>
+              <input id="s-brand" type="range" min="0" max="100" step="10" value="30" />
+            </div>
+            <div class="slider-row">
+              <label for="s-position">Top Position <span>50</span></label>
+              <input id="s-position" type="range" min="0" max="100" step="10" value="50" />
+            </div>
+            <div class="slider-row">
+              <label for="s-discount">Discount <span>80</span></label>
+              <input id="s-discount" type="range" min="0" max="100" step="10" value="80" />
+            </div>
+            <div class="slider-row">
+              <label for="s-prime">Prime <span>40</span></label>
+              <input id="s-prime" type="range" min="0" max="100" step="10" value="40" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="disclaimer">Static mockup · no Amazon data is collected or stored.</p>
+      <div id="tooltip" class="criteria-tooltip-floating hidden" role="tooltip"></div>
+    </div>
+
+    <script>
+      // Auto/Manual toggle: reveal the weight sliders only in manual mode.
+      const sliders = document.getElementById('cadabra-manual-sliders');
+      document.querySelectorAll('input[name="m-rank-mode"]').forEach((r) =>
+        r.addEventListener('change', () =>
+          sliders.classList.toggle('hidden', document.querySelector('input[name="m-rank-mode"]:checked').value !== 'manual')));
+
+      // Live slider value labels.
+      document.querySelectorAll('.slider-row input[type="range"]').forEach((s) => {
+        const out = s.closest('.slider-row').querySelector('span');
+        s.addEventListener('input', () => { out.textContent = s.value; });
+      });
+
+      // Floating tooltips for the [data-tip] criteria labels.
+      const tip = document.getElementById('tooltip');
+      document.querySelectorAll('.criterion-tip').forEach((el) => {
+        el.addEventListener('mouseenter', () => {
+          tip.textContent = el.dataset.tip;
+          tip.classList.remove('hidden');
+          const r = el.getBoundingClientRect();
+          tip.style.left = Math.min(r.left, window.innerWidth - 190) + 'px';
+          tip.style.top = (r.bottom + 6) + 'px';
+        });
+        el.addEventListener('mouseleave', () => tip.classList.add('hidden'));
+      });
+    </script>
+  </body>
+</html>

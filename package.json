@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "bunx vite",
     "build:resume": "bun archive/scripts/build-resume.mjs",
-    "build:og": "bun archive/scripts/gen-og.mjs"
+    "build:og": "bun archive/scripts/gen-og.mjs",
+    "build:clawd": "bun archive/scripts/build-clawd.mjs"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.4"

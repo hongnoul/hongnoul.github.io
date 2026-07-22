@@ -4,6 +4,7 @@
     { "text": "namyang@mit.edu", "href": "mailto:namyang@mit.edu" },
     { "text": "(617) 256-8414" },
     { "text": "linkedin.com/in/hongnoul", "href": "https://linkedin.com/in/hongnoul" },
+    { "text": "github.com/hongnoul", "href": "https://github.com/hongnoul" },
     { "text": "U.S. Citizen" }
   ],
   "sections": [
@@ -29,7 +30,7 @@
           "org": "TrustAI Labs (YCombinator S26)",
           "loc": "San Francisco, CA",
           "role": "Founding Engineer & Designer",
-          "date": "November 2025 -- Present",
+          "date": "March 2026 -- Present",
           "bullets": [
             "Own end-to-end frontend of the product, prototyping features and delivering polished, production-ready interfaces",
             "Built and maintain the full marketing site and interactive product demos used in investor and customer-facing presentations",
@@ -55,16 +56,6 @@
             "Developed a server-side rendered digital exhibition platform with Next.js, improving accessibility and SEO",
             "Collaborated with MIT History faculty to launch a digital archive of activist murals, increased visibility to 1,000+ users"
           ]
-        },
-        {
-          "org": "EAN Design Consulting Group",
-          "loc": "Seoul, South Korea",
-          "role": "Architectural Design Intern",
-          "date": "August 2021",
-          "bullets": [
-            "Produced high-fidelity architectural renderings for a commercial flagship project, enhancing client engagement and improving proposal clarity using Enscape and iterative design reviews",
-            "Conducted site research and prepared financial and ROI reports, integrating statistical analysis to support data-informed client planning and long-term investment decisions"
-          ]
         }
       ]
     },
@@ -72,7 +63,7 @@
       "title": "Technical Projects",
       "entries": [
         {
-          "org": "Boston Tech Week Hackathon, FreightDesk",
+          "org": "Subconscious Hackathon",
           "date": "May 2026",
           "bullets": [
             "Architected repo partitions (web / worker / db) and built full Next.js storefront with voice-first mic launcher (Web Speech API) and customer complaint inbox in a 2-hour build sprint",
@@ -80,7 +71,7 @@
           ]
         },
         {
-          "org": "Cursor Boston Sports Hack, FieldBack",
+          "org": "Cursor Hackathon",
           "date": "May 2026",
           "bullets": [
             "Owned full Next.js 16 frontend for an ACL-injury triage app: coach dashboard with three-sport rosters of 60+ athletes, body-silhouette injury visualization, structured check-in flow, and role-based login routing",
@@ -88,7 +79,15 @@
           ]
         },
         {
-          "org": "Amazon Nova AI Hackathon, Cadabra",
+          "org": "Groundwork — Civic Social Platform",
+          "date": "April 2026",
+          "bullets": [
+            "Built a civic social platform for sharing community service and relaying inspiration into chains of civic action, with a map of local events, one-tap sign-ups, and a trending feed ranked by 24-hour inspiration count",
+            "Full-stack: React 19 frontend (Bun, GSAP, Leaflet) deployed on Vercel; Flask backend on Railway backed by Firestore and Cloud Storage"
+          ]
+        },
+        {
+          "org": "Amazon Nova AI Hackathon",
           "date": "February -- March 2026",
           "bullets": [
             "Built a Chrome extension personalizing Amazon search rankings in real time using AI-inferred behavioral profiles",
@@ -103,6 +102,14 @@
             "Built frontend with real-time transaction UI; presented to panel of judges at MIT Bitcoin Expo"
           ]
         }
+      ]
+    },
+    {
+      "title": "Skills",
+      "list": [
+        "Languages & Frameworks: TypeScript, JavaScript, Python, Next.js, React, FastAPI, Flask",
+        "Cloud, Edge & Infra: AWS (Lambda, API Gateway, DynamoDB), Cloudflare Workers, GCP (Firestore, Cloud Storage), Vercel, Railway",
+        "AI/ML & Tooling: LLM agents & MCP servers, RAG-grounded retrieval, MediaPipe pose estimation"
       ]
     },
     {

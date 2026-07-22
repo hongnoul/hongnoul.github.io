@@ -21,19 +21,19 @@
 
 #align(center)[
   #text(size: 30pt, weight: 800, tracking: -0.6pt)[#data.name]
-  #v(5pt, weak: true)
+  #v(9pt, weak: true)
   #text(size: 9pt, fill: rgb("#222"))[#contact]
 ]
 
-#v(16pt, weak: false)
+#v(14pt, weak: false)
 
 // — Section / entry primitives ————————————————————
 
-#let section(title, body) = block(below: 14pt, breakable: false)[
+#let section(title, body) = block(below: 11pt, breakable: false)[
   #text(size: 10pt, weight: 700, tracking: 0.6pt)[#upper(title)]
   #v(3pt, weak: true)
   #line(length: 100%, stroke: 1.5pt)
-  #v(7pt, weak: true)
+  #v(6pt, weak: true)
   #body
 ]
 
@@ -44,7 +44,7 @@
   left-body, right-body,
 )
 
-#let entry(e) = block(below: 10pt, breakable: false)[
+#let entry(e) = block(below: 8pt, breakable: false)[
   #row(
     text(size: 11pt, weight: 700)[#e.org],
     if "loc" in e { text(size: 10pt)[#e.loc] },
@@ -52,8 +52,8 @@
   #if "role" in e or "date" in e [
     #v(1pt, weak: true)
     #row(
-      if "role" in e { emph(text(size: 10pt)[#e.role]) },
-      if "date" in e { emph(text(size: 10pt)[#e.date]) },
+      if "role" in e { emph(text(size: 10pt)[#eval(e.role, mode: "markup")]) },
+      if "date" in e { emph(text(size: 10pt)[#eval(e.date, mode: "markup")]) },
     )
   ]
   #if "bullets" in e and e.bullets.len() > 0 [

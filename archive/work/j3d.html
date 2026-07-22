@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Justin Hong</title>
+  <meta name="description" content="Justin Hong.">
+  <meta name="author" content="Justin Hong">
+  <link rel="canonical" href="https://hongnoul.github.io/">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta property="og:title" content="Justin Hong">
+  <meta property="og:description" content="Justin Hong.">
+  <meta property="og:url" content="https://hongnoul.github.io/">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#ff2400">
+  <style>
+    html, body { margin: 0; height: 100%; background: #ff2400; overflow: hidden; }
+
+    /* hero: full-viewport canvas holding the rotating 3D "j" */
+    .hero {
+      position: fixed;
+      inset: 0;
+      display: block;
+    }
+    .hero canvas { display: block; width: 100%; height: 100%; }
+
+    /* fallback shown until three.js paints (or if modules don't load):
+       the flat glyph, centered. Hidden once the canvas takes over. */
+    .fallback {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fallback img {
+      width: min(60svh, 60vw);
+      height: auto;
+    }
+    .ready .fallback { display: none; }
+  </style>
+</head>
+<body>
+  <div class="hero"></div>
+  <div class="fallback">
+    <img src="/j.svg" alt="Justin Hong" width="768" height="768">
+  </div>
+
+  <script type="module">
+    // esm.sh serves full ESM with internal bare imports (e.g. SVGLoader's own
+    // `from 'three'`) rewritten to pinned URLs — so this works natively in the
+    // browser and is passed through untouched by Vite, with no importmap.
+    import * as THREE from 'https://esm.sh/three@0.160.0';
+    import { SVGLoader } from 'https://esm.sh/three@0.160.0/examples/jsm/loaders/SVGLoader.js';
+    import { EffectComposer } from 'https://esm.sh/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
+    import { RenderPixelatedPass } from 'https://esm.sh/three@0.160.0/examples/jsm/postprocessing/RenderPixelatedPass.js';
+    import { SMAAPass } from 'https://esm.sh/three@0.160.0/examples/jsm/postprocessing/SMAAPass.js';
+    import polygonClipping from 'https://esm.sh/polygon-clipping@0.15.7';
+
+    const SCARLET = 0xff2400;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hero = document.querySelector('.hero');
+
+    // ---- renderer ----
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setPixelRatio(1);   // uniform blocks for the pixel filter
+    renderer.setSize(innerWidth, innerHeight);
+    hero.appendChild(renderer.domElement);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(SCARLET);
+
+    const camera = new THREE.PerspectiveCamera(35, innerWidth / innerHeight, 0.1, 5000);
+
+    // ---- pixel lo-fi post-processing: render the scene into chunky blocks
+    // with subtle normal/depth edge lines ----
+    const PIXEL_SIZE = 3;
+    const composer = new EffectComposer(renderer);
+    composer.setPixelRatio(1);
+    composer.setSize(innerWidth, innerHeight);
+    composer.addPass(new RenderPixelatedPass(PIXEL_SIZE, scene, camera, {
+      normalEdgeStrength: 0,
+      depthEdgeStrength: 0,
+    }));
+    composer.addPass(new SMAAPass(innerWidth, innerHeight));   // anti-aliasing
+
+    // ---- lighting: bright but directional, so each facet shades differently
+    // and the low-poly depth + soft shadowing stays visible ----
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+    const key = new THREE.DirectionalLight(0xffffff, 1.5);
+    key.position.set(0.8, 1.1, 1.0);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xffffff, 0.5);
+    fill.position.set(-1.0, -0.2, 0.6);
+    scene.add(fill);
+    const rim = new THREE.DirectionalLight(0xffffff, 0.35);
+    rim.position.set(-0.4, 0.6, -1.0);
+    scene.add(rim);
+
+    // group lets us tilt + spin without touching the centered geometry
+    const spinner = new THREE.Group();
+    spinner.rotation.x = -0.12;            // slight tilt for depth
+    scene.add(spinner);
+
+    let modelSize = new THREE.Vector3(1, 1, 1);
+
+    // ---- camera auto-fit to the glyph's bounding box ----
+    function fitCamera() {
+      const fov = (camera.fov * Math.PI) / 180;
+      const fitH = modelSize.y / 2 / Math.tan(fov / 2);
+      const fitW = modelSize.x / 2 / (Math.tan(fov / 2) * camera.aspect);
+      camera.position.set(0, 0, Math.max(fitH, fitW) * 2.2);
+      camera.lookAt(0, 0, 0);
+    }
+
+    function onResize() {
+      camera.aspect = innerWidth / innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      composer.setSize(innerWidth, innerHeight);
+      fitCamera();
+    }
+    addEventListener('resize', onResize);
+
+    const DEPTH = 55;
+
+    // ---- load + extrude the SVG ----
+    new SVGLoader().load('/j.svg', (data) => {
+      // The glyph splits into the stroke body (extruded) and the dot (the SVG
+      // <ellipse>), which we swap for a low-poly sphere. Coarse point sampling
+      // keeps the body's curves chunky to match the faceted look. No holes in
+      // this glyph, so we skip SVGLoader's hole detection (one shape per path).
+      const bodyRings = [];   // raw [x,y] rings of the stroke's sub-paths
+      let dot = null;         // { cx, cy, r } in SVG coords
+      for (const path of data.paths) {
+        const node = path.userData && path.userData.node;
+        const isDot = node && node.nodeName === 'ellipse';
+        for (const sub of path.subPaths) {
+          const pts = sub.getPoints(6);
+          if (pts.length < 3) continue;
+          if (isDot) {
+            let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+            for (const p of pts) {
+              if (p.x < minx) minx = p.x; if (p.x > maxx) maxx = p.x;
+              if (p.y < miny) miny = p.y; if (p.y > maxy) maxy = p.y;
+            }
+            dot = { cx: (minx + maxx) / 2, cy: (miny + maxy) / 2,
+                    r: ((maxx - minx) + (maxy - miny)) / 4 };
+          } else {
+            bodyRings.push(pts.map((p) => [p.x, p.y]));
+          }
+        }
+      }
+
+      // Boolean-union the stroke's sub-paths into one clean silhouette. They
+      // only abut along straight seams (no overlapping volume), so extruding
+      // them separately made their bevels collide there — the messy edges.
+      // Merged, the bevel only ever offsets the true outer edge.
+      const bodyShapes = [];
+      for (const poly of polygonClipping.union(...bodyRings.map((r) => [r]))) {
+        const shape = new THREE.Shape(poly[0].map(([x, y]) => new THREE.Vector2(x, y)));
+        for (let i = 1; i < poly.length; i++) {
+          shape.holes.push(new THREE.Path(poly[i].map(([x, y]) => new THREE.Vector2(x, y))));
+        }
+        bodyShapes.push(shape);
+      }
+
+      const geos = [];
+
+      const bodyGeo = new THREE.ExtrudeGeometry(bodyShapes, {
+        depth: DEPTH,
+        bevelEnabled: false,      // flat, perpendicular cut — no edge offset
+      });
+      geos.push(bodyGeo);
+
+      // low-poly sphere standing in for the dot, centered in the stroke depth
+      if (dot) {
+        const sphere = new THREE.IcosahedronGeometry(dot.r, 1);
+        sphere.translate(dot.cx, dot.cy, DEPTH / 2);
+        geos.push(sphere);
+      }
+
+      // center + flip every piece together so the sphere keeps its place
+      const box = new THREE.Box3();
+      for (const g of geos) { g.computeBoundingBox(); box.union(g.boundingBox); }
+      const c = box.getCenter(new THREE.Vector3());
+      box.getSize(modelSize);
+      for (const g of geos) {
+        g.translate(-c.x, -c.y, -c.z);
+        g.rotateX(Math.PI);       // SVG is y-down → flip upright (winding kept)
+      }
+
+      // FrontSide: a 180° rotation (unlike a mirror) preserves triangle winding,
+      // so the solid culls its back faces — no interior "skeleton" shows through.
+      const material = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.4,
+        metalness: 0.0,
+        side: THREE.FrontSide,
+        flatShading: true,        // per-face normals → visible facets
+      });
+
+      for (const g of geos) spinner.add(new THREE.Mesh(g, material));
+      fitCamera();
+      document.body.classList.add('ready');   // hide flat fallback
+    });
+
+    // ---- render loop ----
+    let last = performance.now();
+    function tick(now) {
+      const dt = (now - last) / 1000;
+      last = now;
+      if (!reduce) spinner.rotation.y += dt * 0.25;   // ~radians/sec
+      composer.render();
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>

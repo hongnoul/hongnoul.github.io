@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>clawd logs — Justin Hong</title>
+  <meta name="description" content="Every prompt I've typed at Claude Code, pulled from ~/.claude/projects.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <meta name="robots" content="noindex">
+  <style>
+    :root { --fg: #111; --muted: #666; --line: #e6e6e6; --bg: #fff; --accent: #000; }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--fg);
+      font: 400 15px/1.5 system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+
+    /* trigger button (when this page is loaded standalone) */
+    .page { max-width: 920px; margin: 0 auto; padding: clamp(24px,5vw,64px) clamp(20px,5vw,40px); }
+    .page h1 { font-size: clamp(28px, 5vw, 48px); margin: 0 0 8px; letter-spacing: -0.02em; }
+    .page p { color: var(--muted); margin: 0 0 24px; max-width: 56ch; }
+    .open-btn {
+      display: inline-block; padding: 10px 18px; border: 1px solid var(--accent);
+      background: var(--accent); color: #fff; cursor: pointer; font: inherit;
+      letter-spacing: 0.02em; text-transform: lowercase;
+    }
+    .open-btn:hover { background: #fff; color: var(--accent); }
+    .meta { color: var(--muted); font-size: 13px; margin-top: 16px; }
+
+    /* modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      display: none; align-items: stretch; justify-content: center; z-index: 100;
+      padding: clamp(16px, 4vw, 48px);
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: #fff; border: 1px solid var(--line); width: 100%; max-width: 880px;
+      display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-head {
+      display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .modal-head h2 { margin: 0; font-size: 16px; font-weight: 600; }
+    .modal-head .stats { color: var(--muted); font-size: 13px; flex: 1; }
+    .modal-head .close {
+      border: none; background: none; cursor: pointer; font-size: 22px; line-height: 1;
+      color: var(--muted); padding: 4px 8px;
+    }
+    .modal-head .close:hover { color: var(--fg); }
+
+    .controls {
+      display: flex; gap: 8px; padding: 10px 18px; border-bottom: 1px solid var(--line);
+      flex-wrap: wrap;
+    }
+    .controls input, .controls select {
+      font: inherit; padding: 6px 10px; border: 1px solid var(--line); background: #fafafa;
+    }
+    .controls input { flex: 1; min-width: 180px; }
+    .controls input:focus, .controls select:focus { outline: none; border-color: var(--fg); background: #fff; }
+
+    .list { overflow-y: auto; flex: 1; }
+    .session {
+      border-bottom: 1px solid var(--line); padding: 14px 18px;
+    }
+    .session-head {
+      display: flex; align-items: baseline; gap: 10px; cursor: pointer; user-select: none;
+    }
+    .session-head:hover .project { text-decoration: underline; }
+    .project { font-weight: 600; font-size: 14px; }
+    .when { color: var(--muted); font-size: 12px; }
+    .badge {
+      margin-left: auto; background: #f0f0f0; color: var(--fg); font-size: 11px;
+      padding: 2px 8px; border-radius: 999px;
+    }
+    .caret { color: var(--muted); transition: transform 0.15s; }
+    .session.open .caret { transform: rotate(90deg); }
+    .preview {
+      color: var(--muted); font-size: 13px; margin-top: 4px; margin-left: 18px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .session.open .preview { display: none; }
+
+    .prompts {
+      display: none; margin-top: 10px; padding-left: 14px; border-left: 2px solid var(--line);
+    }
+    .session.open .prompts { display: block; }
+    .prompt {
+      padding: 8px 0; border-bottom: 1px dashed var(--line); white-space: pre-wrap;
+      font-size: 14px; line-height: 1.5;
+    }
+    .prompt:last-child { border-bottom: none; }
+    .prompt .ts { color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; margin-right: 8px; }
+    mark { background: #ffec3d; color: inherit; padding: 0 2px; }
+
+    .empty { padding: 40px 18px; text-align: center; color: var(--muted); }
+    .footer-note {
+      padding: 10px 18px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted);
+      display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    }
+    .footer-note code { background: #f5f5f5; padding: 1px 5px; font-size: 11px; }
+
+    @media (max-width: 600px) {
+      .modal-backdrop { padding: 0; }
+      .modal { max-width: 100%; height: 100svh; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <h1>clawd</h1>
+    <p>Every prompt I've typed at Claude Code, pulled from <code>~/.claude/projects/*.jsonl</code> at build time. No tool results, no model output — just what I asked for.</p>
+    <button class="open-btn" id="open">open logs</button>
+    <div class="meta" id="meta">loading…</div>
+  </main>
+
+  <div class="modal-backdrop" id="backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="modal-title">clawd logs</h2>
+        <span class="stats" id="stats"></span>
+        <button class="close" id="close" aria-label="close">×</button>
+      </div>
+      <div class="controls">
+        <input id="search" type="search" placeholder="search prompts…" autocomplete="off">
+        <select id="project"><option value="">all projects</option></select>
+      </div>
+      <div class="list" id="list"></div>
+      <div class="footer-note">
+        <span>generated <span id="gen">—</span></span>
+        <span>rebuild: <code>bun archive/scripts/build-clawd.mjs</code></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const escapeHtml = (s) => s.replace(/[&<>"]/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const fmtDate = (iso) => {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+    };
+    const fmtTime = (iso) => {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return d.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+    };
+
+    let DATA = null;
+    let query = '';
+    let projectFilter = '';
+    const openSessions = new Set();
+
+    function render() {
+      if (!DATA) return;
+      const list = $('list');
+      const q = query.toLowerCase().trim();
+      let shownS = 0, shownP = 0;
+      const html = [];
+
+      for (const s of DATA.sessions) {
+        if (projectFilter && s.project !== projectFilter) continue;
+        const matched = q
+          ? s.prompts.filter(p => p.text.toLowerCase().includes(q))
+          : s.prompts;
+        if (!matched.length) continue;
+        shownS++;
+        shownP += matched.length;
+        const isOpen = openSessions.has(s.sessionId) || !!q;
+        const preview = (matched[0]?.text || '').replace(/\s+/g,' ').slice(0, 90);
+        const promptsHtml = matched.map(p => {
+          let t = escapeHtml(p.text);
+          if (q) {
+            const re = new RegExp('(' + q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+            t = t.replace(re, '<mark>$1</mark>');
+          }
+          return `<div class="prompt"><span class="ts">${fmtTime(p.ts)}</span>${t}</div>`;
+        }).join('');
+        html.push(`
+          <div class="session${isOpen ? ' open' : ''}" data-id="${s.sessionId}">
+            <div class="session-head">
+              <span class="caret">▸</span>
+              <span class="project">${escapeHtml(s.project)}</span>
+              <span class="when">${fmtDate(s.lastTs)} · ${fmtTime(s.firstTs)}</span>
+              <span class="badge">${matched.length}${q && matched.length !== s.count ? '/' + s.count : ''}</span>
+            </div>
+            <div class="preview">${escapeHtml(preview)}${preview.length === 90 ? '…' : ''}</div>
+            <div class="prompts">${promptsHtml}</div>
+          </div>`);
+      }
+      list.innerHTML = html.length ? html.join('') : '<div class="empty">no matches</div>';
+      $('stats').textContent = `${shownP} prompt${shownP===1?'':'s'} · ${shownS} session${shownS===1?'':'s'}`;
+    }
+
+    $('list').addEventListener('click', (e) => {
+      const head = e.target.closest('.session-head');
+      if (!head) return;
+      const session = head.closest('.session');
+      const id = session.dataset.id;
+      if (openSessions.has(id)) openSessions.delete(id); else openSessions.add(id);
+      session.classList.toggle('open');
+    });
+
+    $('search').addEventListener('input', (e) => { query = e.target.value; render(); });
+    $('project').addEventListener('change', (e) => { projectFilter = e.target.value; render(); });
+
+    function openModal() {
+      $('backdrop').classList.add('open');
+      $('search').focus();
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+      $('backdrop').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    $('open').addEventListener('click', openModal);
+    $('close').addEventListener('click', closeModal);
+    $('backdrop').addEventListener('click', (e) => { if (e.target === $('backdrop')) closeModal(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    fetch('./index.json').then(r => r.json()).then(d => {
+      DATA = d;
+      $('meta').textContent = `${d.promptCount} prompts across ${d.sessionCount} sessions · generated ${fmtDate(d.generatedAt)}`;
+      $('gen').textContent = new Date(d.generatedAt).toLocaleString();
+      const projects = [...new Set(d.sessions.map(s => s.project))].sort();
+      const sel = $('project');
+      for (const p of projects) {
+        const opt = document.createElement('option');
+        opt.value = p; opt.textContent = p;
+        sel.appendChild(opt);
+      }
+      render();
+      // auto-open if hash present
+      if (location.hash === '#open') openModal();
+    }).catch(err => {
+      $('meta').textContent = 'failed to load index.json — run `bun archive/scripts/build-clawd.mjs`';
+      console.error(err);
+    });
+  </script>
+</body>
+</html>
