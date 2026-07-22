@@ -289,7 +289,6 @@
       overflow: hidden;
       background: #e0e0e0;
       border: 1px solid #000;
-      border-radius: 2px;
       position: relative;
     }
     .card__thumb img {
@@ -389,10 +388,10 @@
     .sort-btn:hover { background: #f0f0f0; }
     .sort-btn.active { background: #000; color: #fff; }
 
-    /* ---- mobile: the fan folds into a vertical shingle stack ---- */
+    /* ---- mobile: the fan folds into a single vertical column ---- */
     @media (max-width: 768px) {
       :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
-      /* the vertical shingle stack can't fit one screen, so scrolling returns */
+      /* the vertical column can't fit one screen, so scrolling returns */
       body { display: block; height: auto; min-height: 100svh; overflow: hidden auto; }
       .mode-bar { left: calc(var(--corner-left) + var(--corner-w) + 12px); right: 0.5rem; }
       .main-content { padding: calc(var(--corner-top) + var(--logo-h) + 20px) 1rem 1rem; }
@@ -402,6 +401,7 @@
       .deck {
         flex-direction: column;
         align-items: center;
+        gap: 1.25rem;
         transform: none !important;
       }
       .card {
@@ -410,7 +410,6 @@
         cursor: pointer;
         transform-origin: center top;
       }
-      .deck > .card:not(:first-child) { margin-top: clamp(-4.25rem, -13vw, -2.75rem); }
       .card:first-child { margin-top: 0.5rem; }
       .card:last-child { margin-bottom: 2.5rem; }
       .card:hover { transform: none; }
@@ -423,7 +422,7 @@
     @media (max-width: 480px) {
       .deck > .card { width: min(88%, 20.5rem); }
       .main-content { padding-left: 0.75rem; padding-right: 0.75rem; }
-      .deck > .card:not(:first-child) { margin-top: clamp(-4rem, -12vw, -2.5rem); }
+      .deck { gap: 1rem; }
       .card:last-child { margin-bottom: 2rem; }
       .card__title { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
       .about-section { padding: 1.5rem 0.75rem; }
