@@ -160,18 +160,24 @@
     body { -ms-overflow-style: none; scrollbar-width: none; }
     body::-webkit-scrollbar { display: none; }
 
-    /* ---- header wordmark ----
-       Big name top-left, sitting clear of the corner logo. Fades in with the
-       reveal alongside everything else. */
+    /* ---- nav wordmark ----
+       The name sits in the top bar, to the right of the corner logo, sized to
+       the logo's height. The header block is kept as a spacer so the content
+       below still clears the fixed bar. Stays under the curtain (z < 50) so it
+       appears with the reveal. */
     .site-header {
-      padding: calc(var(--corner-top) + var(--logo-h) + 28px) 2rem 0.5rem;
+      padding: calc(var(--corner-top) + var(--logo-h) + 28px) 2rem 0;
     }
     .wordmark {
+      position: fixed;
+      top: var(--corner-top);
+      left: calc(var(--corner-left) + var(--corner-w) + 16px);
+      z-index: 40;
       margin: 0;
-      font-size: clamp(2.4rem, 7vw, 5.5rem);
-      font-weight: 550;
-      letter-spacing: -0.03em;
-      line-height: 1;
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: var(--logo-h);
       color: #000;
       cursor: pointer;
       display: inline-block;
@@ -400,7 +406,8 @@
     /* ---- mobile: the fan folds into a vertical shingle stack ---- */
     @media (max-width: 768px) {
       :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
-      .site-header { padding: calc(var(--corner-top) + var(--logo-h) + 20px) 1rem 0.35rem; }
+      .site-header { padding: calc(var(--corner-top) + var(--logo-h) + 20px) 1rem 0; }
+      .wordmark { font-size: 1.1rem; left: calc(var(--corner-left) + var(--corner-w) + 12px); }
       .main-content { padding: 1rem; }
       .works-wrap { gap: 2.15rem; }
       .mode-btn { font-size: 0.9rem; padding: 0.4rem 0.8rem; }
@@ -543,7 +550,7 @@
           'identity and design system.' },
       { title: 'Folio — design system', mode: 'work',
         tags: ['web', 'design', 'ai'], img: '/folio_design_thumb.png',
-        href: 'https://wl.trytrust.ai/design',
+        href: 'https://wl.trytrust.ai/design/character/lio',
         description: 'The design system and harness behind Folio, TrustAI\u2019s ' +
           'CEFR-aligned writing platform: the Lio character and its nine ' +
           'emotional states, semantic color tokens, motion choreography, ' +
