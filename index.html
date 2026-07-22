@@ -99,9 +99,14 @@
        The logo SVG is a 4-frame horizontal strip; on hover it steps through the
        frames to the two-bar menu mark. */
     .logo .sprite { transition: transform 0.18s steps(4, jump-none); }
-    .logo:hover .sprite { transform: translateX(-304.8px); }
     .pop { transform-box: view-box; transform-origin: 42.333px 25.4px; }
-    .logo:hover .pop { animation: pop 0.2s ease; }
+    /* hover preview only on devices with a real pointer - on touch, :hover
+       sticks after a tap and the sprite would stay stuck on the menu mark
+       after the menu is toggled closed */
+    @media (hover: hover) {
+      .logo:hover .sprite { transform: translateX(-304.8px); }
+      .logo:hover .pop { animation: pop 0.2s ease; }
+    }
     @keyframes pop { 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
     @keyframes logo-glide {
       from {
@@ -147,6 +152,18 @@
       transition: color 0.2s ease;
     }
     .menu__link:hover, .menu__link:focus-visible { color: #ff2400; outline: none; }
+    .menu__link.active { color: #000; }
+    /* category filters inside the menu - desktop keeps the top mode-bar, so
+       these only show on mobile (see the 768px media query) */
+    .menu__filter {
+      display: none;
+      background: none;
+      border: 0;
+      padding: 0;
+      text-align: left;
+      font-family: inherit;
+      cursor: pointer;
+    }
     body.menu-open .logo .sprite { transform: translateX(-304.8px); }
 
     /* ================================================================
@@ -393,7 +410,11 @@
       :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
       /* the vertical column can't fit one screen, so scrolling returns */
       body { display: block; height: auto; min-height: 100svh; overflow: hidden auto; }
-      .mode-bar { left: calc(var(--corner-left) + var(--corner-w) + 12px); right: 0.5rem; }
+      /* the tab row wraps badly at this width - fold the categories into the
+         hamburger menu instead */
+      .mode-bar { display: none; }
+      .menu__filter { display: block; }
+      .menu__link--work { display: none; }
       .main-content { padding: calc(var(--corner-top) + var(--logo-h) + 20px) 1rem 1rem; }
       .card { width: min(92%, 22.5rem); }
       .mode-btn { font-size: 0.8rem; padding: 0.35rem 0.7rem; }
@@ -410,7 +431,9 @@
         cursor: pointer;
         transform-origin: center top;
       }
-      .card:first-child { margin-top: 0.5rem; }
+      /* the desktop rule `.card:first-child { margin-left: 0 }` outranks the
+         auto margins above and pushed the first card left - re-center it */
+      .card:first-child { margin-top: 0.5rem; margin-left: auto; }
       .card:last-child { margin-bottom: 2.5rem; }
       .card:hover { transform: none; }
       .card__header { width: 100%; }
@@ -454,7 +477,11 @@
 <body>
   <div class="curtain" aria-hidden="true"></div>
   <nav class="menu" id="site-menu" aria-label="Menu" aria-hidden="true">
-      <a class="menu__link" href="#work">Work</a>
+      <a class="menu__link menu__link--work" href="#work">Work</a>
+      <button class="menu__link menu__filter active" type="button" data-mode="all">All</button>
+      <button class="menu__link menu__filter" type="button" data-mode="work">Work</button>
+      <button class="menu__link menu__filter" type="button" data-mode="hackathons">Hackathons</button>
+      <button class="menu__link menu__filter" type="button" data-mode="studies">Studies</button>
       <a class="menu__link" href="#about">About</a>
   </nav>
   <svg class="logo" width="320" height="192" viewBox="0 0 84.666692 50.799987"
@@ -656,15 +683,21 @@
       setOffset(0);   // rewind the drag position on every filter change
     }
 
+    /* mode selection is shared between the desktop tab bar and the mobile
+       hamburger filters - keep both button sets in sync */
     const modeBtns = [...document.querySelectorAll('.mode-btn')];
-    for (const b of modeBtns) b.addEventListener('click', () => {
-      activeMode = b.dataset.mode;
+    const menuFilterBtns = [...document.querySelectorAll('.menu__filter')];
+    function setMode(mode) {
+      activeMode = mode;
       for (const x of modeBtns) {
-        x.classList.toggle('active', x === b);
-        x.setAttribute('aria-selected', String(x === b));
+        x.classList.toggle('active', x.dataset.mode === mode);
+        x.setAttribute('aria-selected', String(x.dataset.mode === mode));
       }
+      for (const x of menuFilterBtns) x.classList.toggle('active', x.dataset.mode === mode);
       applyFilter();
-    });
+    }
+    for (const b of modeBtns) b.addEventListener('click', () => setMode(b.dataset.mode));
+    for (const b of menuFilterBtns) b.addEventListener('click', () => setMode(b.dataset.mode));
 
     /* Sort buttons are generated from the union of all card tags */
     const tagWrap = document.getElementById('tag-buttons');
