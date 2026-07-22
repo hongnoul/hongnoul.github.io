@@ -25,6 +25,21 @@
       font-display: swap;
     }
     html, body { margin: 0; background: #fafafa; }
+
+    /* ---- cross-document view transitions ----
+       Card thumbs morph into project-page heroes. The clicked thumb is named
+       `project-hero` at the last moment (pageswap/pagereveal below) so names
+       stay unique. Firefox without support degrades to instant navigation. */
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+      ::view-transition-group(project-hero) {
+        animation-duration: .45s;
+        animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+      }
+      ::view-transition-old(root), ::view-transition-new(root) {
+        animation-duration: .3s;
+      }
+    }
     body { min-height: 100svh; overflow-x: hidden; color: #111;
            font: 400 16px/1.4 "InterVariable", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
     /* lock scroll while the intro plays; the script lifts this once the curtain wipes */
@@ -567,6 +582,13 @@
         href: '/archive/work/torus.html',
         description: 'The T(p,q) family, parametric form, and an interactive ' +
           'silhouette text-wrap specimen.' },
+      { title: 'Setup — a desktop built around agents', mode: 'studies',
+        tags: ['systems', 'ai'], img: '/work/setup-strip-demo.svg',
+        href: '/work/setup.html',
+        description: 'niri\u2019s scrollable tiling gives every coding agent its ' +
+          'own column on an infinite strip, jcode is the primary interface to ' +
+          'the machine, and hwatu makes verification free. A tour of an ' +
+          'agent-first Linux desktop, as of Jul 2026.' },
       { title: 'j3d — Software 3D Renderer', mode: 'studies',
         tags: ['3d'], img: '/j3d_thumb.png',
         href: '/archive/work/j3d.html',
@@ -597,14 +619,50 @@
       </article>`).join('');
 
     /* cards with a data-href open their page on click (drags are suppressed by
-       the moved-flag capture handler below) or Enter while focused */
+       the moved-flag capture handler below) or Enter while focused.
+       Internal pages navigate in-tab so the card→hero view transition can
+       play; external links still open a new tab. */
+    let vtCard = null;   /* the card whose thumb should morph on pageswap */
+    function openCard(card) {
+      const href = card.dataset.href;
+      if (href.startsWith('/')) { vtCard = card; location.href = href; }
+      else window.open(href, '_blank', 'noopener');
+    }
     deck.addEventListener('click', (e) => {
       const card = e.target.closest('.card[data-href]');
-      if (card) window.open(card.dataset.href, '_blank', 'noopener');
+      if (card) openCard(card);
     });
     deck.addEventListener('keydown', (e) => {
       const card = e.target.closest('.card[data-href]');
-      if (card && e.key === 'Enter') window.open(card.dataset.href, '_blank', 'noopener');
+      if (card && e.key === 'Enter') openCard(card);
+    });
+
+    /* ---- view-transition naming ----
+       Outbound: name the clicked card's thumb just before the snapshot.
+       Inbound (back from a project page): name the matching card so the hero
+       morphs back into it, then clear the name once the transition settles. */
+    addEventListener('pageswap', (e) => {
+      try {
+        if (!e.viewTransition || !vtCard) return;
+        const thumb = vtCard.querySelector('.card__thumb');
+        if (thumb) thumb.style.viewTransitionName = 'project-hero';
+      } catch {}
+    });
+    addEventListener('pagereveal', (e) => {
+      try {
+        if (!e.viewTransition) return;
+        const from = navigation.activation?.from?.url;
+        if (!from) return;
+        const path = new URL(from).pathname;
+        const card = deck.querySelector(`.card[data-href="${path}"]`);
+        const thumb = card?.querySelector('.card__thumb');
+        if (!thumb) return;
+        thumb.style.viewTransitionName = 'project-hero';
+        /* clear after settle; catch: a skipped transition rejects `finished` */
+        e.viewTransition.finished
+          .catch(() => {})
+          .finally(() => { thumb.style.viewTransitionName = ''; });
+      } catch {}
     });
 
     /* ---- filtering ----
@@ -734,8 +792,17 @@
       document.body.classList.add('revealed');
     }
 
+    /* returning from an internal page (view transition or plain back-nav):
+       skip the curtain so the hero morph lands on a settled deck */
+    const cameFromInternal = (() => {
+      try {
+        const from = navigation?.activation?.from?.url;
+        return from ? new URL(from).origin === location.origin : false;
+      } catch { return false; }
+    })();
+
     document.body.classList.add('intro-lock');
-    if (reduceMotion) reveal();
+    if (reduceMotion || cameFromInternal) reveal();
     else setTimeout(reveal, MIN_INTRO);
   </script>
 </body>

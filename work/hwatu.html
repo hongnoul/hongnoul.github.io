@@ -25,6 +25,19 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; background: #fafafa; }
+
+    /* ---- cross-document view transition: the deck card's thumb morphs into
+       this page's hero (both carry view-transition-name: project-hero) ---- */
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+      ::view-transition-group(project-hero) {
+        animation-duration: .45s;
+        animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+      }
+      ::view-transition-old(root), ::view-transition-new(root) {
+        animation-duration: .3s;
+      }
+    }
     body {
       color: #111;
       font: 400 16px/1.55 "InterVariable", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -45,7 +58,14 @@
     .corner img { width: 100%; height: auto; display: block; }
 
     /* ---- header ---- */
-    header { padding-top: 140px; margin-bottom: 72px; }
+    header { padding-top: 110px; margin-bottom: 72px; }
+    .hero {
+      view-transition-name: project-hero;
+      display: block; width: 100%; aspect-ratio: 1980 / 1080;  /* matches .card__thumb */
+      margin: 0 0 44px; border-radius: 12px; overflow: hidden;
+      border: 1px solid #e4e4e4; background: #1a1b1e;
+    }
+    .hero img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .kicker {
       font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
       color: #898989; margin: 0 0 18px;
@@ -182,6 +202,9 @@
   <div class="wrap">
 
     <header>
+      <figure class="hero" aria-hidden="true">
+        <img src="/work/hwatu-spawn-demo.svg" alt="" width="1200" height="675">
+      </figure>
       <p class="kicker"><b>hwatu</b> · systems / agent tooling · 2026</p>
       <h1>AI agents write frontend code they never see.</h1>
       <p class="lede">
