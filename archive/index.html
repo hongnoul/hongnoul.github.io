@@ -2,405 +2,828 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="/archive/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-  <script src="/archive/favicon.js"></script>
-  <title>Justin Hong</title>
-  <meta name="description" content="Justin Hong - Founding Engineer at TrustAI. Writing on UI/UX and software.">
-  <meta name="author" content="Justin Hong">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>홍승우</title>
+  <meta name="description" content="홍승우.">
+  <meta name="author" content="홍승우">
   <link rel="canonical" href="https://hongnoul.github.io/archive/">
-  <meta property="og:title" content="Justin Hong">
-  <meta property="og:description" content="Justin Hong - Founding Engineer at TrustAI. Writing on UI/UX and software.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <meta property="og:title" content="홍승우">
+  <meta property="og:description" content="홍승우.">
   <meta property="og:url" content="https://hongnoul.github.io/archive/">
   <meta property="og:type" content="website">
-  <meta property="og:image" content="https://hongnoul.github.io/archive/og/index.svg">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Justin Hong">
-  <meta name="twitter:description" content="Justin Hong - Founding Engineer at TrustAI. Writing on UI/UX and software.">
-  <meta name="twitter:image" content="https://hongnoul.github.io/archive/og/index.svg">
+  <meta name="theme-color" content="#fafafa">
+  <style>
+    /* Everett stand-in: Inter variable, self-hosted (preloaded in <head> so the
+       intro curtain hides the swap) */
+    @font-face {
+      font-family: "InterVariable";
+      src: url("/fonts/InterVariable.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    html, body { margin: 0; background: #fafafa; }
+
+    /* ---- cross-document view transitions ----
+       Card thumbs morph into project-page heroes. The clicked thumb is named
+       `project-hero` at the last moment (pageswap/pagereveal below) so names
+       stay unique. Firefox without support degrades to instant navigation. */
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+      ::view-transition-group(project-hero) {
+        animation-duration: .45s;
+        animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+      }
+      ::view-transition-old(root), ::view-transition-new(root) {
+        animation-duration: .3s;
+      }
+    }
+    body { min-height: 100svh; overflow-x: hidden; color: #111;
+           font: 400 16px/1.4 "InterVariable", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; }
+    /* lock scroll while the intro plays; the script lifts this once the curtain wipes */
+    body.intro-lock { overflow: hidden; height: 100svh; }
+
+    /* one source of truth for the corner logo chrome (kept from the intro):
+       42px logo at left 30 / top 20. */
+    :root {
+      --corner-w: 42px;
+      --logo-h: calc(var(--corner-w) * 0.6);      /* aspect 50.8/84.67 */
+      --corner-left: 30px;
+      --corner-top: 20px;
+    }
+
+    /* ---- intro (kept) ----
+       A black curtain covers the page; the logo sits centered on it, glides to
+       the top-left corner (scaling 1.2 → 1), then the curtain wipes up to
+       reveal the page. Pure CSS timeline. */
+
+    .curtain {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: #000;
+    }
+    body.revealed .curtain {
+      animation: curtain-up 1.2s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+    }
+    @keyframes curtain-up {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-100%); }
+    }
+
+    /* the logo: corner is the resting state; the glide animates FROM dead-center. */
+    .logo {
+      position: fixed;
+      top: var(--corner-top);
+      left: var(--corner-left);
+      z-index: 60;
+      width: var(--corner-w);
+      height: auto;
+      display: block;
+      transform-origin: top left;
+      animation: logo-glide 1.8s cubic-bezier(0.65, 0, 0.35, 1) 1s both;
+      filter: invert(1);   /* white while on the black curtain */
+    }
+    body.revealed .logo {
+      filter: invert(0);
+      transition: filter 0.5s cubic-bezier(0.33, 1, 0.68, 1) 1s;
+    }
+
+    .logo { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .logo:focus { outline: none; }
+    .logo:focus-visible { outline: 2px solid #898989; outline-offset: 3px; }
+    /* ---- sprite hover transition (kept) ----
+       The logo SVG is a 4-frame horizontal strip; on hover it steps through the
+       frames to the two-bar menu mark. */
+    .logo .sprite { transition: transform 0.18s steps(4, jump-none); }
+    .logo:hover .sprite { transform: translateX(-304.8px); }
+    .pop { transform-box: view-box; transform-origin: 42.333px 25.4px; }
+    .logo:hover .pop { animation: pop 0.2s ease; }
+    @keyframes pop { 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+    @keyframes logo-glide {
+      from {
+        transform: translate(calc(50vw - var(--corner-left)), calc(50svh - var(--corner-top)))
+                   translate(-50%, -50%) scale(1.2);
+      }
+      to {
+        transform: translate(0, 0) scale(1);
+      }
+    }
+
+    /* ---- corner menu (kept) ----
+       Clicking the logo slides out a small white container of nav links. */
+    .menu {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 48;
+      background: #fff;
+      box-sizing: border-box;
+      padding: calc(var(--corner-top) + var(--logo-h) + clamp(8px, 1.5vh, 14px))
+               clamp(14px, 1.6vw, 22px) clamp(16px, 3vh, 28px) var(--corner-left);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(3px, 0.6vh, 6px);
+      transform: translateX(-100%);
+      transition: transform 0.13s cubic-bezier(0.33, 1, 0.68, 1);
+      pointer-events: none;
+    }
+    body.menu-open .menu { transform: translateX(0); pointer-events: auto; }
+
+    .menu__link {
+      display: block;
+      color: #898989;
+      text-decoration: none;
+      font-size: clamp(12px, 0.95vw, 14px);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: color 0.2s ease;
+    }
+    .menu__link:hover, .menu__link:focus-visible { color: #ff2400; outline: none; }
+    body.menu-open .logo .sprite { transform: translateX(-304.8px); }
+
+    /* ================================================================
+       layout - portfolio deck style: a big header wordmark, category
+       tab buttons, a horizontally fanned row of overlapping project
+       cards (drag to browse), and an About + Sort section below.
+       ================================================================ */
+
+    * { box-sizing: border-box; }
+
+    /* hide scrollbars, the deck is dragged not scrolled */
+    body { -ms-overflow-style: none; scrollbar-width: none; }
+    body::-webkit-scrollbar { display: none; }
+
+    /* ---- nav wordmark ----
+       The name sits in the top bar, to the right of the corner logo, sized to
+       the logo's height. The header block is kept as a spacer so the content
+       below still clears the fixed bar. Stays under the curtain (z < 50) so it
+       appears with the reveal. */
+    .site-header {
+      padding: calc(var(--corner-top) + var(--logo-h) + 28px) 2rem 0;
+    }
+    .wordmark {
+      position: fixed;
+      top: var(--corner-top);
+      left: calc(var(--corner-left) + var(--corner-w) + 16px);
+      z-index: 40;
+      margin: 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: var(--logo-h);
+      color: #000;
+      cursor: pointer;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .wordmark:hover { transform: scale(1.04); }
+    .wordmark a { color: inherit; text-decoration: none; }
+
+    /* ---- main ---- */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem 2rem 2rem;
+    }
+    .works-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2.85rem;
+      width: 100%;
+    }
+
+    /* ---- category tab bar ---- */
+    .mode-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .mode-btn {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #000;
+      background: #fff;
+      border: 1px solid #000;
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .mode-btn:hover { background: #f0f0f0; }
+    .mode-btn.active { background: #000; color: #fff; }
+
+    /* ---- fanned card deck ----
+       A single row of wide cards, each overlapping the previous like spread
+       playing cards. z-index runs front-to-back so the left edge of every card
+       stays visible; hover lifts a card to the top. The row is dragged
+       horizontally via a transform (see deck drag JS). */
+    .deck {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      width: 100%;
+      will-change: transform;
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      width: 600px;
+      flex-shrink: 0;
+      cursor: grab;
+      margin-left: -200px;
+      position: relative;
+      transition: transform 0.3s ease;
+      transform-origin: left center;
+      /* hidden under the curtain until .revealed, then a staggered rise-in */
+      opacity: 0;
+    }
+    body.revealed .card {
+      animation: card-in 0.7s cubic-bezier(0.33, 1, 0.68, 1) calc(var(--i) * 0.07s) both;
+    }
+    @keyframes card-in { from { opacity: 0; transform: translateY(14px); }
+                         to   { opacity: 1; transform: translateY(0); } }
+    .card:active { cursor: grabbing; }
+    .card:first-child { margin-left: 0; }
+    /* stacking: earlier cards sit on top (their left edges read as tabs) */
+    .card:nth-child(1) { z-index: 10; } .card:nth-child(2) { z-index: 9; }
+    .card:nth-child(3) { z-index: 8; }  .card:nth-child(4) { z-index: 7; }
+    .card:nth-child(5) { z-index: 6; }  .card:nth-child(6) { z-index: 5; }
+    .card:nth-child(7) { z-index: 4; }  .card:nth-child(8) { z-index: 3; }
+    .card:nth-child(9) { z-index: 2; }  .card:nth-child(10) { z-index: 1; }
+    .card:hover { z-index: 20; transform: scale(1.05) translateY(-10px); }
+
+    /* the file-folder tab label riding the top edge of each card */
+    .card__header {
+      display: flex;
+      align-items: stretch;
+      gap: 0.35rem;
+      align-self: flex-start;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .card__title {
+      font-size: 0.75rem;
+      color: #000;
+      background: #fff;
+      border: 1px solid #000;
+      border-bottom: none;
+      padding: 0.3rem 0.5rem;
+      white-space: nowrap;
+      width: fit-content;
+    }
+    .card__tag {
+      display: inline-block;
+      font-size: 0.6rem;
+      color: #000;
+      background: #fff;
+      border: 1px solid #000;
+      border-bottom: none;
+      padding: 0.3rem 0.4rem;
+      white-space: nowrap;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+    }
+    .card__thumb {
+      width: 100%;
+      aspect-ratio: 1980 / 1080;
+      overflow: hidden;
+      background: #e0e0e0;
+      border: 1px solid #000;
+      border-radius: 2px;
+      position: relative;
+    }
+    .card__thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* text placeholder for entries without art yet */
+    .card__thumb--empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    /* short description revealed under the tab bar inside the thumb on hover */
+    .card__desc {
+      position: absolute;
+      inset: auto 0 0 0;
+      margin: 0;
+      padding: 0.9rem 1rem;
+      font-size: 0.8rem;
+      line-height: 1.55;
+      color: #111;
+      background: rgba(255, 255, 255, 0.92);
+      border-top: 1px solid #000;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+    }
+    .card:hover .card__desc { opacity: 1; transform: translateY(0); }
+
+    .card[hidden] { display: none; }
+
+    /* ---- about + sort ---- */
+    .about-section {
+      padding: 4rem 2rem;
+      max-width: 1200px;
+      display: flex;
+      gap: 4rem;
+      align-items: flex-start;
+    }
+    .about-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      flex: 1;
+    }
+    .about-title {
+      font-size: 1.5rem;
+      color: #000;
+      font-weight: 500;
+      margin: 0 0 0.5rem;
+    }
+    .about-text {
+      font-size: 1rem;
+      line-height: 1.8;
+      color: #000;
+      max-width: 800px;
+      margin: 0;
+    }
+    .about-text a { color: inherit; }
+    .about-text a:hover { color: #ff2400; }
+
+    .sort-section {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      min-width: 300px;
+    }
+    .sort-title {
+      font-size: 1.2rem;
+      color: #000;
+      font-weight: 500;
+      margin: 0 0 0.5rem;
+    }
+    .tag-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .sort-btn {
+      display: inline-block;
+      font-size: 0.75rem;
+      color: #000;
+      background: #fff;
+      border: 1px solid #000;
+      padding: 0.4rem 0.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+    .sort-btn:hover { background: #f0f0f0; }
+    .sort-btn.active { background: #000; color: #fff; }
+
+    /* ---- mobile: the fan folds into a vertical shingle stack ---- */
+    @media (max-width: 768px) {
+      :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
+      .site-header { padding: calc(var(--corner-top) + var(--logo-h) + 20px) 1rem 0; }
+      .wordmark { font-size: 1.1rem; left: calc(var(--corner-left) + var(--corner-w) + 12px); }
+      .main-content { padding: 1rem; }
+      .works-wrap { gap: 2.15rem; }
+      .mode-btn { font-size: 0.9rem; padding: 0.4rem 0.8rem; }
+
+      .deck {
+        flex-direction: column;
+        align-items: center;
+        transform: none !important;
+      }
+      .card {
+        width: min(92%, 22.5rem);
+        margin-left: auto;
+        margin-right: auto;
+        cursor: pointer;
+        transform-origin: center top;
+      }
+      .deck > .card:not(:first-child) { margin-top: clamp(-4.25rem, -13vw, -2.75rem); }
+      .card:first-child { margin-top: 0.5rem; }
+      .card:last-child { margin-bottom: 2.5rem; }
+      .card:hover { transform: none; }
+      .card__header { width: 100%; }
+      .card__title { font-size: 0.7rem; }
+
+      .about-section { flex-direction: column; gap: 2rem; padding: 2rem 1rem; }
+      .sort-section { min-width: 100%; }
+    }
+    @media (max-width: 480px) {
+      .deck > .card { width: min(88%, 20.5rem); }
+      .site-header { padding-left: 0.75rem; padding-right: 0.75rem; }
+      .main-content { padding: 0.85rem 0.75rem 0.75rem; }
+      .deck > .card:not(:first-child) { margin-top: clamp(-4rem, -12vw, -2.5rem); }
+      .card:last-child { margin-bottom: 2rem; }
+      .card__title { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
+      .about-section { padding: 1.5rem 0.75rem; }
+      .about-title { font-size: 1.2rem; }
+      .about-text { font-size: 0.9rem; }
+      .sort-title { font-size: 1rem; }
+      .sort-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
+    }
+
+    /* intro skip: reloads and returns from internal pages get no curtain, no
+       logo glide, and an already-settled deck - the intro only plays on a
+       fresh entry. */
+    body.intro-skip .curtain { display: none; }
+    body.intro-skip .logo { animation: none; filter: invert(0); transition: none; }
+    body.intro-skip .card { animation: none; opacity: 1; }
+
+    /* reduced motion: no curtain, no glide - logo rests in the corner instantly,
+       cards appear without animation */
+    @media (prefers-reduced-motion: reduce) {
+      .curtain { display: none; }
+      .logo .sprite { transition: none; }
+      .logo:hover .pop { animation: none; }
+      .logo { animation: none; filter: invert(0); }
+      .card, body.revealed .card { animation: none; opacity: 1; transform: none; }
+      .menu { transition: none; }
+      .wordmark, .wordmark:hover { transition: none; transform: none; }
+    }
+  </style>
 </head>
 <body>
-  <div id="bg-text">
-    <div id="bg-fill"></div>
-    <div class="home-block">
-      <div class="home-card">
-        <div id="truu" style="width:128px;height:80px;background:url('/archive/truu.png') 0 0/1024px 80px;image-rendering:pixelated;pointer-events:auto;flex-shrink:0;"></div>
-        <div class="home-lines">
-          <p class="home-name"><strong>Justin Hong</strong><span class="home-tag"> UI/UX</span></p>
-          <p class="home-role">Founding Engineer &middot; <a href="https://trytrust.ai" id="trustai-link">TrustAI</a></p>
-          <p class="home-loc">Boston, MA</p>
-        </div>
+  <div class="curtain" aria-hidden="true"></div>
+  <nav class="menu" id="site-menu" aria-label="Menu" aria-hidden="true">
+      <a class="menu__link" href="#work">Work</a>
+      <a class="menu__link" href="#about">About</a>
+  </nav>
+  <svg class="logo" width="320" height="192" viewBox="0 0 84.666692 50.799987"
+       xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0"
+       aria-label="Menu" aria-controls="site-menu" aria-expanded="false">
+    <!-- 4-frame transition sprite (logo -> two-bar menu), authored in
+         jhokxtransition.svg. The viewBox is one 84.67-wide frame, so only one
+         frame shows at a time. -->
+    <g class="pop">
+    <g class="sprite">
+      <g transform="translate(-423.33334,-999.06659)">
+        <path style="fill:#000;stroke-width:2" d="m 423.33334,1015.9999 16.93333,16.9334 H 457.2 v -16.9334 H 440.26667 L 423.33334,999.0666 H 457.2 l 16.93334,16.9333 h 16.93333 V 999.0666 H 508 v 50.8 h -16.93333 v -16.9333 h -16.93333 v 16.9333 h -33.86667 l -16.93333,-16.9333 z"/>
+        <path style="fill:#000;stroke-width:2" d="m 524.93333,999.0666 v 16.9333 H 558.8 v 16.9334 h -33.86667 l 16.93334,16.9333 H 609.6 v -50.8 h -16.93334 v 33.8667 h -16.93333 v -16.9334 L 558.8,999.0666 Z"/>
+        <path style="fill:#000;stroke-width:2" d="m 626.53333,999.0666 v 16.9333 h 50.8 v 16.9334 h -50.8 l 16.93333,16.9333 h 67.73333 v -16.9333 h -16.93334 v -16.9334 h 16.93334 v -16.9333 z"/>
+        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="999.06659"/>
+        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="1032.9332"/>
+      </g>
+    </g>
+    </g>
+  </svg>
+
+  <header class="site-header">
+    <h1 class="wordmark"><a href="/">홍승우</a></h1>
+  </header>
+
+  <main class="main-content" id="work">
+    <div class="works-wrap">
+      <div class="mode-bar" role="tablist" aria-label="Work categories">
+        <button class="mode-btn active" type="button" role="tab" aria-selected="true"  data-mode="all">All</button>
+        <button class="mode-btn"        type="button" role="tab" aria-selected="false" data-mode="work">Work</button>
+        <button class="mode-btn"        type="button" role="tab" aria-selected="false" data-mode="hackathons">Hackathons</button>
+        <button class="mode-btn"        type="button" role="tab" aria-selected="false" data-mode="studies">Studies</button>
       </div>
-
-
-<div class="term-section">
-        <div class="term-rule"></div>
-        <div class="term-row">
-          <span class="term-prompt">❯</span>
-          <div class="term-input-wrap">
-            <input class="term-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" autofocus>
-            <span class="term-cursor"></span>
-          </div>
-        </div>
-        <div class="term-rule"></div>
-        <div class="term-hint" id="term-hint">? for shortcuts</div>
-      </div>
-
-      <!-- Mobile navigation - giant pixel buttons, only shown on mobile -->
-      <div class="mobile-nav" id="mobile-nav">
-        <a href="https://github.com/hongnoul" target="_blank" rel="noopener" class="mobile-btn">/github</a>
-        <a href="https://linkedin.com/in/hongnoul" target="_blank" rel="noopener" class="mobile-btn">/linkedin</a>
-        <a href="/archive/resume/" target="_blank" rel="noopener" class="mobile-btn">/resume</a>
-        <a href="#" class="mobile-btn" id="mobile-exp-btn">/experience</a>
-      </div>
-
-      <!-- Full-width sprite shown below buttons on mobile -->
-      <div id="truu-mobile" style="background:url('/archive/truu.png') 0 0/800% auto;image-rendering:pixelated;"></div>
+      <div class="deck" id="deck" aria-label="Selected work"></div>
     </div>
-  </div>
+  </main>
+
+  <section class="about-section" id="about">
+    <div class="about-content">
+      <h2 class="about-title">About</h2>
+      <p class="about-text">
+        홍승우 - MIT.<br>
+        <a href="mailto:namyang@mit.edu">namyang@mit.edu</a><br>
+        <a href="https://github.com/hongnoul" rel="me">github.com/hongnoul</a> ·
+        <a href="https://linkedin.com/in/hongnoul" rel="me">linkedin.com/in/hongnoul</a> ·
+        <a href="/archive/resume/resume.pdf">resume</a>
+      </p>
+    </div>
+    <div class="sort-section">
+      <h3 class="sort-title">Sort</h3>
+      <div class="tag-buttons" id="tag-buttons"></div>
+      <button class="sort-btn" id="sort-reset" type="button">Reset</button>
+    </div>
+  </section>
 
   <script>
-    const truu = document.getElementById('truu');
-    const truuMobile = document.getElementById('truu-mobile');
-    const homeBlock = document.querySelector('.home-block');
-    const FRAME_PX = 128;
-    function setTruuFrame(px) {
-      truu.style.backgroundPositionX = px;
-    }
-    let hovered = false;
-    let clicked = false;
-    let clickTimer = null;
-    let clickCount = 0;
-    let clickCountTimer = null;
-
-    truu.addEventListener('mouseenter', () => {
-      hovered = true;
-      if (!clicked) setTruuFrame(-(5 * FRAME_PX) + 'px');
-    });
-    truu.addEventListener('mouseleave', () => { hovered = false; });
-    truu.addEventListener('click', () => {
-      clickCount++;
-      clearTimeout(clickCountTimer);
-      clickCountTimer = setTimeout(() => { clickCount = 0; }, 600);
-
-      clicked = true;
-      const frame = clickCount >= 3 ? 7 : 0;
-      const duration = clickCount >= 3 ? 500 : 200;
-      setTruuFrame(-(frame * FRAME_PX) + 'px');
-      clearTimeout(clickTimer);
-      clickTimer = setTimeout(() => {
-        clicked = false;
-        setTruuFrame(hovered ? -(5 * FRAME_PX) + 'px' : '0px');
-      }, duration);
-    });
-
-    // Invisible background fill - makes the whole page drag-selectable
-    const bgFill = document.getElementById('bg-fill');
-    const charRuler = document.createElement('span');
-    charRuler.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font-family:"JetBrains Mono",ui-monospace,"Courier New",monospace;font-size:23px;';
-    charRuler.textContent = ' ';
-    document.body.appendChild(charRuler);
-
-    function fillBg() {
-      const charW = charRuler.offsetWidth || 14;
-      const cols = Math.ceil(window.innerWidth  / charW) + 1;
-      const rows = Math.ceil(window.innerHeight / 23)    + 1;
-      const line = ' '.repeat(cols);
-      bgFill.textContent = (line + '\n').repeat(rows);
-    }
-    fillBg();
-    window.addEventListener('resize', fillBg);
-
-    // Block cursor - tracks caret position by measuring typed text width
-    const termInput  = document.querySelector('.term-input');
-    const termCursor = document.querySelector('.term-cursor');
-    const ruler = document.createElement('span');
-    ruler.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;font:inherit;font-size:23px;font-family:"JetBrains Mono",ui-monospace,"Courier New",monospace;';
-    document.body.appendChild(ruler);
-
-    function syncCursor() {
-      const pos = termInput.selectionStart ?? termInput.value.length;
-      ruler.textContent = termInput.value.slice(0, pos);
-      termCursor.style.transform = 'translateX(' + ruler.offsetWidth + 'px)';
-    }
-    const termHint = document.getElementById('term-hint');
-    const COMMANDS = [
-      { label: '/github',   href: 'https://github.com/hongnoul',                       target: '_blank'  },
-      { label: '/linkedin', href: 'https://linkedin.com/in/hongnoul',                  target: '_blank'  },
-      { label: '/resume',   href: '/resume/',                                          target: '_blank'  },
-      { label: '/experience', href: '#',                                               target: '_self'   },
+    /* ---- work data ----
+       Each entry: title, category (mode-bar tab), tags (Sort buttons), an
+       optional thumbnail, a short description shown on hover, and an optional
+       href (the card opens it in a new tab on click). Add an entry here and it
+       appears in the deck. */
+    const projects = [
+      { title: 'hwatu - 13 ms browser for coding agents', mode: 'work',
+        tags: ['systems', 'ai'], img: '/hwatu_docs_thumb.png',
+        href: 'https://hongnoul.github.io/hwatu/',
+        description: 'A daemon-based WebKit browser that makes visual ' +
+          'verification nearly free for AI agents: 13 ms median window spawn, ' +
+          'headless-by-default under agent harnesses, JSON-over-socket ' +
+          'protocol. Rust + WebKitGTK 6. 2026.' },
+      { title: 'TrustAI - auto.trytrust.ai', mode: 'work',
+        tags: ['web', 'design', 'ai'], img: '/trustai_auto_thumb.png',
+        href: 'https://auto.trytrust.ai',
+        description: 'TrustAI Labs (YC S26), founding engineer & designer. ' +
+          '"Your team\u2019s best instincts, automated" - the current product. ' +
+          'Own the end-to-end frontend, interactive demos, and the full visual ' +
+          'identity and design system.' },
+      { title: 'Folio - design system', mode: 'work',
+        tags: ['web', 'design', 'ai'], img: '/folio_design_thumb.png',
+        href: 'https://wl.trytrust.ai/design/character/lio',
+        description: 'The design system and harness behind Folio, TrustAI\u2019s ' +
+          'CEFR-aligned writing platform: the Lio character and its nine ' +
+          'emotional states, semantic color tokens, motion choreography, ' +
+          'surface physics, and a primitives kit - all documented as living ' +
+          'brand guidelines.' },
+      { title: 'TrustAI - Agent Risk Assessment', mode: 'work',
+        tags: ['web', 'design'], img: '/trustai_thumb.png',
+        href: 'https://trytrust.ai',
+        description: 'Pre-pivot product: maps what every ERP AI agent can reach ' +
+          'and wreck, then verifies it\u2019s under control. Built the marketing ' +
+          'site and product demos used in investor and customer presentations.' },
+      { title: 'Groundwork - Ripple Designathon', mode: 'hackathons',
+        tags: ['web', 'design'], img: '/groundwork_poster.jpg',
+        href: 'https://frontend-brown-eta-51.vercel.app',
+        description: 'A civic social platform where people share, celebrate, and ' +
+          'inspire community service. React 19 / Bun front end with Leaflet event ' +
+          'maps and a Flask + Firestore back end. Apr 2026.' },
+      { title: 'Cadabra - Amazon Nova Hackathon', mode: 'hackathons',
+        tags: ['extension', 'ai'], img: '/cadabra_nova.png',
+        href: '/cadabra_mock.html',
+        description: 'A Chrome extension that personalizes Amazon search rankings ' +
+          'in real time from AI-inferred behavioral profiles. TypeScript Lambda on ' +
+          'AWS API Gateway with DynamoDB persistence. Feb 2026.' },
+      { title: 'Freight Agent - Subconscious Hackathon', mode: 'hackathons',
+        tags: ['ai', 'web'],
+        description: 'Plan-approve-execute UX for an autonomous freight-exception ' +
+          'agent on Cloudflare Workers, plus a voice-first Next.js storefront ' +
+          'built in a 2-hour sprint. May 2026.' },
+      { title: 'ACL Triage - Cursor Hackathon', mode: 'hackathons',
+        tags: ['ai', 'web'],
+        description: 'Next.js 16 coach dashboard for ACL-injury triage: 60+ athlete ' +
+          'rosters, body-silhouette injury mapping, MediaPipe pose extraction and ' +
+          'RAG-grounded rehab retrieval. May 2026.' },
+      { title: 'T(p,q) Torus Knots', mode: 'studies',
+        tags: ['3d', 'writing'], img: '/torus_thumb.png',
+        href: '/archive/work/torus.html',
+        description: 'The T(p,q) family, parametric form, and an interactive ' +
+          'silhouette text-wrap specimen.' },
+      { title: 'Setup - a desktop built around agents', mode: 'studies',
+        tags: ['systems', 'ai'], img: '/work/setup-strip-demo.svg',
+        href: '/work/setup.html',
+        description: 'niri\u2019s scrollable tiling gives every coding agent its ' +
+          'own column on an infinite strip, jcode is the primary interface to ' +
+          'the machine, and hwatu makes verification free. A tour of an ' +
+          'agent-first Linux desktop, as of Jul 2026.' },
+      { title: 'j3d - Software 3D Renderer', mode: 'studies',
+        tags: ['3d'], img: '/j3d_thumb.png',
+        href: '/archive/work/j3d.html',
+        description: 'A from-scratch 3D renderer study.' },
+      { title: 'Lighting Iteration', mode: 'studies',
+        tags: ['3d'], img: '/lighting_thumb.png',
+        href: '/archive/work/lighting-iteration.html',
+        description: 'Iterating on lighting models - a visual walkthrough.' },
+      { title: 'Sprites', mode: 'studies',
+        tags: ['design'], img: '/sprites_thumb.png',
+        href: '/archive/work/sprites.html',
+        description: 'Sprite studies - including the 4-frame logo transition used ' +
+          'in this site\u2019s corner mark.' },
     ];
 
-    function renderCommands(list) {
-      return list.map((c, i) =>
-        `<span${i === 0 ? ' class="term-cmd-top"' : ''}>${c.label}</span>`
-      ).join('');
+    const deck = document.getElementById('deck');
+    deck.innerHTML = projects.map((p, i) => `
+      <article class="card" style="--i:${i}" data-mode="${p.mode}" data-tags="${p.tags.join(',')}"
+               ${p.href ? `data-href="${p.href}" role="link" tabindex="0"` : ''}>
+        <div class="card__header">
+          <span class="card__title">${p.title}</span>
+          ${p.tags.map(t => `<span class="card__tag">${t}</span>`).join('')}
+        </div>
+        <div class="card__thumb ${p.img ? '' : 'card__thumb--empty'}">
+          ${p.img ? `<img src="${p.img}" alt="${p.title}" draggable="false">` : `<span>${p.title}</span>`}
+          ${p.description ? `<p class="card__desc">${p.description}</p>` : ''}
+        </div>
+      </article>`).join('');
+
+    /* cards with a data-href open their page on click (drags are suppressed by
+       the moved-flag capture handler below) or Enter while focused.
+       Internal pages navigate in-tab so the card→hero view transition can
+       play; external links still open a new tab. */
+    let vtCard = null;   /* the card whose thumb should morph on pageswap */
+    function openCard(card) {
+      const href = card.dataset.href;
+      if (href.startsWith('/')) { vtCard = card; location.href = href; }
+      else window.open(href, '_blank', 'noopener');
     }
-
-    let shortcutsOpen = false;
-    let writingOpen = false;
-    let ctrlCWarning = false;
-    let ctrlCWarningTimer = null;
-    let errCount = 0;
-    let errCountTimer = null;
-
-    function showCtrlCWarning() {
-      ctrlCWarning = true;
-      termHint.textContent = 'Press Ctrl-C again to aggravate';
-      termHint.classList.remove('term-hint--open');
-      clearTimeout(ctrlCWarningTimer);
-      ctrlCWarningTimer = setTimeout(() => {
-        ctrlCWarning = false;
-        syncHint();
-      }, 1000);
-    }
-
-    const EXPERIENCE = [
-      { project: 'FreightDesk', role: 'Next.js storefront, voice launcher & repo architecture', event: 'Boston Tech Week Hackathon', date: 'May 2026', href: 'https://github.com/Wayfair-Token-Burners/hack-webapp'        },
-      { project: 'FieldBack',   role: 'Full Next.js 16 frontend & coach dashboard',             event: 'Cursor Boston Sports Hack',  date: 'May 2026', href: 'https://github.com/Cursor-Token-Burners/cursor-boston-hackathon' },
-      { project: 'Cadabra',     role: 'Chrome extension & full-stack AWS reranking',            event: 'Amazon Nova AI Hackathon',   date: 'Mar 2026', href: 'https://github.com/hongnoul/cadabra'                            },
-    ];
-
-    function showWritingTable() {
-      let html = '<span class="term-writing-dot">●</span><table class="term-writing-table">';
-      EXPERIENCE.forEach(p => {
-        html += '<tr><td><a href="' + p.href + '" class="term-table-link" target="_blank" rel="noopener">' + p.project + '</a></td>'
-              + '<td class="term-table-role">' + p.role  + '</td>'
-              + '<td>' + p.event + '</td>'
-              + '<td class="term-table-meta">' + p.date  + '</td></tr>';
-      });
-      html += '</table>';
-      termHint.innerHTML = html;
-      termHint.querySelectorAll('.term-table-link').forEach(a => {
-        a.addEventListener('click', e => {
-          e.preventDefault();
-          if (e.ctrlKey || e.metaKey) window.open(a.href, '_blank', 'noopener');
-        });
-      });
-      termHint.classList.add('term-hint--table');
-      termHint.classList.remove('term-hint--open');
-      homeBlock.classList.add('writing-mode');
-      homeBlock.addEventListener('transitionend', function onWritingEnd(e) {
-        if (e.propertyName !== 'transform') return;
-        homeBlock.removeEventListener('transitionend', onWritingEnd);
-        if (!writingOpen) return;
-        clicked = true;
-        clearTimeout(clickTimer);
-        [2, 3, 2, 3, 5, 1].forEach((frame, i) => {
-          setTimeout(() => {
-            setTruuFrame(-(frame * FRAME_PX) + 'px');
-          }, i * 300);
-        });
-        clickTimer = setTimeout(() => {
-          clicked = false;
-          setTruuFrame(hovered ? -(5 * FRAME_PX) + 'px' : '0px');
-        }, 1800);
-      });
-    }
-
-    function syncHint() {
-      if (writingOpen || ctrlCWarning) return;
-      const q = termInput.value.trim().toLowerCase();
-      termHint.classList.remove('term-hint--table');
-      homeBlock.classList.remove('writing-mode');
-      if (shortcutsOpen) {
-        termHint.innerHTML = renderCommands(COMMANDS);
-        termHint.classList.add('term-hint--open');
-      } else if (q) {
-        const matches = COMMANDS.filter(c => c.label.includes(q));
-        if (matches.length) {
-          termHint.innerHTML = renderCommands(matches);
-          termHint.classList.add('term-hint--open');
-        } else {
-          termHint.textContent = '';
-          termHint.classList.remove('term-hint--open');
-        }
-      } else {
-        termHint.textContent = '? for shortcuts';
-        termHint.classList.remove('term-hint--open');
-      }
-    }
-
-    termInput.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        const val = termInput.value.trim();
-        if (val === '/experience') {
-          writingOpen = true;
-          termInput.value = '';
-          syncCursor();
-          showWritingTable();
-          return;
-        }
-        const match = COMMANDS.find(c => c.label === val);
-        if (match) {
-          match.target === '_blank'
-            ? window.open(match.href, '_blank', 'noopener')
-            : window.location.href = match.href;
-        } else if (val) {
-          if (val.startsWith('/')) {
-            const parts = val.slice(1).split(' ');
-            const cmd = parts[0];
-            const arg = parts.slice(1).join(' ');
-            if (arg) {
-              const prefix = '● Args from unknown shortcut: ';
-              let truncArg = arg;
-              ruler.textContent = prefix + truncArg;
-              while (ruler.offsetWidth > termInput.offsetWidth && truncArg.length > 0) {
-                truncArg = truncArg.slice(0, -1);
-                ruler.textContent = prefix + truncArg + '…';
-              }
-              const display = truncArg.length < arg.length ? prefix + truncArg + '…' : prefix + arg;
-              termHint.innerHTML = '<span class="term-arg-output">' + display + '</span>';
-            } else {
-              termHint.innerHTML = '<span class="term-err-icon">└</span><span class="term-unknown-msg"> Unknown shortcut: ' + cmd + '</span>';
-            }
-          } else {
-            termHint.innerHTML = '<span class="term-err-icon">└</span><span class="term-err-msg"> API error: Rate limit reached</span>';
-          }
-          termHint.classList.remove('term-hint--open');
-          errCount++;
-          clearTimeout(errCountTimer);
-          errCountTimer = setTimeout(() => { errCount = 0; }, 1000);
-          const errFrame = errCount >= 3 ? 7 : 6;
-          setTruuFrame(-(errFrame * FRAME_PX) + 'px');
-        }
-      } else if (e.key === 'Tab') {
-        e.preventDefault();
-        const q = termInput.value.trim().toLowerCase();
-        const list = shortcutsOpen ? COMMANDS : (q ? COMMANDS.filter(c => c.label.includes(q)) : []);
-        if (list.length) {
-          termInput.value = list[0].label;
-          shortcutsOpen = false;
-          syncHint();
-          syncCursor();
-        }
-      } else if (e.key === '?') {
-        e.preventDefault();
-        shortcutsOpen = !shortcutsOpen;
-        syncHint();
-      } else if (e.key === 'Escape') {
-        shortcutsOpen = false;
-        writingOpen = false;
-        ctrlCWarning = false;
-        clearTimeout(ctrlCWarningTimer);
-        termInput.value = '';
-        syncHint();
-        syncCursor();
-      } else if (e.key === 'c' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        if (termInput.value) {
-          shortcutsOpen = false;
-          writingOpen = false;
-          ctrlCWarning = false;
-          clearTimeout(ctrlCWarningTimer);
-          termInput.value = '';
-          syncHint();
-          syncCursor();
-        } else if (ctrlCWarning) {
-          setTruuFrame(-(7 * FRAME_PX) + 'px');
-          clicked = true;
-          clearTimeout(clickTimer);
-          clickTimer = setTimeout(() => {
-            clicked = false;
-            setTruuFrame(hovered ? -(5 * FRAME_PX) + 'px' : '0px');
-          }, 500);
-        } else {
-          showCtrlCWarning();
-        }
-      }
+    deck.addEventListener('click', (e) => {
+      const card = e.target.closest('.card[data-href]');
+      if (card) openCard(card);
     });
-    termInput.addEventListener('input', () => {
-      ruler.textContent = termInput.value;
-      while (termInput.value.length > 0 && ruler.offsetWidth > termInput.offsetWidth) {
-        termInput.value = termInput.value.slice(0, -1);
-        ruler.textContent = termInput.value;
-      }
-      shortcutsOpen = false; writingOpen = false; ctrlCWarning = false; clearTimeout(ctrlCWarningTimer); syncHint(); syncCursor();
-    });
-    termInput.addEventListener('keyup',   syncCursor);
-    termInput.addEventListener('click',   syncCursor);
-    termInput.addEventListener('select',  syncCursor);
-    syncCursor();
-    syncHint();
-
-    // TrustAI link - ctrl+click only
-    // /experience shortcut link - show table instead of navigating
-    termHint.addEventListener('click', e => {
-      const a = e.target.closest('a');
-      if (a && a.textContent.trim() === '/experience') {
-        e.preventDefault();
-        writingOpen = true;
-        termInput.value = '';
-        syncCursor();
-        showWritingTable();
-      }
+    deck.addEventListener('keydown', (e) => {
+      const card = e.target.closest('.card[data-href]');
+      if (card && e.key === 'Enter') openCard(card);
     });
 
-    document.getElementById('trustai-link').addEventListener('click', e => {
+    /* ---- view-transition naming ----
+       Outbound: name the clicked card's thumb just before the snapshot.
+       Inbound (back from a project page): name the matching card so the hero
+       morphs back into it, then clear the name once the transition settles. */
+    addEventListener('pageswap', (e) => {
+      try {
+        if (!e.viewTransition || !vtCard) return;
+        const thumb = vtCard.querySelector('.card__thumb');
+        if (thumb) thumb.style.viewTransitionName = 'project-hero';
+      } catch {}
+    });
+    addEventListener('pagereveal', (e) => {
+      try {
+        if (!e.viewTransition) return;
+        const from = navigation.activation?.from?.url;
+        if (!from) return;
+        const path = new URL(from).pathname;
+        const card = deck.querySelector(`.card[data-href="${path}"]`);
+        const thumb = card?.querySelector('.card__thumb');
+        if (!thumb) return;
+        thumb.style.viewTransitionName = 'project-hero';
+        /* clear after settle; catch: a skipped transition rejects `finished` */
+        e.viewTransition.finished
+          .catch(() => {})
+          .finally(() => { thumb.style.viewTransitionName = ''; });
+      } catch {}
+    });
+
+    /* ---- filtering ----
+       Mode tabs and Sort tags combine: a card shows when it matches the active
+       mode AND (no tag selected OR it carries the selected tag). Re-stagger the
+       reveal indexes after each filter so the rise-in stays tidy. */
+    const cards = [...deck.querySelectorAll('.card')];
+    let activeMode = 'all';
+    let activeTag = null;
+
+    function applyFilter() {
+      let vis = 0;
+      for (const c of cards) {
+        const okMode = activeMode === 'all' || c.dataset.mode === activeMode;
+        const okTag = !activeTag || c.dataset.tags.split(',').includes(activeTag);
+        const show = okMode && okTag;
+        c.hidden = !show;
+        if (show) c.style.setProperty('--i', vis++);
+      }
+      setOffset(0);   // rewind the drag position on every filter change
+    }
+
+    const modeBtns = [...document.querySelectorAll('.mode-btn')];
+    for (const b of modeBtns) b.addEventListener('click', () => {
+      activeMode = b.dataset.mode;
+      for (const x of modeBtns) {
+        x.classList.toggle('active', x === b);
+        x.setAttribute('aria-selected', String(x === b));
+      }
+      applyFilter();
+    });
+
+    /* Sort buttons are generated from the union of all card tags */
+    const tagWrap = document.getElementById('tag-buttons');
+    const allTags = [...new Set(projects.flatMap(p => p.tags))];
+    tagWrap.innerHTML = allTags.map(t => `<button class="sort-btn" type="button" data-tag="${t}">${t}</button>`).join('');
+    const tagBtns = [...tagWrap.querySelectorAll('.sort-btn')];
+    for (const b of tagBtns) b.addEventListener('click', () => {
+      activeTag = activeTag === b.dataset.tag ? null : b.dataset.tag;
+      for (const x of tagBtns) x.classList.toggle('active', x.dataset.tag === activeTag);
+      applyFilter();
+    });
+    document.getElementById('sort-reset').addEventListener('click', () => {
+      activeTag = null;
+      for (const x of tagBtns) x.classList.remove('active');
+      applyFilter();
+    });
+
+    /* ---- deck drag ----
+       Desktop: the fanned row is wider than the viewport, so dragging pans it
+       with a translateX clamped to the overflow. Pointer events cover mouse and
+       touch; a wheel handler maps vertical scroll over the deck to a pan too.
+       On mobile the CSS stacks the cards vertically and forces transform: none. */
+    let offset = 0;
+    function maxOffset() {
+      const over = deck.scrollWidth - deck.parentElement.clientWidth;
+      return Math.max(0, over);
+    }
+    function setOffset(x) {
+      offset = Math.min(0, Math.max(-maxOffset(), x));
+      deck.style.transform = `translateX(${offset}px)`;
+    }
+    let dragging = false, startX = 0, startOffset = 0, moved = false;
+    deck.addEventListener('pointerdown', (e) => {
+      if (matchMedia('(max-width: 768px)').matches) return;
+      dragging = true; moved = false;
+      startX = e.clientX; startOffset = offset;
+    });
+    deck.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) > 4) {
+        moved = true;
+        /* capture only once a drag is real: capturing on pointerdown retargets
+           the eventual click to the deck, which broke card navigation */
+        try { deck.setPointerCapture(e.pointerId); } catch {}
+      }
+      if (moved) setOffset(startOffset + dx);
+    });
+    const endDrag = () => { dragging = false; };
+    deck.addEventListener('pointerup', endDrag);
+    deck.addEventListener('pointercancel', endDrag);
+    /* suppress accidental clicks after a drag */
+    deck.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+    deck.addEventListener('wheel', (e) => {
+      if (matchMedia('(max-width: 768px)').matches) return;
+      if (maxOffset() === 0) return;
       e.preventDefault();
-      const isMobile = window.matchMedia('(max-width: 1024px)').matches;
-      if (e.ctrlKey || e.metaKey || isMobile) window.open('https://trytrust.ai', '_blank', 'noopener');
-    });
+      setOffset(offset - (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY));
+    }, { passive: false });
+    addEventListener('resize', () => setOffset(offset));
 
-    // Keep input always active
-    let mouseIsDown = false;
-    document.addEventListener('mousedown', () => { mouseIsDown = true;  });
-    document.addEventListener('mouseup',   () => { mouseIsDown = false; });
+    applyFilter();
 
-    // Suppress refocus during mousedown so drag selection can form
-    termInput.addEventListener('blur', () => {
-      if (!mouseIsDown) setTimeout(() => termInput.focus(), 0);
-    });
-    // Plain click (no drag) - browser fires click only if mouse didn't move
-    document.addEventListener('click', () => termInput.focus());
-    // Typing after a drag selection refocuses
-    document.addEventListener('keydown', () => {
-      if (document.activeElement !== termInput) termInput.focus();
-    });
-    window.addEventListener('focus', () => termInput.focus());
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) termInput.focus();
-    });
+    /* ---- corner menu toggle (kept) ----
+       The corner logo doubles as the menu button. Clicking it - or Enter/Space
+       while focused - toggles the nav links. Escape / outside click closes. */
+    (function () {
+      const logo = document.querySelector('.logo');
+      const menu = document.getElementById('site-menu');
+      if (!logo || !menu) return;
 
-    // Mobile /experience button
-    const mobileExpBtn = document.getElementById('mobile-exp-btn');
-    if (mobileExpBtn) {
-      mobileExpBtn.addEventListener('click', e => {
-        e.preventDefault();
-        if (!window.matchMedia('(max-width: 1024px)').matches) {
-          writingOpen = true;
-          showWritingTable();
-          return;
-        }
-        // Mobile: replace /experience with project repo buttons
-        const nav = document.getElementById('mobile-nav');
-        EXPERIENCE.forEach(p => {
-          const a = document.createElement('a');
-          a.className = 'mobile-btn';
-          a.textContent = p.project;
-          a.href = p.href;
-          a.target = '_blank';
-          a.rel = 'noopener';
-          nav.insertBefore(a, mobileExpBtn);
-        });
-        nav.removeChild(mobileExpBtn);
+      const setOpen = (open) => {
+        document.body.classList.toggle('menu-open', open);
+        logo.setAttribute('aria-expanded', String(open));
+        menu.setAttribute('aria-hidden', String(!open));
+      };
+      const isOpen = () => document.body.classList.contains('menu-open');
+      const toggle = () => setOpen(!isOpen());
+
+      logo.addEventListener('click', toggle);
+      logo.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
       });
+      menu.addEventListener('click', (e) => { if (e.target.closest('.menu__link')) setOpen(false); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) setOpen(false); });
+      document.addEventListener('click', (e) => {
+        if (isOpen() && !e.target.closest('.menu') && !e.target.closest('.logo')) setOpen(false);
+      });
+    })();
+
+    /* ---- intro (kept) ----
+       Hold the curtain for the logo glide, then reveal. The reveal toggles
+       `body.revealed`, which drives the curtain wipe, the logo recolor and the
+       cards' staggered rise-in. */
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const MIN_INTRO = 1850;
+
+    function reveal() {
+      document.body.classList.remove('intro-lock');
+      document.body.classList.add('revealed');
     }
 
-    // 1=NE(right-up)  2=SE(right-down)  3=SW(left-down)  4=NW(left-up)
-    document.addEventListener('mousemove', e => {
-      if (hovered || clicked) return;
-      const rect = truu.getBoundingClientRect();
-      const dx = e.clientX - (rect.left + rect.width  / 2);
-      const dy = e.clientY - (rect.top  + rect.height / 2);
-      let frame;
-      if      (dx >= 0 && dy <= 0) frame = 1; // NE
-      else if (dx >= 0 && dy >  0) frame = 2; // SE
-      else if (dx <  0 && dy >  0) frame = 3; // SW
-      else                         frame = 4; // NW
-      setTruuFrame(-(frame * FRAME_PX) + 'px');
-    });
+    /* skip the intro on anything that isn't a fresh entry: reloads,
+       back/forward restores, and returns from internal pages (where the hero
+       morph needs a settled deck). `intro-skip` removes the curtain/glide
+       entirely so nothing replays. */
+    const skipIntro = (() => {
+      try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        if (nav && (nav.type === 'reload' || nav.type === 'back_forward')) return true;
+        const from = navigation?.activation?.from?.url;
+        return from ? new URL(from).origin === location.origin : false;
+      } catch { return false; }
+    })();
+
+    if (skipIntro) {
+      document.body.classList.add('intro-skip');
+      reveal();
+    } else {
+      document.body.classList.add('intro-lock');
+      if (reduceMotion) reveal();
+      else setTimeout(reveal, MIN_INTRO);
+    }
   </script>
 </body>
 </html>
