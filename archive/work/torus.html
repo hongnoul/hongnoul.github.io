@@ -19,6 +19,14 @@
   <meta name="twitter:description" content="Torus knots — the T(p,q) family, parametric form, and an interactive silhouette text-wrap specimen.">
   <meta name="twitter:image" content="https://hongnoul.github.io/archive/og/torus.svg">
   <style>
+    /* cross-document view transition: smooth root cross-fade to/from the
+       rest of the site (hero morphs are reserved for /work/ pages) */
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+      ::view-transition-old(root), ::view-transition-new(root) {
+        animation-duration: .3s;
+      }
+    }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {

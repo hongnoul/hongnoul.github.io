@@ -14,6 +14,14 @@
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#ff2400">
   <style>
+    /* cross-document view transition: smooth root cross-fade to/from the
+       rest of the site (hero morphs are reserved for /work/ pages) */
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+      ::view-transition-old(root), ::view-transition-new(root) {
+        animation-duration: .3s;
+      }
+    }
     html, body { margin: 0; height: 100%; background: #ff2400; overflow: hidden; }
 
     /* hero: full-viewport canvas holding the rotating 3D "j" */

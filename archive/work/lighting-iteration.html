@@ -24,6 +24,14 @@
   <meta name="twitter:title" content="A Randomized Illumination Grid for Material Exploration — Justin Hong">
   <meta name="twitter:description" content="An infinite pannable grid of seeded-random lighting and material configurations for developing perceptual intuition about surface quality.">
   <style>
+    /* cross-document view transition: smooth root cross-fade to/from the
+       rest of the site (hero morphs are reserved for /work/ pages) */
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+      ::view-transition-old(root), ::view-transition-new(root) {
+        animation-duration: .3s;
+      }
+    }
     *, *::before, *::after { box-sizing: border-box; }
 
     html { scroll-behavior: smooth; }
