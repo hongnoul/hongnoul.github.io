@@ -441,6 +441,13 @@
       .sort-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
     }
 
+    /* intro skip: reloads and returns from internal pages get no curtain, no
+       logo glide, and an already-settled deck — the intro only plays on a
+       fresh entry. */
+    body.intro-skip .curtain { display: none; }
+    body.intro-skip .logo { animation: none; filter: invert(0); transition: none; }
+    body.intro-skip .card { animation: none; opacity: 1; }
+
     /* reduced motion: no curtain, no glide — logo rests in the corner instantly,
        cards appear without animation */
     @media (prefers-reduced-motion: reduce) {
@@ -521,7 +528,7 @@
        appears in the deck. */
     const projects = [
       { title: 'hwatu — 13 ms browser for coding agents', mode: 'work',
-        tags: ['systems', 'ai'], img: '/work/hwatu-spawn-demo.svg',
+        tags: ['systems', 'ai'], img: '/hwatu_docs_thumb.png',
         href: '/work/hwatu.html',
         description: 'A daemon-based WebKit browser that makes visual ' +
           'verification nearly free for AI agents: 13 ms median window spawn, ' +
@@ -730,13 +737,17 @@
       if (matchMedia('(max-width: 768px)').matches) return;
       dragging = true; moved = false;
       startX = e.clientX; startOffset = offset;
-      deck.setPointerCapture(e.pointerId);
     });
     deck.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       const dx = e.clientX - startX;
-      if (Math.abs(dx) > 4) moved = true;
-      setOffset(startOffset + dx);
+      if (!moved && Math.abs(dx) > 4) {
+        moved = true;
+        /* capture only once a drag is real: capturing on pointerdown retargets
+           the eventual click to the deck, which broke card navigation */
+        try { deck.setPointerCapture(e.pointerId); } catch {}
+      }
+      if (moved) setOffset(startOffset + dx);
     });
     const endDrag = () => { dragging = false; };
     deck.addEventListener('pointerup', endDrag);
@@ -792,18 +803,27 @@
       document.body.classList.add('revealed');
     }
 
-    /* returning from an internal page (view transition or plain back-nav):
-       skip the curtain so the hero morph lands on a settled deck */
-    const cameFromInternal = (() => {
+    /* skip the intro on anything that isn't a fresh entry: reloads,
+       back/forward restores, and returns from internal pages (where the hero
+       morph needs a settled deck). `intro-skip` removes the curtain/glide
+       entirely so nothing replays. */
+    const skipIntro = (() => {
       try {
+        const nav = performance.getEntriesByType('navigation')[0];
+        if (nav && (nav.type === 'reload' || nav.type === 'back_forward')) return true;
         const from = navigation?.activation?.from?.url;
         return from ? new URL(from).origin === location.origin : false;
       } catch { return false; }
     })();
 
-    document.body.classList.add('intro-lock');
-    if (reduceMotion || cameFromInternal) reveal();
-    else setTimeout(reveal, MIN_INTRO);
+    if (skipIntro) {
+      document.body.classList.add('intro-skip');
+      reveal();
+    } else {
+      document.body.classList.add('intro-lock');
+      if (reduceMotion) reveal();
+      else setTimeout(reveal, MIN_INTRO);
+    }
   </script>
 </body>
 </html>
