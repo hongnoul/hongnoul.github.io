@@ -47,7 +47,7 @@
 
     a { color: inherit; text-decoration-color: #c9c9c9; text-underline-offset: 3px; transition: color .2s ease, text-decoration-color .2s ease; }
     a:hover { color: #ff2400; text-decoration-color: #ff2400; }
-    code { font: 400 0.88em ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: #f0f0f0; padding: 1px 5px; border-radius: 4px; }
+    code { font: 400 0.88em ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: #f0f0f0; padding: 1px 5px; }
 
     .wrap { max-width: 680px; margin: 0 auto; padding: 0 24px 140px; }
 
@@ -63,7 +63,7 @@
     .hero {
       view-transition-name: project-hero;
       display: block; width: 100%; aspect-ratio: 1980 / 1080;  /* matches .card__thumb */
-      margin: 0 0 44px; border-radius: 12px; overflow: hidden;
+      margin: 0 0 44px; overflow: hidden;
       border: 1px solid #e4e4e4; background: #1a1b1e;
     }
     .hero img, .hero video { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -94,12 +94,12 @@
     p:last-child { margin-bottom: 0; }
 
     .figure { margin: 28px 0; }
-    .figure img { width: 100%; height: auto; display: block; border-radius: 10px; }
+    .figure img { width: 100%; height: auto; display: block; }
     .figure figcaption { font-size: 12.5px; color: #898989; margin-top: 10px; }
 
     /* ---- the strip demo: a draggable niri viewport ---- */
     .strip {
-      margin: 32px 0; border: 1px solid #e4e4e4; border-radius: 12px;
+      margin: 32px 0; border: 1px solid #e4e4e4;
       background: #fff; overflow: hidden;
     }
     .strip__bar {
@@ -112,7 +112,7 @@
     .strip__keys { margin-left: auto; display: flex; gap: 6px; }
     .strip__key {
       font: 500 12px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-      color: #444; background: #f4f4f4; border: 1px solid #ddd; border-radius: 6px;
+      color: #444; background: #f4f4f4; border: 1px solid #ddd;
       padding: 6px 10px; cursor: pointer; transition: background .15s ease, color .15s ease;
       user-select: none;
     }
@@ -123,28 +123,14 @@
     }
     .strip__view:active { cursor: grabbing; }
     .strip__row {
-      display: flex; gap: 6px; padding: 16px 16px;
+      display: flex; padding: 0;
       will-change: transform;
     }
     .strip__row.anim { transition: transform .45s cubic-bezier(.33,1,.68,1); }
-    .win {
-      flex: 0 0 200px; height: 190px; border-radius: 6px;
-      background: #171d24; border: 1px solid #2a3138;
-      padding: 12px 12px 10px; display: flex; flex-direction: column;
-      font: 400 11px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-      color: #7d8590; user-select: none;
-      transition: border-color .3s ease, box-shadow .3s ease;
+    .strip__pano {
+      display: block; height: 380px; width: auto; max-width: none;
+      user-select: none; -webkit-user-drag: none;
     }
-    .win.focused { border-color: #e6edf3; box-shadow: 0 0 0 1px #e6edf3; }
-    .win__name { font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
-    .win__name--jcode { color: #7ee787; }
-    .win__name--hwatu { color: #79c0ff; }
-    .win__name--self { color: #ff7b72; }
-    .win__body { flex: 1; overflow: hidden; }
-    .win__body .dim { color: #454c54; }
-    .win__body .ok { color: #79c0ff; }
-    .win__body .warn { color: #e3b341; }
-    .win__hint { font-size: 10px; color: #454c54; margin-top: auto; }
     .strip__note { font-size: 12.5px; color: #898989; margin: 0; padding: 14px 18px 16px; border-top: 1px solid #eee; }
     .strip__note b { color: #444; font-weight: 550; }
 
@@ -157,7 +143,7 @@
 
     /* ---- terminal transcript ---- */
     pre.term {
-      margin: 26px 0; padding: 20px 18px; border-radius: 12px; overflow-x: auto;
+      margin: 26px 0; padding: 20px 18px; overflow-x: auto;
       background: #111; color: #d6d6d6;
       font: 400 13px/1.75 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     }
@@ -254,59 +240,22 @@
       <div class="strip" id="strip">
         <div class="strip__bar">
           <div class="strip__dots" aria-hidden="true"><i></i><i></i><i></i></div>
-          <span class="strip__title">the strip: drag, or focus a column</span>
+          <span class="strip__title">the actual strip: two real workspaces, eight agent columns. drag it</span>
           <div class="strip__keys">
-            <button class="strip__key" id="kLeft"  type="button" aria-label="Focus column left">alt+h</button>
-            <button class="strip__key" id="kRight" type="button" aria-label="Focus column right">alt+l</button>
+            <button class="strip__key" id="kLeft"  type="button" aria-label="Scroll strip left">alt+h</button>
+            <button class="strip__key" id="kRight" type="button" aria-label="Scroll strip right">alt+l</button>
           </div>
         </div>
         <div class="strip__view" id="stripView">
           <div class="strip__row" id="stripRow">
-            <div class="win">
-              <div class="win__name win__name--jcode">jcode · home</div>
-              <div class="win__body">&gt; fix the nav overlap<br>
-                <span class="dim">reading index.html…</span><br>
-                <span class="ok">✓ edited nav.css</span><br>
-                <span class="ok">✓ hwatu screenshot</span><br>
-                <span class="dim">looks right. done.</span></div>
-              <div class="win__hint">alt+;</div>
-            </div>
-            <div class="win">
-              <div class="win__name win__name--jcode">jcode · beni-hana</div>
-              <div class="win__body">&gt; run the eval suite<br>
-                <span class="warn">⏳ 34/60 scenarios…</span><br>
-                <span class="dim">will wake you when done</span></div>
-              <div class="win__hint">alt+'</div>
-            </div>
-            <div class="win">
-              <div class="win__name win__name--hwatu">hwatu · localhost:3000</div>
-              <div class="win__body"><span class="dim">rendered in 13 ms</span><br>
-                <span class="dim">headless for the agent,</span><br>
-                <span class="dim">focused for me:</span><br>
-                <span class="ok">hwatu focus 3</span></div>
-              <div class="win__hint">app-id: hwatu-background</div>
-            </div>
-            <div class="win">
-              <div class="win__name win__name--self">jcode · self-dev</div>
-              <div class="win__body">&gt; add a triage hotkey<br>
-                <span class="dim">editing its own harness</span><br>
-                <span class="ok">✓ config.kdl updated</span><br>
-                <span class="dim">reloading…</span></div>
-              <div class="win__hint">alt+shift+'</div>
-            </div>
-            <div class="win">
-              <div class="win__name win__name--jcode">jcode · #5</div>
-              <div class="win__body"><span class="dim">a fifth agent costs</span><br>
-                <span class="dim">nothing but width.</span></div>
-              <div class="win__hint">the strip just grows →</div>
-            </div>
+            <img class="strip__pano" src="/work/setup-strip-pano.jpg" alt="Two niri workspaces side by side: eight kitty columns running jcode agents and a hwatu verification window" draggable="false">
           </div>
         </div>
         <p class="strip__note">
           Terminals open at <b>1/4 screen width, zero gaps</b>, so four agent
-          columns fit one viewport exactly. This widget is the actual mental
-          model, not a metaphor. The footage at the top of the page is the
-          real thing, driven by <code>niri msg action focus-window</code>.
+          columns fit one viewport exactly. These are unretouched screenshots
+          of the two workspaces from the footage above, stitched the way the
+          strip actually extends: sideways, forever.
         </p>
       </div>
     </section>
@@ -427,12 +376,11 @@
   </div>
 
   <script>
-    /* ---- the strip: draggable viewport + focus-stepping keys ---- */
+    /* ---- the strip: a draggable viewport over the real panorama ---- */
     (function () {
       const view = document.getElementById('stripView');
       const row  = document.getElementById('stripRow');
-      const wins = [...row.querySelectorAll('.win')];
-      let x = 0, focused = 0;
+      let x = 0;
 
       function maxScroll() { return Math.max(0, row.scrollWidth - view.clientWidth); }
       function apply(anim) {
@@ -440,22 +388,14 @@
         x = Math.max(-maxScroll(), Math.min(0, x));
         row.style.transform = `translateX(${x}px)`;
       }
-      function setFocus(i, scroll) {
-        focused = Math.max(0, Math.min(wins.length - 1, i));
-        wins.forEach((w, j) => w.classList.toggle('focused', j === focused));
-        if (scroll) {
-          const w = wins[focused];
-          const left = w.offsetLeft, right = left + w.offsetWidth;
-          const vw = view.clientWidth;
-          if (left + x < 0) x = -left + 16;
-          else if (right + x > vw) x = vw - right - 16;
-          apply(true);
-        }
+      /* alt+h / alt+l step one "column": a quarter of the viewport,
+         matching the real 1/4-width terminal columns */
+      function step(dir) {
+        x -= dir * view.clientWidth / 4;
+        apply(true);
       }
-      setFocus(0, false);
-
-      document.getElementById('kLeft').addEventListener('click', () => setFocus(focused - 1, true));
-      document.getElementById('kRight').addEventListener('click', () => setFocus(focused + 1, true));
+      document.getElementById('kLeft').addEventListener('click', () => step(-1));
+      document.getElementById('kRight').addEventListener('click', () => step(1));
 
       /* drag (pointer events cover mouse + touch) */
       let dragging = false, startX = 0, startPos = 0;
@@ -480,8 +420,8 @@
         if (entries[0].isIntersecting && !toured) {
           toured = true;
           let i = 0;
-          const step = () => { if (i < 3 && !dragging) { setFocus(++i, true); setTimeout(step, 900); } };
-          setTimeout(() => { setTimeout(step, 400); }, 600);
+          const drift = () => { if (i++ < 3 && !dragging) { step(1); setTimeout(drift, 900); } };
+          setTimeout(drift, 1000);
           obs.disconnect();
         }
       }, { threshold: 0.5 }).observe(view);
