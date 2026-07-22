@@ -17,12 +17,6 @@ const PAGES = [
     desc: 'Writing on UI/UX and software.',
   },
   {
-    file: 'torus.svg',
-    title: 'T(p,q)',
-    sub: 'Torus Knots',
-    desc: 'The T(p,q) family, parametric form, and an\ninteractive silhouette text-wrap specimen.',
-  },
-  {
     file: 'sprites.svg',
     title: 'Sprites',
     sub: 'CSS Sprite Sheets',
