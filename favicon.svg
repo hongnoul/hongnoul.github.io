@@ -1,69 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="512" height="512" shape-rendering="crispEdges">
-<rect width="32" height="32" fill="#000000"/>
-<rect x="14" y="2" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="2" width="4" height="1" fill="#ffffff"/>
-<rect x="5" y="3" width="3" height="1" fill="#ffffff"/>
-<rect x="14" y="3" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="3" width="4" height="1" fill="#ffffff"/>
-<rect x="4" y="4" width="6" height="1" fill="#ffffff"/>
-<rect x="14" y="4" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="4" width="4" height="1" fill="#ffffff"/>
-<rect x="5" y="5" width="6" height="1" fill="#ffffff"/>
-<rect x="14" y="5" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="5" width="4" height="1" fill="#ffffff"/>
-<rect x="6" y="6" width="5" height="1" fill="#ffffff"/>
-<rect x="14" y="6" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="6" width="4" height="1" fill="#ffffff"/>
-<rect x="8" y="7" width="2" height="1" fill="#ffffff"/>
-<rect x="14" y="7" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="7" width="4" height="1" fill="#ffffff"/>
-<rect x="11" y="8" width="19" height="1" fill="#ffffff"/>
-<rect x="11" y="9" width="19" height="1" fill="#ffffff"/>
-<rect x="11" y="10" width="19" height="1" fill="#ffffff"/>
-<rect x="3" y="11" width="3" height="1" fill="#ffffff"/>
-<rect x="14" y="11" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="11" width="4" height="1" fill="#ffffff"/>
-<rect x="2" y="12" width="6" height="1" fill="#ffffff"/>
-<rect x="14" y="12" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="12" width="4" height="1" fill="#ffffff"/>
-<rect x="3" y="13" width="6" height="1" fill="#ffffff"/>
-<rect x="14" y="13" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="13" width="4" height="1" fill="#ffffff"/>
-<rect x="5" y="14" width="4" height="1" fill="#ffffff"/>
-<rect x="14" y="14" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="14" width="4" height="1" fill="#ffffff"/>
-<rect x="6" y="15" width="2" height="1" fill="#ffffff"/>
-<rect x="14" y="15" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="15" width="4" height="1" fill="#ffffff"/>
-<rect x="14" y="16" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="16" width="4" height="1" fill="#ffffff"/>
-<rect x="10" y="17" width="20" height="1" fill="#ffffff"/>
-<rect x="8" y="18" width="1" height="1" fill="#ffffff"/>
-<rect x="10" y="18" width="20" height="1" fill="#ffffff"/>
-<rect x="8" y="19" width="22" height="1" fill="#ffffff"/>
-<rect x="7" y="20" width="23" height="1" fill="#ffffff"/>
-<rect x="7" y="21" width="4" height="1" fill="#ffffff"/>
-<rect x="6" y="22" width="4" height="1" fill="#ffffff"/>
-<rect x="15" y="22" width="2" height="1" fill="#ffffff"/>
-<rect x="24" y="22" width="1" height="1" fill="#ffffff"/>
-<rect x="6" y="23" width="4" height="1" fill="#ffffff"/>
-<rect x="14" y="23" width="4" height="1" fill="#ffffff"/>
-<rect x="22" y="23" width="4" height="1" fill="#ffffff"/>
-<rect x="5" y="24" width="4" height="1" fill="#ffffff"/>
-<rect x="13" y="24" width="4" height="1" fill="#ffffff"/>
-<rect x="23" y="24" width="4" height="1" fill="#ffffff"/>
-<rect x="4" y="25" width="5" height="1" fill="#ffffff"/>
-<rect x="12" y="25" width="5" height="1" fill="#ffffff"/>
-<rect x="24" y="25" width="4" height="1" fill="#ffffff"/>
-<rect x="4" y="26" width="4" height="1" fill="#ffffff"/>
-<rect x="11" y="26" width="5" height="1" fill="#ffffff"/>
-<rect x="24" y="26" width="5" height="1" fill="#ffffff"/>
-<rect x="3" y="27" width="4" height="1" fill="#ffffff"/>
-<rect x="10" y="27" width="5" height="1" fill="#ffffff"/>
-<rect x="25" y="27" width="5" height="1" fill="#ffffff"/>
-<rect x="5" y="28" width="2" height="1" fill="#ffffff"/>
-<rect x="11" y="28" width="3" height="1" fill="#ffffff"/>
-<rect x="26" y="28" width="3" height="1" fill="#ffffff"/>
-<rect x="12" y="29" width="1" height="1" fill="#ffffff"/>
-<rect x="27" y="29" width="1" height="1" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="512" height="512">
+  <rect width="100" height="100" fill="#000000"/>
+  <!-- JH logo mark from jhokx.svg (84.667 x 50.8), centered with padding -->
+  <g transform="translate(7.666654,24.599933) translate(-355.60001,-203.2)">
+    <path fill="#ffffff" d="m 355.60001,203.2 16.93333,16.93333 h 16.93334 v 16.93334 h -16.93334 l -16.93333,-16.93334 v 16.93334 L 372.53334,254 h 16.93334 16.93333 v -16.93333 h 16.93334 V 254 h 16.93333 v -50.8 h -16.93333 v 16.93333 H 406.40001 L 389.46668,203.2 h -16.93334 z"/>
+  </g>
 </svg>
