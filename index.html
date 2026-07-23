@@ -344,13 +344,13 @@
 
     .card[hidden] { display: none; }
 
-    /* ---- about + sort ---- */
+    /* ---- about + token burn ---- */
     .about-section {
-      padding: 0 2rem 1.25rem;
-      max-width: 1200px;
+      padding: 0 2rem 1.25rem;   /* 2rem gutters match the deck */
       display: flex;
       gap: 4rem;
       align-items: flex-start;
+      justify-content: space-between;
       flex-shrink: 0;
     }
     .about-content {
@@ -379,9 +379,11 @@
     .burn-section {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: flex-end;      /* right-aligned against the right gutter */
+      text-align: right;
       gap: 0.75rem;
       min-width: 300px;
+      margin-left: auto;
     }
     .burn-title {
       font-size: 1.1rem;
@@ -441,7 +443,10 @@
       .card__title { font-size: 0.7rem; }
 
       .about-section { flex-direction: column; gap: 2rem; padding: 1rem var(--corner-left) 2rem; }
-      .burn-section { min-width: 100%; }
+      /* mobile: the widget sits at the bottom, left-aligned to the same
+         gutters as the cards */
+      .burn-section { min-width: 100%; align-items: flex-start; text-align: left; margin-left: 0; }
+      .burn-grid { width: 100%; max-width: 420px; height: auto; }
     }
     @media (max-width: 480px) {
       .deck { gap: 1rem; }
@@ -546,14 +551,6 @@
           'own column on an infinite strip, jcode is the primary interface to ' +
           'the machine, and hwatu makes verification free. A tour of an ' +
           'agent-first Linux desktop, as of Jul 2026.' },
-      { title: 'token-burn - daily AI usage dashboard', mode: 'studies',
-        tags: ['systems', 'ai'], img: 'https://hongnoul.github.io/token-burn/data/thumb.svg',
-        href: 'https://github.com/hongnoul/token-burn',
-        description: 'A GitHub-contributions-style dashboard of the tokens my ' +
-          'coding agents burn every day. Zero-dep CLI parses local jcode and ' +
-          'Claude Code logs into a counts-only JSON published via GitHub Pages. ' +
-          'No backend, no cloud: the repo is the database. The card thumbnail ' +
-          'is itself live data.' },
       { title: 'hwatu - 13 ms browser for coding agents', mode: 'work',
         tags: ['systems', 'ai'], img: '/hwatu_docs_thumb.png',
         href: 'https://hongnoul.github.io/hwatu/',
