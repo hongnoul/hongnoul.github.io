@@ -463,6 +463,46 @@
     </section>
 
     <section class="reveal">
+      <h2>The bar</h2>
+      <p>
+        The waybar workspace ticker is where the fleet becomes legible. The
+        stock module numbers workspaces and stops there; this one is a custom
+        Rust binary that subscribes to niri&rsquo;s event stream, walks each
+        window&rsquo;s <code>/proc</code> cmdline to find the ones running
+        jcode, and cross-references them against
+        <code>~/.jcode/session_status/</code> - the per-session state files
+        every agent keeps updated as it works. Each session shows up in the
+        bar as its own cell, color-coded by what the agent is doing right now:
+      </p>
+      <table>
+        <thead><tr><th>color</th><th>meaning</th></tr></thead>
+        <tbody>
+          <tr><td class="key"><span style="color:#2ecc71">&#9632;</span> green</td><td>agent is working - leave it alone</td></tr>
+          <tr><td class="key"><span style="color:#f1c40f">&#9632;</span> yellow</td><td>waiting on my input - this is the queue</td></tr>
+          <tr><td class="key"><span style="color:#e74c3c">&#9632;</span> red</td><td>stalled or dead - the session needs rescuing</td></tr>
+          <tr><td class="key"><span style="color:#71717a">&#9632;</span> dim</td><td>fresh or idle - spawned but not yet tasked</td></tr>
+        </tbody>
+      </table>
+      <p>
+        With 12+ sessions live, this is the difference between managing a
+        fleet and losing one. A glance at the bar answers &ldquo;who needs
+        me&rdquo; without visiting a single column, and it pairs directly
+        with <code>alt+`</code>: the bar says someone is blocked, the chord
+        takes me to them. The status files update event-driven, not polled,
+        so a session flipping from working to waiting shows in the bar the
+        same instant the agent stops.
+      </p>
+      <p>
+        Credit split on this one: the ticker itself is
+        <a href="https://github.com/1jehuang">Jeremy Huang</a>&rsquo;s design,
+        part of the jcode setup this whole rice descends from. The session
+        status color coding is the new addition, patched in on this machine -
+        by a jcode agent editing the bar that reports on jcode agents, which
+        felt appropriately circular.
+      </p>
+    </section>
+
+    <section class="reveal">
       <h2>Verification</h2>
       <p>
         The third leg is <a href="https://hongnoul.github.io/hwatu/">hwatu</a>, the 13&nbsp;ms
@@ -501,7 +541,7 @@
         <li><b>terminal</b><span>kitty, spawned at 1/4-width columns</span></li>
         <li><b>agent</b><span>jcode, daily driver + self-dev harness</span></li>
         <li><b>browser</b><span>hwatu for verification, agent-driven</span></li>
-        <li><b>bar</b><span>waybar with a custom niri workspace ticker</span></li>
+        <li><b>bar</b><span>waybar with the custom workspace ticker above, session states included</span></li>
         <li><b>launcher</b><span>jofi (alt+space)</span></li>
         <li><b>osd</b><span>quickshell for volume/brightness</span></li>
         <li><b>shell</b><span>zsh</span></li>
