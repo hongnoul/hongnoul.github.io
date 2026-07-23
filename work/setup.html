@@ -173,20 +173,50 @@
       background: #fff; overflow: hidden;
     }
     .strip__bar {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
       padding: 10px 14px; border-bottom: 1px solid #eee;
     }
     .strip__dots { display: flex; gap: 5px; }
     .strip__dots i { width: 9px; height: 9px; border-radius: 50%; background: #e4e4e4; }
     .strip__title { font-size: 12px; color: #898989; }
-    .strip__keys { margin-left: auto; display: flex; gap: 6px; }
+    .strip__keys { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+    .strip__hint { font-size: 11px; color: #b5b5b5; margin-right: 4px; user-select: none; white-space: nowrap; }
+    @media (max-width: 900px) { .strip__hint { display: none; } }
+    /* real keycaps: they depress when you press the actual chord */
     .strip__key {
       font: 500 12px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-      color: #444; background: #f4f4f4; border: 1px solid #ddd;
-      padding: 6px 10px; cursor: pointer; transition: background .15s ease, color .15s ease;
+      color: #444; background: #fbfbfb; border: 1px solid #d5d5d5;
+      border-radius: 5px;
+      padding: 6px 10px; cursor: pointer;
       user-select: none;
+      box-shadow: 0 2px 0 #d5d5d5;
+      transform: translateY(0);
+      transition: transform .06s ease, box-shadow .06s ease,
+                  background .15s ease, color .15s ease, border-color .15s ease;
     }
-    .strip__key:hover { background: #111; color: #fff; }
+    .strip__key:hover { background: #111; color: #fff; border-color: #111; box-shadow: 0 2px 0 #000; }
+    .strip__key.down, .strip__key:active {
+      transform: translateY(2px); box-shadow: 0 0 0 #d5d5d5;
+      background: #ff2400; color: #fff; border-color: #ff2400;
+    }
+    /* niri-style hotkey HUD: shows the real action name when a chord fires */
+    .strip__hud {
+      position: absolute; top: 12px; right: 12px; z-index: 2;
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 12px;
+      background: rgba(10, 12, 15, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      font: 500 12px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      color: #e8e8e8;
+      opacity: 0; transform: translateY(-4px);
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+    .strip__hud.show { opacity: 1; transform: translateY(0); }
+    .strip__hud .chord { color: #ff6a52; }
+    .strip__hud .act { color: #9fe29f; }
     .strip__view {
       position: relative; overflow: hidden; background: #101418;
       cursor: grab; touch-action: pan-y;
@@ -343,11 +373,15 @@
           <div class="strip__dots" aria-hidden="true"><i></i><i></i><i></i></div>
           <span class="strip__title">the actual strip: two real workspaces, eight agent columns. drag it</span>
           <div class="strip__keys">
-            <button class="strip__key" id="kLeft"  type="button" aria-label="Scroll strip left">alt+h</button>
-            <button class="strip__key" id="kRight" type="button" aria-label="Scroll strip right">alt+l</button>
+            <span class="strip__hint" aria-hidden="true">these work for real &rarr;</span>
+            <button class="strip__key" data-chord="h" type="button" aria-label="Focus column left (alt+h)">alt+h</button>
+            <button class="strip__key" data-chord="j" type="button" aria-label="Workspace down (alt+j)">alt+j</button>
+            <button class="strip__key" data-chord="k" type="button" aria-label="Workspace up (alt+k)">alt+k</button>
+            <button class="strip__key" data-chord="l" type="button" aria-label="Focus column right (alt+l)">alt+l</button>
           </div>
         </div>
         <div class="strip__view" id="stripView">
+          <div class="strip__hud" id="stripHud" aria-hidden="true"></div>
           <div class="strip__row" id="stripRow">
             <img class="strip__pano" src="/work/setup-strip-pano.jpg" alt="Two niri workspaces side by side: eight kitty columns running jcode agents and a hwatu verification window" draggable="false">
           </div>
@@ -356,7 +390,10 @@
           Terminals open at <b>1/4 screen width, zero gaps</b>, so four agent
           columns fit one viewport exactly. These are unretouched screenshots
           of the two workspaces from the footage above, stitched the way the
-          strip actually extends: sideways, forever.
+          strip actually extends: sideways, forever. And the keys aren&rsquo;t
+          decoration: hold <b>alt</b> and tap <b>h / j / k / l</b> right now.
+          Those are the exact binds from this machine&rsquo;s
+          <code>config.kdl</code>.
         </p>
       </div>
     </section>
@@ -479,10 +516,15 @@
   </div>
 
   <script>
-    /* ---- the strip: a draggable viewport over the real panorama ---- */
+    /* ---- the strip: a draggable niri viewport that answers to the real
+       keybinds from this machine's config.kdl. Hold alt + h/j/k/l. ---- */
     (function () {
       const view = document.getElementById('stripView');
       const row  = document.getElementById('stripRow');
+      const hud  = document.getElementById('stripHud');
+      const strip = document.getElementById('strip');
+      const caps = {};
+      document.querySelectorAll('.strip__key').forEach(b => { caps[b.dataset.chord] = b; });
       let x = 0;
 
       function maxScroll() { return Math.max(0, row.scrollWidth - view.clientWidth); }
@@ -491,14 +533,55 @@
         x = Math.max(-maxScroll(), Math.min(0, x));
         row.style.transform = `translateX(${x}px)`;
       }
-      /* alt+h / alt+l step one "column": a quarter of the viewport,
-         matching the real 1/4-width terminal columns */
-      function step(dir) {
-        x -= dir * view.clientWidth / 4;
+      /* h/l step one "column" (a quarter viewport, matching the real 1/4-width
+         terminals); j/k jump a whole workspace (one full viewport) */
+      function step(dir, cols) {
+        x -= dir * view.clientWidth * cols / 4;
         apply(true);
       }
-      document.getElementById('kLeft').addEventListener('click', () => step(-1));
-      document.getElementById('kRight').addEventListener('click', () => step(1));
+
+      /* the same chord -> action table as config.kdl */
+      const binds = {
+        h: { act: 'focus-column-left',              run: () => step(-1, 1) },
+        l: { act: 'focus-column-right',             run: () => step( 1, 1) },
+        j: { act: 'focus-window-or-workspace-down', run: () => step( 1, 4) },
+        k: { act: 'focus-window-or-workspace-up',   run: () => step(-1, 4) },
+      };
+
+      let hudTimer;
+      function fire(chord) {
+        const bind = binds[chord];
+        if (!bind) return;
+        bind.run();
+        const cap = caps[chord];
+        if (cap) {
+          cap.classList.add('down');
+          setTimeout(() => cap.classList.remove('down'), 140);
+        }
+        hud.innerHTML = `<span class="chord">alt+${chord}</span><span class="act">${bind.act}</span>`;
+        hud.classList.add('show');
+        clearTimeout(hudTimer);
+        hudTimer = setTimeout(() => hud.classList.remove('show'), 1100);
+      }
+
+      Object.entries(caps).forEach(([chord, btn]) => {
+        btn.addEventListener('click', () => fire(chord));
+      });
+
+      /* listen for the real chords, but only while the strip is on screen,
+         so the page never hijacks alt shortcuts elsewhere */
+      function stripVisible() {
+        const r = strip.getBoundingClientRect();
+        const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
+        return h > r.height * 0.25;
+      }
+      document.addEventListener('keydown', e => {
+        if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+        const chord = e.key.toLowerCase();
+        if (!binds[chord] || !stripVisible()) return;
+        e.preventDefault();
+        fire(chord);
+      });
 
       /* drag (pointer events cover mouse + touch) */
       let dragging = false, startX = 0, startPos = 0;
@@ -523,7 +606,7 @@
         if (entries[0].isIntersecting && !toured) {
           toured = true;
           let i = 0;
-          const drift = () => { if (i++ < 3 && !dragging) { step(1); setTimeout(drift, 900); } };
+          const drift = () => { if (i++ < 3 && !dragging) { step(1, 1); setTimeout(drift, 900); } };
           setTimeout(drift, 1000);
           obs.disconnect();
         }
