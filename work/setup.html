@@ -167,9 +167,12 @@
     .figure img { width: 100%; height: auto; display: block; }
     .figure figcaption { font-size: 12.5px; color: #898989; margin-top: 10px; }
 
-    /* ---- the strip demo: a draggable niri viewport ---- */
+    /* ---- the strip demo: a live model of the desktop. Breaks out of the
+       680px text column so the 16:9 viewport is big enough to read ---- */
     .strip {
-      margin: 32px 0; border: 1px solid #e4e4e4;
+      --bleed: min(180px, calc((100vw - 100%) / 2 - 24px));
+      margin: 32px calc(-1 * max(0px, var(--bleed)));
+      border: 1px solid #e4e4e4;
       background: #fff; overflow: hidden;
     }
     .strip__bar {
@@ -201,7 +204,7 @@
     }
     /* niri-style hotkey HUD: shows the real action name when a chord fires */
     .strip__hud {
-      position: absolute; top: 12px; right: 12px; z-index: 2;
+      position: absolute; top: 40px; right: 12px; z-index: 4;
       display: flex; align-items: center; gap: 8px;
       padding: 7px 12px;
       background: rgba(10, 12, 15, 0.88);
@@ -224,8 +227,8 @@
        alt+j/k translate this; alt+h/l translate the row inside a workspace */
     .strip__world { will-change: transform; }
     .strip__world.anim { transition: transform .6s cubic-bezier(.33,1,.68,1); }
+    /* height set by JS to keep the viewport 16:9 */
     .strip__ws { position: relative; height: 560px; overflow: hidden; }
-    @media (max-width: 700px) { .strip__ws { height: 400px; } }
     .strip__ws + .strip__ws { border-top: 2px solid #2a2f36; }
     .strip__ws-tag {
       position: absolute; left: 10px; bottom: 10px; z-index: 2;
@@ -280,7 +283,7 @@
       flex: 0 0 auto; height: 100%; position: relative; overflow: hidden;
       background: #0c0e11; color: #b9bec4;
       padding: 12px 13px 30px;
-      font: 400 9.5px/1.7 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font: 400 11.5px/1.75 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
       box-shadow: inset 0 0 0 1px #1a1e24;
       filter: brightness(.5) saturate(.8);
       transition: filter .35s ease;
@@ -813,8 +816,10 @@
       }
       function render(anim) { renderBar(); renderTerms(); renderCamera(anim); }
       function layout() {
-        scene.style.height = 'calc(100% - 28px)';
-        view.style.height = (wsH() + 28) + 'px';
+        /* whole viewport (bar + scene) locked to 16:9, like the panel */
+        const h = Math.round(view.clientWidth * 9 / 16);
+        wsEls.forEach(el => { el.style.height = (h - 28) + 'px'; });
+        view.style.height = h + 'px';
         layoutTerms(); render(false);
       }
 
