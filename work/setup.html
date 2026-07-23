@@ -331,8 +331,11 @@
       <p>
         That model happens to be exactly right for agent-heavy work. A grid asks
         &ldquo;where do I fit this?&rdquo; every time something opens. A strip
-        just grows. Each running agent keeps a full, undisturbed terminal column,
-        and adding a fifth agent costs nothing but width. Drag the viewport:
+        just grows. Navigation is vim keybinds throughout: <code>alt+h</code>
+        and <code>alt+l</code> walk the strip the way <code>h</code> and
+        <code>l</code> walk a line. Each running agent keeps a full, undisturbed
+        terminal column, and adding a fifth agent costs nothing but width. Drag
+        the viewport:
       </p>
 
       <div class="strip" id="strip">
@@ -424,7 +427,7 @@
         <li><b>The WM is the tab manager.</b><span>hwatu has no tabs and jcode sessions have no session switcher. Every unit of work is a window, and niri is the single manager for all of them. One abstraction, everywhere.</span></li>
         <li><b>Agents get first-class citizenship.</b><span>Window rules, focus etiquette, and launch hotkeys are designed for processes that open windows while I'm not looking. The human default (steal focus, animate, notify) is wrong when the &ldquo;user&rdquo; is a daemon.</span></li>
         <li><b>Config the agent can edit.</b><span>niri's KDL config is plain text with obvious structure. That's not just nice for me. It means jcode can safely patch its own hotkeys, with backups, without a settings UI in the way.</span></li>
-        <li><b>Everything keyboard, nothing modal.</b><span>No dock, no alt-tab overlay, no drag-to-tile. The hands stay on the row where the prompts are typed.</span></li>
+        <li><b>Everything keyboard, nothing modal.</b><span>No dock, no alt-tab overlay, no drag-to-tile. Vim keybinds everywhere: h/j/k/l move focus in niri, the same motions drive the editor. The hands stay on the row where the prompts are typed.</span></li>
       </ul>
     </section>
 
