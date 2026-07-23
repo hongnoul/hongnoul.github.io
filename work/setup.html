@@ -222,6 +222,21 @@
       cursor: grab; touch-action: pan-y;
     }
     .strip__view:active { cursor: grabbing; }
+    /* the world: workspaces stacked vertically, the way niri stacks them.
+       alt+j/k translate this; alt+h/l translate the row inside a workspace */
+    .strip__world { will-change: transform; }
+    .strip__world.anim { transition: transform .45s cubic-bezier(.33,1,.68,1); }
+    .strip__ws { position: relative; height: 380px; overflow: hidden; }
+    .strip__ws + .strip__ws { border-top: 2px solid #2a2f36; }
+    .strip__ws-tag {
+      position: absolute; left: 10px; bottom: 10px; z-index: 2;
+      padding: 4px 8px;
+      background: rgba(10, 12, 15, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      font: 500 11px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      color: #9aa3ad; pointer-events: none;
+    }
     .strip__row {
       display: flex; padding: 0;
       will-change: transform;
@@ -371,7 +386,7 @@
       <div class="strip" id="strip">
         <div class="strip__bar">
           <div class="strip__dots" aria-hidden="true"><i></i><i></i><i></i></div>
-          <span class="strip__title">the actual strip: two real workspaces, eight agent columns. drag it</span>
+          <span class="strip__title">the actual strip: two real workspaces stacked niri-style. drag it, or use the keys</span>
           <div class="strip__keys">
             <span class="strip__hint" aria-hidden="true">these work for real &rarr;</span>
             <button class="strip__key" data-chord="h" type="button" aria-label="Focus column left (alt+h)">alt+h</button>
@@ -382,8 +397,19 @@
         </div>
         <div class="strip__view" id="stripView">
           <div class="strip__hud" id="stripHud" aria-hidden="true"></div>
-          <div class="strip__row" id="stripRow">
-            <img class="strip__pano" src="/work/setup-strip-pano.jpg" alt="Two niri workspaces side by side: eight kitty columns running jcode agents and a hwatu verification window" draggable="false">
+          <div class="strip__world" id="stripWorld">
+            <div class="strip__ws">
+              <span class="strip__ws-tag" aria-hidden="true">workspace 1</span>
+              <div class="strip__row">
+                <img class="strip__pano" src="/work/setup-strip-pano.jpg" alt="niri workspace 1: kitty columns running jcode agents" draggable="false">
+              </div>
+            </div>
+            <div class="strip__ws">
+              <span class="strip__ws-tag" aria-hidden="true">workspace 2</span>
+              <div class="strip__row">
+                <img class="strip__pano" src="/work/setup-strip-pano.jpg" alt="niri workspace 2: more agent columns and a hwatu verification window" draggable="false">
+              </div>
+            </div>
           </div>
         </div>
         <p class="strip__note">
@@ -517,35 +543,65 @@
 
   <script>
     /* ---- the strip: a draggable niri viewport that answers to the real
-       keybinds from this machine's config.kdl. Hold alt + h/j/k/l. ---- */
+       keybinds from this machine's config.kdl. The pano is two workspaces
+       stitched side by side; here they're split and stacked vertically,
+       the way niri actually stacks workspaces. alt+h/l walk columns,
+       alt+j/k move between workspaces. ---- */
     (function () {
-      const view = document.getElementById('stripView');
-      const row  = document.getElementById('stripRow');
-      const hud  = document.getElementById('stripHud');
+      const view  = document.getElementById('stripView');
+      const world = document.getElementById('stripWorld');
       const strip = document.getElementById('strip');
-      const caps = {};
+      const hud   = document.getElementById('stripHud');
+      const rows  = Array.from(world.querySelectorAll('.strip__row'));
+      const panos = Array.from(world.querySelectorAll('.strip__pano'));
+      const caps  = {};
       document.querySelectorAll('.strip__key').forEach(b => { caps[b.dataset.chord] = b; });
-      let x = 0;
 
-      function maxScroll() { return Math.max(0, row.scrollWidth - view.clientWidth); }
-      function apply(anim) {
-        row.classList.toggle('anim', !!anim);
-        x = Math.max(-maxScroll(), Math.min(0, x));
-        row.style.transform = `translateX(${x}px)`;
+      let ws = 0;                     /* current workspace, 0 or 1 */
+      const xs = [0, 0];              /* horizontal offset per workspace */
+
+      /* each workspace shows one half of the stitched pano */
+      function half() { return panos[0].scrollWidth / 2; }
+      function clampX(i, x) {
+        const lo = -Math.max(half() * i, half() * (i + 1) - view.clientWidth);
+        const hi = -half() * i;
+        return Math.max(lo, Math.min(hi, x));
       }
-      /* h/l step one "column" (a quarter viewport, matching the real 1/4-width
-         terminals); j/k jump a whole workspace (one full viewport) */
-      function step(dir, cols) {
-        x -= dir * view.clientWidth * cols / 4;
-        apply(true);
+      function applyX(i, anim) {
+        rows[i].classList.toggle('anim', !!anim);
+        xs[i] = clampX(i, xs[i]);
+        rows[i].style.transform = `translateX(${xs[i]}px)`;
+      }
+      function applyY(anim) {
+        world.classList.toggle('anim', !!anim);
+        world.style.transform = `translateY(${-ws * 380}px)`;
+      }
+      function layout() {
+        view.style.height = '380px';
+        xs[1] = clampX(1, xs[1] === 0 ? -half() : xs[1]);
+        applyX(0, false); applyX(1, false); applyY(false);
+      }
+      panos.forEach(p => p.addEventListener('load', layout));
+      layout();
+
+      /* h/l step one "column" (a quarter viewport, matching the real
+         1/4-width terminals) inside the current workspace */
+      function stepX(dir) {
+        xs[ws] -= dir * view.clientWidth / 4;
+        applyX(ws, true);
+      }
+      /* j/k move a workspace down/up: a real vertical move */
+      function stepY(dir) {
+        ws = Math.max(0, Math.min(rows.length - 1, ws + dir));
+        applyY(true);
       }
 
       /* the same chord -> action table as config.kdl */
       const binds = {
-        h: { act: 'focus-column-left',              run: () => step(-1, 1) },
-        l: { act: 'focus-column-right',             run: () => step( 1, 1) },
-        j: { act: 'focus-window-or-workspace-down', run: () => step( 1, 4) },
-        k: { act: 'focus-window-or-workspace-up',   run: () => step(-1, 4) },
+        h: { act: 'focus-column-left',              run: () => stepX(-1) },
+        l: { act: 'focus-column-right',             run: () => stepX( 1) },
+        j: { act: 'focus-window-or-workspace-down', run: () => stepY( 1) },
+        k: { act: 'focus-window-or-workspace-up',   run: () => stepY(-1) },
       };
 
       let hudTimer;
@@ -583,30 +639,33 @@
         fire(chord);
       });
 
-      /* drag (pointer events cover mouse + touch) */
+      /* drag scrolls the current workspace horizontally
+         (pointer events cover mouse + touch) */
       let dragging = false, startX = 0, startPos = 0;
       view.addEventListener('pointerdown', e => {
-        dragging = true; startX = e.clientX; startPos = x;
+        dragging = true; startX = e.clientX; startPos = xs[ws];
         view.setPointerCapture(e.pointerId);
-        row.classList.remove('anim');
+        rows[ws].classList.remove('anim');
       });
       view.addEventListener('pointermove', e => {
         if (!dragging) return;
-        x = startPos + (e.clientX - startX);
-        apply(false);
+        xs[ws] = startPos + (e.clientX - startX);
+        applyX(ws, false);
       });
-      const end = () => { dragging = false; apply(true); };
+      const end = () => { dragging = false; applyX(ws, true); };
       view.addEventListener('pointerup', end);
       view.addEventListener('pointercancel', end);
-      window.addEventListener('resize', () => apply(false));
+      window.addEventListener('resize', layout);
 
-      /* gentle idle drift once, when it first scrolls into view */
+      /* gentle idle tour once, when it first scrolls into view:
+         a column step, a workspace hop down, and back up */
       let toured = false;
       new IntersectionObserver((entries, obs) => {
         if (entries[0].isIntersecting && !toured) {
           toured = true;
+          const tour = [() => stepX(1), () => stepY(1), () => stepY(-1)];
           let i = 0;
-          const drift = () => { if (i++ < 3 && !dragging) { step(1, 1); setTimeout(drift, 900); } };
+          const drift = () => { if (i < tour.length && !dragging) { tour[i++](); setTimeout(drift, 1000); } };
           setTimeout(drift, 1000);
           obs.disconnect();
         }
