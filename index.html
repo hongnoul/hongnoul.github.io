@@ -376,34 +376,33 @@
     .about-text a { color: inherit; }
     .about-text a:hover { color: #ff2400; }
 
-    .sort-section {
+    .burn-section {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 1rem;
+      gap: 0.75rem;
       min-width: 300px;
     }
-    .sort-title {
+    .burn-title {
       font-size: 1.1rem;
       color: #000;
       font-weight: 500;
       margin: 0 0 0.35rem;
+      text-decoration: none;
+      display: block;
     }
-    .tag-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    .sort-btn {
-      display: inline-block;
-      font-size: 0.75rem;
-      color: #000;
-      background: #fff;
-      border: 1px solid #000;
-      padding: 0.4rem 0.8rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      font-family: inherit;
+    .burn-title:hover { color: #ff2400; }
+    .burn-grid { display: block; }
+    .burn-grid .cell:hover { stroke: #111; stroke-width: 1; }
+    .burn-stat {
+      font-size: 0.8rem;
+      color: #898989;
+      margin: 0;
+      font-variant-numeric: tabular-nums;
     }
-    .sort-btn:hover { background: #f0f0f0; }
-    .sort-btn.active { background: #000; color: #fff; }
+    .burn-stat b { color: #ff2400; font-weight: 550; }
+    .burn-stat a { color: inherit; }
+    .burn-stat a:hover { color: #ff2400; }
 
     /* ---- mobile: the fan folds into a single vertical column ---- */
     @media (max-width: 768px) {
@@ -442,7 +441,7 @@
       .card__title { font-size: 0.7rem; }
 
       .about-section { flex-direction: column; gap: 2rem; padding: 1rem var(--corner-left) 2rem; }
-      .sort-section { min-width: 100%; }
+      .burn-section { min-width: 100%; }
     }
     @media (max-width: 480px) {
       .deck { gap: 1rem; }
@@ -451,8 +450,7 @@
       .about-section { padding-top: 1.5rem; }
       .about-title { font-size: 1.2rem; }
       .about-text { font-size: 0.9rem; }
-      .sort-title { font-size: 1rem; }
-      .sort-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
+      .burn-title { font-size: 1rem; }
     }
 
     /* intro skip: reloads and returns from internal pages get no curtain, no
@@ -527,10 +525,10 @@
         <a href="/archive/resume/resume.pdf">resume</a>
       </p>
     </div>
-    <div class="sort-section">
-      <h3 class="sort-title">Sort</h3>
-      <div class="tag-buttons" id="tag-buttons"></div>
-      <button class="sort-btn" id="sort-reset" type="button">Reset</button>
+    <div class="burn-section">
+      <a class="burn-title" href="https://github.com/hongnoul/token-burn">Token burn</a>
+      <svg class="burn-grid" id="burn-grid" role="img" aria-label="Daily AI token usage heatmap"></svg>
+      <p class="burn-stat" id="burn-stat">loading…</p>
     </div>
   </section>
 
@@ -670,16 +668,15 @@
        Mode tabs and Sort tags combine: a card shows when it matches the active
        mode AND (no tag selected OR it carries the selected tag). Re-stagger the
        reveal indexes after each filter so the rise-in stays tidy. */
+    /* cards are shown when they match the current category (mode).
+       Re-stagger the reveal indexes after each filter so the rise-in stays tidy. */
     const cards = [...deck.querySelectorAll('.card')];
     let activeMode = 'all';
-    let activeTag = null;
 
     function applyFilter() {
       let vis = 0;
       for (const c of cards) {
-        const okMode = activeMode === 'all' || c.dataset.mode === activeMode;
-        const okTag = !activeTag || c.dataset.tags.split(',').includes(activeTag);
-        const show = okMode && okTag;
+        const show = activeMode === 'all' || c.dataset.mode === activeMode;
         c.hidden = !show;
         if (show) c.style.setProperty('--i', vis++);
       }
@@ -708,21 +705,70 @@
       if (m && ['work', 'hackathons', 'studies'].includes(m)) setMode(m);
     }
 
-    /* Sort buttons are generated from the union of all card tags */
-    const tagWrap = document.getElementById('tag-buttons');
-    const allTags = [...new Set(projects.flatMap(p => p.tags))];
-    tagWrap.innerHTML = allTags.map(t => `<button class="sort-btn" type="button" data-tag="${t}">${t}</button>`).join('');
-    const tagBtns = [...tagWrap.querySelectorAll('.sort-btn')];
-    for (const b of tagBtns) b.addEventListener('click', () => {
-      activeTag = activeTag === b.dataset.tag ? null : b.dataset.tag;
-      for (const x of tagBtns) x.classList.toggle('active', x.dataset.tag === activeTag);
-      applyFilter();
-    });
-    document.getElementById('sort-reset').addEventListener('click', () => {
-      activeTag = null;
-      for (const x of tagBtns) x.classList.remove('active');
-      applyFilter();
-    });
+    /* ---- token burn mini dashboard (bottom right) ----
+       The last ~5 months of daily agent token usage, fetched live from the
+       token-burn repo's Pages data. Same pipeline as the deck card thumb. */
+    (async () => {
+      const grid = document.getElementById('burn-grid');
+      const stat = document.getElementById('burn-stat');
+      let data;
+      try {
+        data = await (await fetch('https://hongnoul.github.io/token-burn/data/tokens.json', { cache: 'no-cache' })).json();
+      } catch { stat.textContent = 'data unavailable'; return; }
+      const days = data.days || {};
+      const total = d => (days[d] || [0,0,0,0]).reduce((a, b) => a + b, 0);
+      const human = n =>
+        n >= 1e9 ? (n / 1e9).toFixed(2) + 'B'
+        : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M'
+        : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k'
+        : String(n);
+      const isoLocal = d => {
+        const p = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+      };
+
+      const CELL = 11, GAP = 3, STEP = CELL + GAP, WEEKS = 22, TOP = 14;
+      const end = new Date(); end.setHours(0,0,0,0);
+      const start = new Date(end);
+      start.setDate(start.getDate() - (WEEKS * 7 - 1));
+      start.setDate(start.getDate() - start.getDay());
+      const weeks = Math.ceil(((end - start) / 864e5 + 1) / 7);
+      const W = weeks * STEP - GAP, H = TOP + 7 * STEP - GAP;
+      grid.setAttribute('viewBox', `0 0 ${W} ${H}`);
+      grid.setAttribute('width', W); grid.setAttribute('height', H);
+
+      const RAMP = ['#efefef', '#ffd3c9', '#ff9c85', '#ff5c3a', '#e01e00'];
+      const max = Math.max(1, ...Object.keys(days).map(total));
+      const level = v => v <= 0 ? 0 : 1 + Math.min(3, Math.floor((Math.log(v + 1) / Math.log(max + 1)) * 4));
+
+      const NS = 'http://www.w3.org/2000/svg';
+      const monthFmt = new Intl.DateTimeFormat('en-US', { month: 'short' });
+      let cells = '', labels = '', lastMonth = -1;
+      const cur = new Date(start);
+      for (let w = 0; w < weeks; w++) {
+        const m = cur.getMonth();
+        if (m !== lastMonth && cur.getDate() <= 7 && w < weeks - 1) {
+          labels += `<text x="${w * STEP}" y="${TOP - 5}" font-size="8.5" fill="#b5b5b5">${monthFmt.format(cur)}</text>`;
+          lastMonth = m;
+        }
+        for (let d = 0; d < 7; d++) {
+          if (cur > end) break;
+          const iso = isoLocal(cur);
+          const v = days[iso] ? total(iso) : 0;
+          cells += `<rect class="cell" x="${w * STEP}" y="${TOP + d * STEP}" width="${CELL}" height="${CELL}" rx="2.5" fill="${RAMP[level(v)]}"><title>${iso}: ${v.toLocaleString()} tokens</title></rect>`;
+          cur.setDate(cur.getDate() + 1);
+        }
+      }
+      grid.innerHTML = labels + cells;
+
+      const todayIso = isoLocal(new Date());
+      const dates = Object.keys(days).sort();
+      const showDay = days[todayIso] ? todayIso : dates[dates.length - 1];
+      const allTime = dates.reduce((a, d) => a + total(d), 0);
+      stat.innerHTML =
+        `\u{1f525} <b>${human(total(showDay))}</b> ${showDay === todayIso ? 'today' : 'on ' + showDay}` +
+        ` \u00b7 ${human(allTime)} all-time \u00b7 <a href="https://hongnoul.github.io/token-burn/">dashboard</a>`;
+    })();
 
     /* ---- deck drag ----
        Desktop: the fanned row is wider than the viewport, so dragging pans it
