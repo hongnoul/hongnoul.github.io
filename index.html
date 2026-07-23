@@ -385,16 +385,9 @@
       min-width: 300px;
       margin-left: auto;
     }
-    .burn-title {
-      font-size: 1.1rem;
-      color: #000;
-      font-weight: 500;
-      margin: 0 0 0.35rem;
-      text-decoration: none;
-      display: block;
-    }
-    .burn-title:hover { color: #ff2400; }
-    .burn-grid { display: block; }
+    /* height-capped so the whole widget matches the About block; the
+       viewBox keeps the aspect ratio and width follows */
+    .burn-grid { display: block; height: 80px; width: auto; }
     .burn-grid .cell:hover { stroke: #111; stroke-width: 1; }
     .burn-stat {
       font-size: 0.8rem;
@@ -455,7 +448,6 @@
       .about-section { padding-top: 1.5rem; }
       .about-title { font-size: 1.2rem; }
       .about-text { font-size: 0.9rem; }
-      .burn-title { font-size: 1rem; }
     }
 
     /* intro skip: reloads and returns from internal pages get no curtain, no
@@ -531,7 +523,6 @@
       </p>
     </div>
     <div class="burn-section">
-      <a class="burn-title" href="https://github.com/hongnoul/token-burn">Token burn</a>
       <svg class="burn-grid" id="burn-grid" role="img" aria-label="Daily AI token usage heatmap"></svg>
       <p class="burn-stat" id="burn-stat">loading…</p>
     </div>
@@ -764,7 +755,8 @@
       const allTime = dates.reduce((a, d) => a + total(d), 0);
       stat.innerHTML =
         `\u{1f525} <b>${human(total(showDay))}</b> ${showDay === todayIso ? 'today' : 'on ' + showDay}` +
-        ` \u00b7 ${human(allTime)} all-time \u00b7 <a href="https://hongnoul.github.io/token-burn/">dashboard</a>`;
+        ` \u00b7 ${human(allTime)} all-time \u00b7 <a href="https://github.com/hongnoul/token-burn">token-burn</a>` +
+        ` \u00b7 <a href="https://hongnoul.github.io/token-burn/">dashboard</a>`;
     })();
 
     /* ---- deck drag ----
