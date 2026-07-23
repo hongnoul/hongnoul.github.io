@@ -219,9 +219,7 @@
     .strip__hud .act { color: #9fe29f; }
     .strip__view {
       position: relative; overflow: hidden; background: #101418;
-      cursor: grab; touch-action: pan-y;
     }
-    .strip__view:active { cursor: grabbing; }
     /* the world: workspaces stacked vertically, the way niri stacks them.
        alt+j/k translate this; alt+h/l translate the row inside a workspace */
     .strip__world { will-change: transform; }
@@ -239,14 +237,77 @@
       color: #9aa3ad; pointer-events: none;
     }
     .strip__row {
-      display: flex; padding: 0;
+      display: flex; height: 100%; padding: 0;
       will-change: transform;
     }
     .strip__row.anim { transition: transform .45s cubic-bezier(.33,1,.68,1); }
-    .strip__pano {
-      display: block; height: 100%; width: auto; max-width: none;
-      user-select: none; -webkit-user-drag: none;
+
+    /* ---- waybar mockup: the real bar, modeled. 28px, black, three
+       modules: niri/window title left, the workspace ticker center,
+       tray + fcitx badge + clock right (config.jsonc, style.css) ---- */
+    .wb {
+      display: flex; align-items: center; height: 28px;
+      background: #000; color: #e4e4e7;
+      font: 500 11px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      padding: 0 10px; gap: 10px;
+      position: relative; z-index: 3;
+      user-select: none;
     }
+    .wb__win {
+      color: #a1a1aa; flex: 1 1 0; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .wb__ticker { display: flex; align-items: center; flex: 0 0 auto; }
+    .wb__ticker .t  { font-weight: 700; width: 7px; text-align: center; }
+    .wb__ticker .gap { width: 14px; }
+    .wb__ticker .badge {
+      color: #fff; padding: 2px 5px; margin: 0 2px; font-weight: 700;
+      transition: background .25s ease;
+    }
+    .wb__right {
+      flex: 1 1 0; min-width: 0;
+      display: flex; justify-content: flex-end; align-items: center; gap: 9px;
+    }
+    .wb__dot { width: 5px; height: 5px; background: #3f3f46; }
+    .wb__fcitx { background: #e4e4e7; color: #18181b; padding: 1px 4px; font-weight: 600; }
+    .wb__clock { color: #e4e4e7; }
+    @media (max-width: 700px) { .wb__win, .wb__right { display: none; } .wb { justify-content: center; } }
+
+    /* ---- terminal windows: kitty columns, no decorations, niri's 1px
+       white focus ring, unfocused windows dimmed (the compositor's job) ---- */
+    .strip__scene { position: relative; overflow: hidden; }
+    .kt {
+      flex: 0 0 auto; height: 100%; position: relative; overflow: hidden;
+      background: #0c0e11; color: #b9bec4;
+      padding: 12px 13px 30px;
+      font: 400 9.5px/1.7 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      box-shadow: inset 0 0 0 1px #1a1e24;
+      filter: brightness(.5) saturate(.8);
+      transition: filter .35s ease;
+      cursor: pointer;
+    }
+    .kt.focused { filter: none; box-shadow: inset 0 0 0 1px #fff; z-index: 1; }
+    .kt__ln { display: block; white-space: nowrap; overflow: hidden; }
+    .kt__ln--user { color: #fff; font-weight: 600; }
+    .kt__ln--dim  { color: #61666d; font-style: italic; }
+    .kt__ln--ok   { color: #5c9e5c; }
+    .kt__ln--run  { color: #8a91d9; }
+    .kt__status {
+      position: absolute; left: 0; right: 0; bottom: 0;
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 13px; font-size: 9px;
+      background: rgba(0,0,0,.55); color: #9aa0a8;
+      white-space: nowrap; overflow: hidden;
+    }
+    .kt__st { width: 5px; height: 10px; flex: 0 0 auto; transition: background .25s ease; }
+    /* the hwatu verification window: a rendered page, not a terminal */
+    .kt--web { background: #fafafa; color: #333; box-shadow: inset 0 0 0 1px #d9d9d9; }
+    .kt--web.focused { box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px #bbb; }
+    .web__chrome { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; color: #999; font-size: 8.5px; }
+    .web__url { background: #eee; padding: 3px 8px; flex: 1; overflow: hidden; white-space: nowrap; }
+    .web__h { height: 14px; width: 55%; background: #1a1a1a; margin: 14px 0 10px; }
+    .web__p { height: 6px; background: #dcdcdc; margin: 6px 0; }
+    .web__thumb { height: 34%; background: #101418; margin-top: 12px; }
     .strip__note { font-size: 12.5px; color: #898989; margin: 0; padding: 14px 18px 16px; border-top: 1px solid #eee; }
     .strip__note b { color: #444; font-weight: 550; }
 
@@ -387,39 +448,41 @@
       <div class="strip" id="strip">
         <div class="strip__bar">
           <div class="strip__dots" aria-hidden="true"><i></i><i></i><i></i></div>
-          <span class="strip__title">the actual strip: two real workspaces stacked niri-style. drag it, or use the keys</span>
+          <span class="strip__title">a working scale model of the desktop: the real bar format, the real binds</span>
           <div class="strip__keys">
             <span class="strip__hint" aria-hidden="true">these work for real &rarr;</span>
             <button class="strip__key" data-chord="h" type="button" aria-label="Focus column left (alt+h)">alt+h</button>
             <button class="strip__key" data-chord="j" type="button" aria-label="Workspace down (alt+j)">alt+j</button>
             <button class="strip__key" data-chord="k" type="button" aria-label="Workspace up (alt+k)">alt+k</button>
             <button class="strip__key" data-chord="l" type="button" aria-label="Focus column right (alt+l)">alt+l</button>
+            <button class="strip__key" data-chord="`" type="button" aria-label="Jump to oldest waiting agent (alt+`)">alt+`</button>
           </div>
         </div>
         <div class="strip__view" id="stripView">
           <div class="strip__hud" id="stripHud" aria-hidden="true"></div>
-          <div class="strip__world" id="stripWorld">
-            <div class="strip__ws">
-              <span class="strip__ws-tag" aria-hidden="true">workspace 1</span>
-              <div class="strip__row">
-                <img class="strip__pano" src="/work/setup-strip-pano.jpg" alt="niri workspace 1: kitty columns running jcode agents" draggable="false">
-              </div>
-            </div>
-            <div class="strip__ws">
-              <span class="strip__ws-tag" aria-hidden="true">workspace 2</span>
-              <div class="strip__row">
-                <img class="strip__pano" src="/work/setup-strip-pano.jpg" alt="niri workspace 2: more agent columns and a hwatu verification window" draggable="false">
-              </div>
-            </div>
+          <div class="wb" aria-hidden="true">
+            <span class="wb__win" id="wbWin"></span>
+            <span class="wb__ticker" id="wbTicker"></span>
+            <span class="wb__right">
+              <i class="wb__dot"></i><i class="wb__dot"></i><i class="wb__dot"></i>
+              <span class="wb__fcitx">A</span>
+              <span class="wb__clock" id="wbClock"></span>
+            </span>
+          </div>
+          <div class="strip__scene" id="stripScene">
+            <div class="strip__world" id="stripWorld"></div>
           </div>
         </div>
         <p class="strip__note">
-          Terminals open at <b>1/4 screen width, zero gaps</b>, so four agent
-          columns fit one viewport exactly. These are unretouched screenshots
-          of the two workspaces from the footage above, stitched the way the
-          strip actually extends: sideways, forever. And the keys aren&rsquo;t
-          decoration: hold <b>alt</b> and tap <b>h / j / k / l</b> right now.
-          Those are the exact binds from this machine&rsquo;s
+          Not screenshots - a live model. The bar on top renders the exact
+          Pango format the real Rust ticker emits (<b>|</b> per window,
+          <b>&#9612;</b> for a workspace&rsquo;s active window, the focused
+          cell as a badge), terminals open at <b>1/4 screen width, zero
+          gaps</b>, unfocused windows dim because that&rsquo;s the
+          compositor&rsquo;s job, and the agents flip between working and
+          waiting on their own. The keys aren&rsquo;t decoration either: hold
+          <b>alt</b> and tap <b>h / j / k / l</b>, or <b>alt+`</b> to jump to
+          the oldest waiting agent. Exact binds from this machine&rsquo;s
           <code>config.kdl</code>.
         </p>
       </div>
@@ -593,67 +656,204 @@
   </div>
 
   <script>
-    /* ---- the strip: a draggable niri viewport that answers to the real
-       keybinds from this machine's config.kdl. The pano is two workspaces
-       stitched side by side; here they're split and stacked vertically,
-       the way niri actually stacks workspaces. alt+h/l walk columns,
-       alt+j/k move between workspaces. ---- */
+    /* ---- a working scale model of the desktop ----------------------------
+       One state object drives everything: the niri viewport (columns on an
+       infinite strip, workspaces stacked vertically) and the waybar mockup
+       on top. Both are pure renders of the same state, so they can never
+       disagree - which is the whole point of the real setup.
+
+       Fidelity notes, all measured from this machine:
+       - ticker format: exactly what ~/.config/waybar/niri-workspaces emits:
+         | per window, ▌ for each workspace's active window, the focused
+         cell as a "A03"-style bgcolor badge, two-space gaps between
+         workspace groups.
+       - colors: #2ecc71 running, #f1c40f waiting, #e74c3c stalled,
+         #3498db active-but-quiet, #a855f7 focused badge - the palette
+         strings inside the real Rust binary.
+       - states come from ~/.jcode/session_status/*.json:
+         fresh / running / waiting / finished.
+       - terminals: kitty, no decorations, 1/4 screen width, zero gaps,
+         niri's 1px white focus ring, unfocused windows dimmed.        ---- */
     (function () {
-      const view  = document.getElementById('stripView');
-      const world = document.getElementById('stripWorld');
-      const strip = document.getElementById('strip');
-      const hud   = document.getElementById('stripHud');
-      const rows  = Array.from(world.querySelectorAll('.strip__row'));
-      const panos = Array.from(world.querySelectorAll('.strip__pano'));
-      const caps  = {};
+      const view   = document.getElementById('stripView');
+      const scene  = document.getElementById('stripScene');
+      const world  = document.getElementById('stripWorld');
+      const strip  = document.getElementById('strip');
+      const hud    = document.getElementById('stripHud');
+      const ticker = document.getElementById('wbTicker');
+      const wbWin  = document.getElementById('wbWin');
+      const caps   = {};
       document.querySelectorAll('.strip__key').forEach(b => { caps[b.dataset.chord] = b; });
 
-      let ws = 0;                     /* current workspace, 0 or 1 */
-      const xs = [0, 0];              /* horizontal offset per workspace */
+      /* ---- state: the fleet. Titles and states mirror a real evening. ---- */
+      const COLORS = { running: '#2ecc71', waiting: '#f1c40f',
+                       stalled: '#e74c3c', fresh: '#71717a', active: '#3498db' };
+      const state = {
+        ws: 0, col: 0,          /* focused cell */
+        workspaces: [
+          [ { title: '~/git/hwatu',                st: 'running' },
+            { title: '~/git/hongnoul.github.io',   st: 'waiting' },
+            { title: '~/git/beni-hana',            st: 'running' },
+            { title: 'jcode self-dev',             st: 'waiting' } ],
+          [ { title: '~/git/hwatu benchmarks',     st: 'running' },
+            { title: 'hwatu: stripe.com clone',    st: 'web'     },
+            { title: '~ (anything session)',       st: 'fresh'   },
+            { title: '~/git/jofi',                 st: 'stalled' } ],
+        ],
+        waitingSince: {},        /* "ws:col" -> timestamp, for alt+` */
+      };
+      state.workspaces.forEach((cols, w) => cols.forEach((c, i) => {
+        if (c.st === 'waiting') state.waitingSince[w + ':' + i] = Date.now() - (w * 4 + i) * 60000;
+      }));
 
-      function wsH() { return world.querySelector('.strip__ws').offsetHeight; }
-      /* each workspace shows one half of the stitched pano */
-      function half() { return panos[0].scrollWidth / 2; }
-      function clampX(i, x) {
-        const lo = -Math.max(half() * i, half() * (i + 1) - view.clientWidth);
-        const hi = -half() * i;
-        return Math.max(lo, Math.min(hi, x));
+      /* ---- build the DOM: one .strip__ws per workspace, .term per column.
+         Each terminal gets generated transcript lines so no two look alike. */
+      const SNIPPETS = [
+        ['&gt; fix the settled-wait race in the bench harness', 'I should check the git log to see what the other agent committed.', '✓ bash · git log --oneline -5 · 43 tok', '✓ bash · cargo test settled · 217 tok', 'All 28/28 tests passing across warm and cold runs.', '✓ bash · commit + push · 44 tok', '● Run benchmark on settled-wait'],
+        ['&gt; [image 1] what is up with this black bar', 'The black bars appear as full-width horizontal bands at fixed positions, which could indicate unpainted or failed tiles.', "I'm considering a practical mitigation: setting the webview background color to match the page.", '✓ Explore hwatud screenshot/automa…', '✓ Add IPC: Motion (spec extraction)', '○ Iterate diff loop until stripe.c…'],
+        ['&gt; ok go build this feature, success will be measured', 'Scope/process gates: work committed with clear messages and pushed; other client&rsquo;s uncommitted docs changes left untouched.', '✓ bash · Stress warm and col… · 35 tok', '✓ bash · Run benchmark on s… · 131 tok', 'Background task started 712906esfa'],
+        ['&gt; remove the trust ai risk assessment entry', 'Found the entry at index.html:573. Removing the six-line card and its unused thumbnail.', '✓ edit · index.html · 1 occurrence', '✓ bash · git commit + push · 6613d64', 'Done. Entry removed, thumbnail deleted, pushed to origin main.'],
+        ['&gt; why is the fcitx badge square', 'GTK CSS has no real transparency clipping, so the badge is a white box with the glyph knocked out in the bar background color.', '✓ read · ~/.config/waybar/style.css', 'The 18px height after 5px margins makes an 18px square.'],
+        ['&gt; draft the AUR PKGBUILD', 'I need to check the hwatu repository docs to understand the recent product update before preparing the submission.', '✓ bash · Inspect repo layou… · 269 tok', '✓ bash · Read latest posit… · 1.9k tok', '2&gt; yes git/hwatu had major product update so refer to the latest docs'],
+        ['&gt; connect discord MCP', 'Connection keeps getting killed by server reloads, likely the jcode server. Let me check the status and attempt to call channels directly.', '· Point discord MCP at… · 6 tok', '· Run discord MCP ma… · 137 tok', 'raise [provider] idle_timeout_secs if your model thinks for longer.'],
+      ];
+      function esc(s) { return s; }
+      function termHTML(col, w, i) {
+        if (col.st === 'web') {
+          return '<div class="web__chrome"><span>●</span><span class="web__url">localhost:4173 · stripe clone · hwatu --background</span></div>' +
+                 '<div class="web__h"></div><div class="web__p" style="width:92%"></div><div class="web__p" style="width:84%"></div>' +
+                 '<div class="web__p" style="width:88%"></div><div class="web__p" style="width:61%"></div><div class="web__thumb"></div>' +
+                 statusHTML(col, w, i);
+        }
+        /* fill the column like a real long-running session: this snippet,
+           then earlier "scrollback" from the other transcripts */
+        const base = (w * 4 + i) % SNIPPETS.length;
+        const snip = [];
+        for (let k = 0; snip.length < 42; k++) {
+          SNIPPETS[(base + k) % SNIPPETS.length].forEach(ln => snip.push(ln));
+        }
+        let html = '';
+        snip.forEach((ln, n) => {
+          const cls = ln.startsWith('&gt;') || ln.startsWith('2&gt;') ? 'kt__ln--user'
+                    : ln.startsWith('✓') ? 'kt__ln--ok'
+                    : ln.startsWith('●') || ln.startsWith('○') || ln.startsWith('·') ? 'kt__ln--run'
+                    : (n % 2 ? 'kt__ln--dim' : '');
+          html += '<span class="kt__ln ' + cls + '">' + esc(ln) + '</span>';
+          if (cls === 'kt__ln--user') html += '<span class="term__ln"></span>';
+        });
+        return html + statusHTML(col, w, i);
       }
-      function applyX(i, anim) {
-        rows[i].classList.toggle('anim', !!anim);
-        xs[i] = clampX(i, xs[i]);
-        rows[i].style.transform = `translateX(${xs[i]}px)`;
+      function statusHTML(col, w, i) {
+        return '<span class="kt__status"><i class="kt__st"></i><b class="kt__title"></b><span class="kt__meta">· jcode · ' + (12 + ((w * 7 + i * 3) % 46)) + 'm</span></span>';
       }
-      function applyY(anim) {
+      state.workspaces.forEach((cols, w) => {
+        const ws = document.createElement('div');
+        ws.className = 'strip__ws';
+        const row = document.createElement('div');
+        row.className = 'strip__row';
+        cols.forEach((col, i) => {
+          const t = document.createElement('div');
+          t.className = 'kt' + (col.st === 'web' ? ' kt--web' : '');
+          t.innerHTML = termHTML(col, w, i);
+          t.addEventListener('click', () => { state.ws = w; state.col = i; render(true); });
+          row.appendChild(t);
+          col.el = t;
+        });
+        ws.appendChild(row);
+        world.appendChild(ws);
+        cols.row = row;
+      });
+
+      /* ---- render: state -> viewport + bar ---- */
+      const wsEls = Array.from(world.querySelectorAll('.strip__ws'));
+      function wsH()  { return wsEls[0].offsetHeight; }
+      function colW() { return view.clientWidth / 4; }
+      function layoutTerms() {
+        state.workspaces.forEach(cols => cols.forEach(c => { c.el.style.width = colW() + 'px'; }));
+      }
+      function cellName(w, i) { return String.fromCharCode(65 + w) + String(i).padStart(2, '0'); }
+
+      function renderBar() {
+        let html = '';
+        state.workspaces.forEach((cols, w) => {
+          if (w) html += '<span class="gap"></span>';
+          cols.forEach((col, i) => {
+            const color = col.st === 'web' ? COLORS.active : (COLORS[col.st] || COLORS.fresh);
+            if (w === state.ws && i === state.col) {
+              html += '<span class="badge" style="background:#a855f7"> ' + cellName(w, i) + ' </span>';
+            } else {
+              const glyph = (i === (w === state.ws ? state.col : 0)) ? '▌' : '|';
+              html += '<span class="t" style="color:' + color + '">' + glyph + '</span>';
+            }
+          });
+        });
+        ticker.innerHTML = html;
+        wbWin.textContent = state.workspaces[state.ws][state.col].title;
+      }
+      function renderTerms() {
+        state.workspaces.forEach((cols, w) => cols.forEach((col, i) => {
+          col.el.classList.toggle('focused', w === state.ws && i === state.col);
+          const st = col.el.querySelector('.kt__st');
+          const title = col.el.querySelector('.kt__title');
+          if (st) st.style.background = col.st === 'web' ? COLORS.active : (COLORS[col.st] || COLORS.fresh);
+          if (title) title.textContent = col.st;
+        }));
+      }
+      function renderCamera(anim) {
         world.classList.toggle('anim', !!anim);
-        world.style.transform = `translateY(${-ws * wsH()}px)`;
+        world.style.transform = 'translateY(' + (-state.ws * wsH()) + 'px)';
+        state.workspaces.forEach((cols, w) => {
+          /* keep the focused column in view, niri-style */
+          const focusI = (w === state.ws) ? state.col : 0;
+          const maxX = Math.max(0, cols.length * colW() - view.clientWidth);
+          let x = Math.min(Math.max(focusI * colW() - colW() * 1.5, 0), maxX);
+          cols.row.classList.toggle('anim', !!anim);
+          cols.row.style.transform = 'translateX(' + (-x) + 'px)';
+        });
       }
+      function render(anim) { renderBar(); renderTerms(); renderCamera(anim); }
       function layout() {
-        view.style.height = wsH() + 'px';
-        xs[1] = clampX(1, xs[1] === 0 ? -half() : xs[1]);
-        applyX(0, false); applyX(1, false); applyY(false);
-      }
-      panos.forEach(p => p.addEventListener('load', layout));
-      layout();
-
-      /* h/l step one "column" (a quarter viewport, matching the real
-         1/4-width terminals) inside the current workspace */
-      function stepX(dir) {
-        xs[ws] -= dir * view.clientWidth / 4;
-        applyX(ws, true);
-      }
-      /* j/k move a workspace down/up: a real vertical move */
-      function stepY(dir) {
-        ws = Math.max(0, Math.min(rows.length - 1, ws + dir));
-        applyY(true);
+        scene.style.height = 'calc(100% - 28px)';
+        view.style.height = (wsH() + 28) + 'px';
+        layoutTerms(); render(false);
       }
 
-      /* the same chord -> action table as config.kdl */
+      /* clock: the real bar shows %H:%M */
+      const wbClock = document.getElementById('wbClock');
+      function tickClock() {
+        const d = new Date();
+        wbClock.textContent = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+      }
+      tickClock(); setInterval(tickClock, 15000);
+
+      /* ---- actions: the same chord -> action table as config.kdl ---- */
+      function focusCol(dir) {
+        const cols = state.workspaces[state.ws];
+        state.col = Math.max(0, Math.min(cols.length - 1, state.col + dir));
+        render(true);
+      }
+      function focusWs(dir) {
+        state.ws = Math.max(0, Math.min(state.workspaces.length - 1, state.ws + dir));
+        state.col = Math.min(state.col, state.workspaces[state.ws].length - 1);
+        render(true);
+      }
+      function focusWaiting() {
+        /* alt+`: jump to the oldest agent waiting for input */
+        let oldest = null, at = Infinity;
+        state.workspaces.forEach((cols, w) => cols.forEach((col, i) => {
+          const k = w + ':' + i;
+          if (col.st === 'waiting' && (state.waitingSince[k] || 0) < at) {
+            at = state.waitingSince[k] || 0; oldest = [w, i];
+          }
+        }));
+        if (oldest) { state.ws = oldest[0]; state.col = oldest[1]; render(true); }
+      }
       const binds = {
-        h: { act: 'focus-column-left',              run: () => stepX(-1) },
-        l: { act: 'focus-column-right',             run: () => stepX( 1) },
-        j: { act: 'focus-window-or-workspace-down', run: () => stepY( 1) },
-        k: { act: 'focus-window-or-workspace-up',   run: () => stepY(-1) },
+        h:   { act: 'focus-column-left',              run: () => focusCol(-1) },
+        l:   { act: 'focus-column-right',             run: () => focusCol( 1) },
+        j:   { act: 'focus-window-or-workspace-down', run: () => focusWs( 1) },
+        k:   { act: 'focus-window-or-workspace-up',   run: () => focusWs(-1) },
+        '`': { act: 'jcode: focus oldest waiting',    run: focusWaiting },
       };
 
       let hudTimer;
@@ -666,18 +866,16 @@
           cap.classList.add('down');
           setTimeout(() => cap.classList.remove('down'), 140);
         }
-        hud.innerHTML = `<span class="chord">alt+${chord}</span><span class="act">${bind.act}</span>`;
+        hud.innerHTML = '<span class="chord">alt+' + chord + '</span><span class="act">' + bind.act + '</span>';
         hud.classList.add('show');
         clearTimeout(hudTimer);
         hudTimer = setTimeout(() => hud.classList.remove('show'), 1100);
       }
-
       Object.entries(caps).forEach(([chord, btn]) => {
         btn.addEventListener('click', () => fire(chord));
       });
 
-      /* listen for the real chords, but only while the strip is on screen,
-         so the page never hijacks alt shortcuts elsewhere */
+      /* real chords, armed only while the strip is on screen */
       function stripVisible() {
         const r = strip.getBoundingClientRect();
         const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
@@ -685,40 +883,45 @@
       }
       document.addEventListener('keydown', e => {
         if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-        const chord = e.key.toLowerCase();
+        const chord = e.key === 'Backquote' ? '`' : e.key.toLowerCase();
         if (!binds[chord] || !stripVisible()) return;
         e.preventDefault();
         fire(chord);
       });
 
-      /* drag scrolls the current workspace horizontally
-         (pointer events cover mouse + touch) */
-      let dragging = false, startX = 0, startPos = 0;
-      view.addEventListener('pointerdown', e => {
-        dragging = true; startX = e.clientX; startPos = xs[ws];
-        view.setPointerCapture(e.pointerId);
-        rows[ws].classList.remove('anim');
-      });
-      view.addEventListener('pointermove', e => {
-        if (!dragging) return;
-        xs[ws] = startPos + (e.clientX - startX);
-        applyX(ws, false);
-      });
-      const end = () => { dragging = false; applyX(ws, true); };
-      view.addEventListener('pointerup', end);
-      view.addEventListener('pointercancel', end);
-      window.addEventListener('resize', layout);
+      /* ---- fleet life: agents flip state on their own, event-driven like
+         the real session_status files. The bar updates the same instant. */
+      const FLIPS = { running: ['waiting', 'running', 'running'], waiting: ['running'],
+                      stalled: ['running'], fresh: ['running'] };
+      setInterval(() => {
+        if (!stripVisible()) return;
+        const w = Math.random() < 0.5 ? 0 : 1;
+        const cols = state.workspaces[w];
+        const i = Math.floor(Math.random() * cols.length);
+        const col = cols[i];
+        if (col.st === 'web') return;
+        const next = FLIPS[col.st];
+        if (!next) return;
+        const to = next[Math.floor(Math.random() * next.length)];
+        if (to === col.st) return;
+        col.st = to;
+        if (to === 'waiting') state.waitingSince[w + ':' + i] = Date.now();
+        renderBar(); renderTerms();
+      }, 2600);
 
-      /* gentle idle tour once, when it first scrolls into view:
-         a column step, a workspace hop down, and back up */
+      window.addEventListener('resize', layout);
+      layout();
+
+      /* idle tour on first view: walk two columns, hop down, come back,
+         then answer the bar with alt+` */
       let toured = false;
       new IntersectionObserver((entries, obs) => {
         if (entries[0].isIntersecting && !toured) {
           toured = true;
-          const tour = [() => stepX(1), () => stepY(1), () => stepY(-1)];
+          const tour = [() => fire('l'), () => fire('l'), () => fire('j'), () => fire('k'), () => fire('`')];
           let i = 0;
-          const drift = () => { if (i < tour.length && !dragging) { tour[i++](); setTimeout(drift, 1000); } };
-          setTimeout(drift, 1000);
+          const drift = () => { if (i < tour.length) { tour[i++](); setTimeout(drift, 1100); } };
+          setTimeout(drift, 900);
           obs.disconnect();
         }
       }, { threshold: 0.5 }).observe(view);
