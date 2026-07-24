@@ -408,44 +408,27 @@
         </video>
       </figure>
       <p class="hero-caption">
-        Real footage, not a mockup: this machine on July 22, 2026. Four jcode
-        agents debugging in parallel, then a hop to a second workspace with
-        five more sessions and hwatu verification windows.
+        Real footage: this machine on July 22, 2026. Nine jcode sessions
+        across two workspaces.
       </p>
       <p class="kicker"><b>my dev rice</b> · systems / tools · as of jul 2026</p>
       <h1>A desktop built around agents, not apps.</h1>
       <p class="lede">
-        Most desktops are organized around a human clicking between applications.
-        Mine is organized around <strong>coding agents doing the work</strong> while
-        I direct: niri gives every agent its own column on an infinite strip,
-        jcode is the primary interface to the machine, and
-        <a href="https://hongnoul.github.io/hwatu/">hwatu</a> makes looking at the result free.
+        <strong>Coding agents do the work, I direct.</strong> niri gives every
+        agent a column on an infinite strip, jcode is the interface to the
+        machine, <a href="https://hongnoul.github.io/hwatu/">hwatu</a> makes
+        verification free.
       </p>
     </header>
 
     <section class="reveal">
       <h2>The window manager</h2>
       <p>
-        <a href="https://github.com/YaLTeR/niri">niri</a> is a scrollable-tiling
-        Wayland compositor. Instead of cramming windows into a fixed grid or
-        juggling numbered workspaces, the workspace is an infinite horizontal
-        strip and the screen is a viewport onto it. New windows never resize
-        existing ones, they just extend the strip.
-      </p>
-      <p>
-        I didn&rsquo;t start here. The previous setup was Hyprland with a 2&times;2
-        window split across two workspaces: eight windows, hard ceiling. Every
-        new agent meant evicting an old one or spawning another workspace to
-        forget about. That cap quietly set the size of the fleet.
-      </p>
-      <p>
-        That model happens to be exactly right for agent-heavy work. A grid asks
-        &ldquo;where do I fit this?&rdquo; every time something opens. A strip
-        just grows. Navigation is vim keybinds throughout: <code>alt+h</code>
-        and <code>alt+l</code> walk the strip the way <code>h</code> and
-        <code>l</code> walk a line. Each running agent keeps a full, undisturbed
-        terminal column, and adding a fifth agent costs nothing but width. Drag
-        the viewport:
+        <a href="https://github.com/YaLTeR/niri">niri</a>: the workspace is an
+        infinite horizontal strip, the screen a viewport onto it. New windows
+        never resize existing ones. My old Hyprland grid capped out at 8
+        windows; a strip just grows, so another agent costs nothing but width.
+        Navigation is vim keys: <code>alt+h/l</code> walks the strip. Try it:
       </p>
 
       <div class="strip" id="strip">
@@ -477,16 +460,9 @@
           </div>
         </div>
         <p class="strip__note">
-          Not screenshots - a live model. The bar on top renders the exact
-          Pango format the real Rust ticker emits (<b>|</b> per window,
-          <b>&#9612;</b> for a workspace&rsquo;s active window, the focused
-          cell as a badge), terminals open at <b>1/4 screen width, zero
-          gaps</b>, unfocused windows dim because that&rsquo;s the
-          compositor&rsquo;s job, and the agents flip between working and
-          waiting on their own. The keys aren&rsquo;t decoration either: hold
+          A live model, not screenshots: real bar format, real binds. Hold
           <b>alt</b> and tap <b>h / j / k / l</b>, or <b>alt+`</b> to jump to
-          the oldest waiting agent. Exact binds from this machine&rsquo;s
-          <code>config.kdl</code>.
+          the oldest waiting agent.
         </p>
       </div>
     </section>
@@ -494,10 +470,9 @@
     <section class="reveal">
       <h2>The agent</h2>
       <p>
-        <a href="https://github.com/1jehuang/jcode">jcode</a> is the interface I
-        actually live in. Not an editor with a chat panel bolted on, a coding
-        agent that owns the terminal. It writes its own launch hotkeys into
-        niri&rsquo;s config, so starting a session anywhere is one chord:
+        <a href="https://github.com/1jehuang/jcode">jcode</a> owns the terminal.
+        It writes its own launch hotkeys into niri&rsquo;s config, so a session
+        is one chord away:
       </p>
       <table>
         <thead><tr><th>chord</th><th>opens</th></tr></thead>
@@ -509,47 +484,20 @@
           <tr><td class="key">alt+shift+`</td><td>triage: cycle every open session</td></tr>
         </tbody>
       </table>
-      <p class="tbl-note">
-        The bindings live between managed markers in <code>config.kdl</code> -
-        jcode rewrites that block itself when its build or hotkeys change.
-      </p>
       <p>
-        The pattern that falls out: I don&rsquo;t context-switch between
-        projects, I <em>visit</em> agents. <code>alt+`</code> is the closest
-        thing to an inbox: it jumps the viewport to whichever column is blocked
-        on me, oldest first. The strip holds the state; I supply judgment and
-        move on.
-      </p>
-      <p>
-        The self-dev session deserves a note: jcode routinely modifies its own
-        harness: hotkeys, tools, the compositor config it runs under. My
-        <code>~/.config/niri/</code> has a dozen timestamped
-        <code>config.kdl.bak-jcode-hotkeys-*</code> files, which is what it looks
-        like when the agent edits its own environment and leaves an undo trail.
+        I don&rsquo;t context-switch between projects, I <em>visit</em> agents.
+        <code>alt+`</code> is the inbox: it jumps to whichever column is
+        blocked on me, oldest first.
       </p>
     </section>
 
     <section class="reveal">
       <h2>The bar</h2>
       <p>
-        The waybar workspace ticker is where the fleet becomes legible. The
-        stock module numbers workspaces and stops there; this one is a custom
-        Rust binary that subscribes to niri&rsquo;s event stream, walks each
-        window&rsquo;s <code>/proc</code> cmdline to find the ones running
-        jcode, and cross-references them against
-        <code>~/.jcode/session_status/</code> - the per-session state files
-        every agent keeps updated as it works.
-      </p>
-      <p>
-        The addressing is a spreadsheet. Workspaces are letters, columns are
-        numbers, and the focused window reads as a cell reference:
-        <code>A03</code> is workspace A, fourth column; hop down a workspace
-        and you&rsquo;re in <code>B00</code>. It turns &ldquo;where was that
-        agent?&rdquo; into coordinates - an infinite strip per row, rows
-        stacked alphabetically, exactly the mental model a grid of running
-        sessions deserves. The bar renders the whole sheet as one line: a
-        tick per window, the focused cell&rsquo;s address highlighted, and
-        every tick color-coded by what its agent is doing right now:
+        A custom Rust ticker in waybar addresses windows like spreadsheet
+        cells (<code>A03</code> = workspace A, fourth column) and color-codes
+        every tick by what its agent is doing, live from
+        <code>~/.jcode/session_status/</code>:
       </p>
       <table>
         <thead><tr><th>color</th><th>meaning</th></tr></thead>
@@ -561,31 +509,20 @@
         </tbody>
       </table>
       <p>
-        With 12+ sessions live, this is the difference between managing a
-        fleet and losing one. A glance at the bar answers &ldquo;who needs
-        me&rdquo; without visiting a single column, and it pairs directly
-        with <code>alt+`</code>: the bar says someone is blocked, the chord
-        takes me to them. The status files update event-driven, not polled,
-        so a session flipping from working to waiting shows in the bar the
-        same instant the agent stops.
-      </p>
-      <p>
-        Credit split on this one: the ticker itself is
-        <a href="https://github.com/1jehuang">Jeremy Huang</a>&rsquo;s design,
-        part of the jcode setup this whole rice descends from. The session
-        status color coding is the new addition, patched in on this machine -
-        by a jcode agent editing the bar that reports on jcode agents, which
-        felt appropriately circular.
+        With 12+ sessions live, one glance answers &ldquo;who needs me&rdquo;;
+        <code>alt+`</code> takes me there. Ticker design by
+        <a href="https://github.com/1jehuang">Jeremy Huang</a>, status colors
+        added here - by a jcode agent editing the bar that reports on jcode
+        agents.
       </p>
     </section>
 
     <section class="reveal">
       <h2>Verification</h2>
       <p>
-        The third leg is <a href="https://hongnoul.github.io/hwatu/">hwatu</a>, the 13&nbsp;ms
-        daemon browser. It closes the loop the other two open: agents produce
-        frontend changes constantly, so seeing the rendered result has to cost
-        nothing. Two niri window rules do the etiquette:
+        <a href="https://hongnoul.github.io/hwatu/">hwatu</a>, the 13&nbsp;ms
+        daemon browser, closes the loop. One niri window rule does the
+        etiquette:
       </p>
       <pre class="term"><span class="cmt">// hwatu --background: agent-verification windows must not steal focus.</span>
 <span class="out">window-rule {
@@ -593,21 +530,20 @@
     open-focused false
 }</span></pre>
       <p>
-        An agent can open, screenshot, and close real rendered pages in a hot
-        loop without a single window flashing in front of me. When I want to see
-        what it sees, <code>hwatu focus</code> promotes the invisible session
-        into a normal column on the strip.
+        Agents screenshot rendered pages in a hot loop without a window ever
+        flashing in front of me. <code>hwatu focus</code> promotes a session
+        onto the strip when I want to look.
       </p>
     </section>
 
     <section class="reveal">
       <h2>Why this shape</h2>
       <ul class="decisions">
-        <li><b>Columns, not workspaces.</b><span>Workspaces are places you have to remember. A strip is a sequence you scroll. With 4-6 agents running, spatial order (oldest work leftward) beats naming things.</span></li>
-        <li><b>The WM is the tab manager.</b><span>hwatu has no tabs and jcode sessions have no session switcher. Every unit of work is a window, and niri is the single manager for all of them. One abstraction, everywhere.</span></li>
-        <li><b>Agents get first-class citizenship.</b><span>Window rules, focus etiquette, and launch hotkeys are designed for processes that open windows while I'm not looking. The human default (steal focus, animate, notify) is wrong when the &ldquo;user&rdquo; is a daemon.</span></li>
-        <li><b>Config the agent can edit.</b><span>niri's KDL config is plain text with obvious structure. That's not just nice for me. It means jcode can safely patch its own hotkeys, with backups, without a settings UI in the way.</span></li>
-        <li><b>Everything keyboard, nothing modal.</b><span>No dock, no alt-tab overlay, no drag-to-tile. Vim keybinds everywhere: h/j/k/l move focus in niri, the same motions drive the editor. The hands stay on the row where the prompts are typed.</span></li>
+        <li><b>Columns, not workspaces.</b><span>A strip is a sequence you scroll, not places you have to remember.</span></li>
+        <li><b>The WM is the tab manager.</b><span>Every unit of work is a window; niri manages them all. One abstraction.</span></li>
+        <li><b>Agents get first-class citizenship.</b><span>Focus etiquette and window rules built for processes that open windows while I'm not looking.</span></li>
+        <li><b>Config the agent can edit.</b><span>Plain-text KDL means jcode patches its own hotkeys, with backups.</span></li>
+        <li><b>Everything keyboard.</b><span>Vim keys everywhere. Hands stay where the prompts are typed.</span></li>
       </ul>
     </section>
 
@@ -632,14 +568,9 @@
       <p>
         This rice isn&rsquo;t original.
         <a href="https://github.com/1jehuang">Jeremy Huang</a> built
-        <a href="https://github.com/1jehuang/jcode">jcode</a>, and when we met
-        in person at Hogpatch he walked me through his niri-optimized
-        workflow: the 1/4-width agent columns, the launch chords, the
-        &ldquo;visit agents instead of switching projects&rdquo; habit. Most of
-        what this page describes is his design, adopted wholesale and then
-        tuned to this machine. The practical difference: the old Hyprland grid
-        topped out at 8 windows, and this setup routinely runs a fleet of
-        12&ndash;32 agents without changing shape.
+        <a href="https://github.com/1jehuang/jcode">jcode</a> and walked me
+        through his niri workflow at Hogpatch. Most of this page is his
+        design, tuned to this machine.
       </p>
     </section>
 
@@ -651,8 +582,8 @@
         <a href="https://hongnoul.github.io/hwatu/">hwatu</a>
       </div>
       <p class="colophon">
-        Dated <b>July 2026</b> on purpose. A rice is a snapshot, not a promise.
-        Written, and visually verified, by a jcode agent running in column two.
+        Dated <b>July 2026</b>. A rice is a snapshot, not a promise.
+        Written by a jcode agent running in column two.
       </p>
     </section>
 
