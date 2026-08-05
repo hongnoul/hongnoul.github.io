@@ -344,7 +344,7 @@
 
     .card[hidden] { display: none; }
 
-    /* ---- about + token burn ---- */
+    /* ---- about ---- */
     .about-section {
       padding: 0 2rem 1.25rem;   /* 2rem gutters match the deck */
       display: flex;
@@ -376,28 +376,6 @@
     .about-text a { color: inherit; }
     .about-text a:hover { color: #ff2400; }
 
-    .burn-section {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;      /* right-aligned against the right gutter */
-      text-align: right;
-      gap: 0.75rem;
-      min-width: 300px;
-      margin-left: auto;
-    }
-    /* height-capped so the whole widget matches the About block; the
-       viewBox keeps the aspect ratio and width follows */
-    .burn-grid { display: block; height: 80px; width: auto; }
-    .burn-grid .cell:hover { stroke: #111; stroke-width: 1; }
-    .burn-stat {
-      font-size: 0.8rem;
-      color: #898989;
-      margin: 0;
-      font-variant-numeric: tabular-nums;
-    }
-    .burn-stat b { color: #ff2400; font-weight: 550; }
-    .burn-stat a { color: inherit; }
-    .burn-stat a:hover { color: #ff2400; }
 
     /* ---- mobile: the fan folds into a single vertical column ---- */
     @media (max-width: 768px) {
@@ -436,10 +414,6 @@
       .card__title { font-size: 0.7rem; }
 
       .about-section { flex-direction: column; gap: 2rem; padding: 1rem var(--corner-left) 2rem; }
-      /* mobile: the widget sits at the bottom, left-aligned to the same
-         gutters as the cards */
-      .burn-section { min-width: 100%; align-items: flex-start; text-align: left; margin-left: 0; }
-      .burn-grid { width: 100%; max-width: 420px; height: auto; }
     }
     @media (max-width: 480px) {
       .deck { gap: 1rem; }
@@ -521,10 +495,6 @@
         <a href="https://linkedin.com/in/hongnoul" rel="me">linkedin.com/in/hongnoul</a> ·
         <a href="/archive/resume/resume.pdf">resume</a>
       </p>
-    </div>
-    <div class="burn-section">
-      <svg class="burn-grid" id="burn-grid" role="img" aria-label="Daily AI token usage heatmap"></svg>
-      <p class="burn-stat" id="burn-stat">loading…</p>
     </div>
   </section>
 
@@ -689,72 +659,6 @@
       const m = new URLSearchParams(location.search).get('mode');
       if (m && ['work', 'hackathons', 'studies'].includes(m)) setMode(m);
     }
-
-    /* ---- token burn mini dashboard (bottom right) ----
-       The last ~5 months of daily agent token usage, fetched live from the
-       token-burn repo's Pages data. Same pipeline as the deck card thumb. */
-    (async () => {
-      const grid = document.getElementById('burn-grid');
-      const stat = document.getElementById('burn-stat');
-      let data;
-      try {
-        data = await (await fetch('https://hongnoul.github.io/token-burn/data/tokens.json', { cache: 'no-cache' })).json();
-      } catch { stat.textContent = 'data unavailable'; return; }
-      const days = data.days || {};
-      const total = d => (days[d] || [0,0,0,0]).reduce((a, b) => a + b, 0);
-      const human = n =>
-        n >= 1e9 ? (n / 1e9).toFixed(2) + 'B'
-        : n >= 1e6 ? (n / 1e6).toFixed(1) + 'M'
-        : n >= 1e3 ? (n / 1e3).toFixed(1) + 'k'
-        : String(n);
-      const isoLocal = d => {
-        const p = n => String(n).padStart(2, '0');
-        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-      };
-
-      const CELL = 11, GAP = 3, STEP = CELL + GAP, WEEKS = 22, TOP = 14;
-      const end = new Date(); end.setHours(0,0,0,0);
-      const start = new Date(end);
-      start.setDate(start.getDate() - (WEEKS * 7 - 1));
-      start.setDate(start.getDate() - start.getDay());
-      const weeks = Math.ceil(((end - start) / 864e5 + 1) / 7);
-      const W = weeks * STEP - GAP, H = TOP + 7 * STEP - GAP;
-      grid.setAttribute('viewBox', `0 0 ${W} ${H}`);
-      grid.setAttribute('width', W); grid.setAttribute('height', H);
-
-      const RAMP = ['#efefef', '#ffd3c9', '#ff9c85', '#ff5c3a', '#e01e00'];
-      const max = Math.max(1, ...Object.keys(days).map(total));
-      const level = v => v <= 0 ? 0 : 1 + Math.min(3, Math.floor((Math.log(v + 1) / Math.log(max + 1)) * 4));
-
-      const NS = 'http://www.w3.org/2000/svg';
-      const monthFmt = new Intl.DateTimeFormat('en-US', { month: 'short' });
-      let cells = '', labels = '', lastMonth = -1;
-      const cur = new Date(start);
-      for (let w = 0; w < weeks; w++) {
-        const m = cur.getMonth();
-        if (m !== lastMonth && cur.getDate() <= 7 && w < weeks - 1) {
-          labels += `<text x="${w * STEP}" y="${TOP - 5}" font-size="8.5" fill="#b5b5b5">${monthFmt.format(cur)}</text>`;
-          lastMonth = m;
-        }
-        for (let d = 0; d < 7; d++) {
-          if (cur > end) break;
-          const iso = isoLocal(cur);
-          const v = days[iso] ? total(iso) : 0;
-          cells += `<rect class="cell" x="${w * STEP}" y="${TOP + d * STEP}" width="${CELL}" height="${CELL}" rx="2.5" fill="${RAMP[level(v)]}"><title>${iso}: ${v.toLocaleString()} tokens</title></rect>`;
-          cur.setDate(cur.getDate() + 1);
-        }
-      }
-      grid.innerHTML = labels + cells;
-
-      const todayIso = isoLocal(new Date());
-      const dates = Object.keys(days).sort();
-      const showDay = days[todayIso] ? todayIso : dates[dates.length - 1];
-      const allTime = dates.reduce((a, d) => a + total(d), 0);
-      stat.innerHTML =
-        `\u{1f525} <b>${human(total(showDay))}</b> ${showDay === todayIso ? 'today' : 'on ' + showDay}` +
-        ` \u00b7 ${human(allTime)} all-time \u00b7 <a href="https://github.com/hongnoul/token-burn">token-burn</a>` +
-        ` \u00b7 <a href="https://hongnoul.github.io/token-burn/">dashboard</a>`;
-    })();
 
     /* ---- deck drag ----
        Desktop: the fanned row is wider than the viewport, so dragging pans it
