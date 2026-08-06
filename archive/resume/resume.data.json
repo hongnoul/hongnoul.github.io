@@ -14,7 +14,7 @@
         {
           "org": "Massachusetts Institute of Technology",
           "loc": "Cambridge, MA",
-          "role": "BS in Computer Science and Engineering (GPA: 4.3)",
+          "role": "BS in Artificial Intelligence and Decision Making (Course 6-4), GPA: 4.3",
           "date": "Expected May 2027",
           "bullets": [
             "*Relevant Coursework:* Data Structures & Algorithms, Software Construction, Web Design",
@@ -24,17 +24,55 @@
       ]
     },
     {
+      "title": "Technical Projects",
+      "entries": [
+        {
+          "org": "hwatu -- Browser Engine for AI Coding Agents",
+          "date": "2026",
+          "bullets": [
+            "Built a daemon-based WebKit browser in Rust (WebKitGTK 6) that makes visual verification nearly free for coding agents: 13 ms median window spawn (p90 35 ms) from a warm daemon, 216 ms full verify loop",
+            "Designed the agent-facing control plane: JSON-over-Unix-socket IPC protocol, MCP server over stdio, headless-as-window-property rendering, and human hand-off into a tiling window manager",
+            "Sole author across a 3-crate Rust workspace (client, daemon, IPC); 350+ commits with published engineering writeups and benchmarks"
+          ]
+        },
+        {
+          "org": "Agent-First Linux Desktop",
+          "date": "2026",
+          "bullets": [
+            "Composed a development environment where AI agents are first-class citizens: custom browser (hwatu), agent memory servers (MCP), and Wayland compositor tooling orchestrated for autonomous verify-fix loops",
+            "Built and deployed multiple MCP servers (game-economy analytics API wrapper, personal relationship memory) used daily by local and remote agents"
+          ]
+        },
+        {
+          "org": "Freight Agent -- Subconscious Hackathon",
+          "date": "May 2026",
+          "bullets": [
+            "Designed plan-approve-execute UX for an autonomous freight-exception agent on Cloudflare Workers (Subconscious reasoning, Baseten vision/ASR); live SSE trace surfaces draft carrier, customer, and AR messages",
+            "Architected repo partitions (web / worker / db) and built full Next.js storefront with voice-first mic launcher in a 2-hour build sprint"
+          ]
+        },
+        {
+          "org": "ACL Triage -- Cursor Hackathon",
+          "date": "May 2026",
+          "bullets": [
+            "Built Next.js 16 coach dashboard for ACL-injury triage: 60+ athlete rosters, body-silhouette injury mapping, structured check-in flow, and role-based routing",
+            "Integrated FastAPI backend running MediaPipe pose extraction and RAG-grounded rehab retrieval to turn short video + text intake into severity and urgency bands"
+          ]
+        }
+      ]
+    },
+    {
       "title": "Work & Leadership Experience",
       "entries": [
         {
-          "org": "TrustAI Labs (YCombinator S26)",
+          "org": "TrustAI Labs (Y Combinator S26)",
           "loc": "San Francisco, CA",
-          "role": "Founding Engineer & Designer",
+          "role": "Founding Engineer",
           "date": "March 2026 -- Present",
           "bullets": [
-            "Own end-to-end frontend of the product, prototyping features and delivering polished, production-ready interfaces",
+            "Own the end-to-end frontend of an AI product as one of the first engineers: prototyping features and shipping polished, production-ready interfaces",
             "Built and maintain the full marketing site and interactive product demos used in investor and customer-facing presentations",
-            "Defined visual identity and design system including logo; responsible for all brand, motion, and interaction decisions"
+            "Defined the company's visual identity and design system; responsible for all brand, motion, and interaction decisions"
           ]
         },
         {
@@ -43,8 +81,8 @@
           "role": "Squad Leader & Personnel Administration Specialist",
           "date": "July 2024 -- Jan 2026",
           "bullets": [
-            "Created advanced Excel macros to automate reports, minimizing errors in high-stakes administrative workflows",
-            "Served as squad leader in a top-ranked infantry platoon (1st of 48) in CQB room-clearing competition"
+            "Led a squad in a top-ranked infantry platoon (1st of 48) in CQB room-clearing competition",
+            "Automated high-stakes administrative reporting with Excel macro pipelines, minimizing errors across the battalion"
           ]
         },
         {
@@ -54,52 +92,7 @@
           "date": "December 2023 -- February 2024",
           "bullets": [
             "Developed a server-side rendered digital exhibition platform with Next.js, improving accessibility and SEO",
-            "Collaborated with MIT History faculty to launch a digital archive of activist murals, increased visibility to 1,000+ users"
-          ]
-        }
-      ]
-    },
-    {
-      "title": "Technical Projects",
-      "entries": [
-        {
-          "org": "Subconscious Hackathon",
-          "date": "May 2026",
-          "bullets": [
-            "Architected repo partitions (web / worker / db) and built full Next.js storefront with voice-first mic launcher (Web Speech API) and customer complaint inbox in a 2-hour build sprint",
-            "Designed plan-approve-execute UX for an autonomous freight-exception agent on Cloudflare Workers (Subconscious reasoning, Baseten vision/ASR); live SSE trace surfaces draft carrier, customer, and AR messages"
-          ]
-        },
-        {
-          "org": "Cursor Hackathon",
-          "date": "May 2026",
-          "bullets": [
-            "Owned full Next.js 16 frontend for an ACL-injury triage app: coach dashboard with three-sport rosters of 60+ athletes, body-silhouette injury visualization, structured check-in flow, and role-based login routing",
-            "Integrated FastAPI backend running MediaPipe pose extraction and RAG-grounded rehab retrieval to turn short video + text intake into severity and urgency bands"
-          ]
-        },
-        {
-          "org": "Groundwork - Civic Social Platform",
-          "date": "April 2026",
-          "bullets": [
-            "Built a civic social platform for sharing community service and relaying inspiration into chains of civic action, with a map of local events, one-tap sign-ups, and a trending feed ranked by 24-hour inspiration count",
-            "Full-stack: React 19 frontend (Bun, GSAP, Leaflet) deployed on Vercel; Flask backend on Railway backed by Firestore and Cloud Storage"
-          ]
-        },
-        {
-          "org": "Amazon Nova AI Hackathon",
-          "date": "February -- March 2026",
-          "bullets": [
-            "Built a Chrome extension personalizing Amazon search rankings in real time using AI-inferred behavioral profiles",
-            "Engineered full-stack: TypeScript Lambda on AWS API Gateway, DynamoDB profile persistence, DOM reranking with AI-generated explanation badges"
-          ]
-        },
-        {
-          "org": "MIT Bitcoin Hackathon",
-          "date": "February 2024",
-          "bullets": [
-            "Developed a tokenized property deed system and live marketplace prototype, leading a team of 5+ to explore trust, ownership, and verification in digital marketplaces",
-            "Built frontend with real-time transaction UI; presented to panel of judges at MIT Bitcoin Expo"
+            "Collaborated with MIT History faculty to launch a digital archive of activist murals, increasing visibility to 1,000+ users"
           ]
         }
       ]
@@ -107,9 +100,9 @@
     {
       "title": "Skills",
       "list": [
-        "Languages & Frameworks: TypeScript, JavaScript, Python, Next.js, React, FastAPI, Flask",
-        "Cloud, Edge & Infra: AWS (Lambda, API Gateway, DynamoDB), Cloudflare Workers, GCP (Firestore, Cloud Storage), Vercel, Railway",
-        "AI/ML & Tooling: LLM agents & MCP servers, RAG-grounded retrieval, MediaPipe pose estimation"
+        "Systems: Rust, Linux/Wayland, Unix IPC, daemon architecture, WebKitGTK",
+        "AI Agent Infrastructure: MCP servers, agent memory systems, LLM tool design, RAG-grounded retrieval",
+        "Web: TypeScript, Next.js, React, Python, FastAPI, Cloudflare Workers, AWS, Vercel"
       ]
     },
     {
