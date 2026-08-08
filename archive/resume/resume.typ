@@ -5,13 +5,13 @@
 #let data = json("resume.data.json")
 
 #set document(title: data.name + " - Resume", author: data.name)
-#set page(paper: "us-letter", margin: (x: 0.65in, y: 0.5in))
+#set page(paper: "us-letter", margin: (x: 0.7in, y: 0.65in))
 #set text(
   font: ("Libertinus Serif", "New Computer Modern", "FreeSerif"),
   size: 10pt,
   fill: rgb("#000"),
 )
-#set par(leading: 0.5em, justify: false)
+#set par(leading: 0.62em, justify: false)
 #set list(marker: [•], indent: 0pt, body-indent: 6pt)
 
 // - Header -----------------------------------------
@@ -25,15 +25,15 @@
   #text(size: 9pt, fill: rgb("#222"))[#contact]
 ]
 
-#v(14pt, weak: false)
+#v(20pt, weak: false)
 
 // - Section / entry primitives --------------------
 
-#let section(title, body) = block(below: 11pt, breakable: false)[
+#let section(title, body) = block(below: 15pt, breakable: false)[
   #text(size: 10pt, weight: 700, tracking: 0.6pt)[#upper(title)]
   #v(3pt, weak: true)
   #line(length: 100%, stroke: 1.5pt)
-  #v(6pt, weak: true)
+  #v(8pt, weak: true)
   #body
 ]
 
@@ -44,7 +44,7 @@
   left-body, right-body,
 )
 
-#let entry(e) = block(below: 8pt, breakable: false)[
+#let entry(e) = block(below: 11pt, breakable: false)[
   #row(
     text(size: 11pt, weight: 700)[#e.org],
     if "loc" in e { text(size: 10pt)[#e.loc] },
@@ -57,8 +57,8 @@
     )
   ]
   #if "bullets" in e and e.bullets.len() > 0 [
-    #v(3pt, weak: true)
-    #set list(spacing: 2.5pt)
+    #v(4pt, weak: true)
+    #set list(spacing: 4pt)
     #pad(left: 14pt)[
       #for b in e.bullets [
         - #eval(b, mode: "markup")
