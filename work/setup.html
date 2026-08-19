@@ -53,8 +53,8 @@
 
     /* ---- top chrome: the same corner logo + hamburger menu as the
        homepage, so navigation chrome stays constant across pages. The
-       logo is the 4-frame sprite (logo -> two-bar menu) and toggles the
-       slide-out menu; sizing tracks the homepage's --corner-* vars. ---- */
+       shared vector morph doubles as the menu toggle; sizing tracks the
+       homepage's --corner-* vars. ---- */
     :root {
       --corner-w: 42px;
       --logo-h: calc(var(--corner-w) * 0.6);   /* aspect 50.8/84.67 */
@@ -74,13 +74,7 @@
     }
     .logo:focus { outline: none; }
     .logo:focus-visible { outline: 2px solid #898989; outline-offset: 3px; }
-    .logo .sprite { transition: transform 0.18s steps(4, jump-none); }
-    .pop { transform-box: view-box; transform-origin: 42.333px 25.4px; }
-    @media (hover: hover) {
-      .logo:hover .sprite { transform: translateX(-304.8px); }
-      .logo:hover .pop { animation: pop 0.2s ease; }
-    }
-    @keyframes pop { 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+    .logo__shape { fill: #000; }
 
     .menu {
       position: fixed;
@@ -116,15 +110,12 @@
     /* category links mirror the homepage: hidden on desktop (the homepage
        shows its tab bar there), visible in the menu on mobile */
     .menu__filter { display: none; }
-    body.menu-open .logo .sprite { transform: translateX(-304.8px); }
     @media (max-width: 768px) {
       :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
       .menu__filter { display: block; }
       .menu__link--work { display: none; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .logo .sprite { transition: none; }
-      .logo:hover .pop { animation: none; }
       .menu { transition: none; }
     }
 
@@ -363,7 +354,7 @@
 </head>
 <body>
 
-  <nav class="menu" id="site-menu" aria-label="Menu" aria-hidden="true">
+  <nav class="menu" id="site-menu" aria-label="Menu" aria-hidden="true" inert>
       <a class="menu__link menu__link--work" href="/#work">Work</a>
       <a class="menu__link menu__filter" href="/">All</a>
       <a class="menu__link menu__filter" href="/?mode=work">Work</a>
@@ -374,19 +365,16 @@
   <svg class="logo" width="320" height="192" viewBox="0 0 84.666692 50.799987"
        xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0"
        aria-label="Menu" aria-controls="site-menu" aria-expanded="false">
-    <!-- same 4-frame transition sprite as the homepage (logo -> two-bar
-         menu); the viewBox is one 84.67-wide frame. -->
-    <g class="pop">
-    <g class="sprite">
-      <g transform="translate(-423.33334,-999.06659)">
-        <path style="fill:#000;stroke-width:2" d="m 423.33334,1015.9999 16.93333,16.9334 H 457.2 v -16.9334 H 440.26667 L 423.33334,999.0666 H 457.2 l 16.93334,16.9333 h 16.93333 V 999.0666 H 508 v 50.8 h -16.93333 v -16.9333 h -16.93333 v 16.9333 h -33.86667 l -16.93333,-16.9333 z"/>
-        <path style="fill:#000;stroke-width:2" d="m 524.93333,999.0666 v 16.9333 H 558.8 v 16.9334 h -33.86667 l 16.93334,16.9333 H 609.6 v -50.8 h -16.93334 v 33.8667 h -16.93333 v -16.9334 L 558.8,999.0666 Z"/>
-        <path style="fill:#000;stroke-width:2" d="m 626.53333,999.0666 v 16.9333 h 50.8 v 16.9334 h -50.8 l 16.93333,16.9333 h 67.73333 v -16.9333 h -16.93334 v -16.9334 h 16.93334 v -16.9333 z"/>
-        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="999.06659"/>
-        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="1032.9332"/>
-      </g>
-    </g>
-    </g>
+    <defs aria-hidden="true">
+      <clipPath id="logo-clip-top" clipPathUnits="userSpaceOnUse">
+        <rect class="logo__clip-top" x="0" y="0" width="84.667" height="25.45"/>
+      </clipPath>
+      <clipPath id="logo-clip-bottom" clipPathUnits="userSpaceOnUse">
+        <rect class="logo__clip-bottom" x="0" y="25.35" width="84.667" height="25.45"/>
+      </clipPath>
+    </defs>
+    <path class="logo__shape" clip-path="url(#logo-clip-top)" d="M 0 16.933 L 16.933 33.867 L 33.867 33.867 L 33.867 16.933 L 16.933 16.933 L 0 0 L 33.867 0 L 50.8 16.933 L 67.733 16.933 L 67.733 0 L 84.667 0 L 84.667 50.8 L 67.733 50.8 L 67.733 33.867 L 50.8 33.867 L 50.8 50.8 L 16.933 50.8 L 0 33.867 Z"/>
+    <path class="logo__shape" clip-path="url(#logo-clip-bottom)" d="M 0 16.933 L 16.933 33.867 L 33.867 33.867 L 33.867 16.933 L 16.933 16.933 L 0 0 L 33.867 0 L 50.8 16.933 L 67.733 16.933 L 67.733 0 L 84.667 0 L 84.667 50.8 L 67.733 50.8 L 67.733 33.867 L 50.8 33.867 L 50.8 50.8 L 16.933 50.8 L 0 33.867 Z"/>
   </svg>
 
   <div class="wrap">
@@ -828,36 +816,12 @@
       }, { threshold: 0.5 }).observe(view);
     })();
 
-    /* ---- corner menu toggle (same behavior as the homepage) ---- */
-    (function () {
-      const logo = document.querySelector('.logo');
-      const menu = document.getElementById('site-menu');
-      if (!logo || !menu) return;
-
-      const setOpen = (open) => {
-        document.body.classList.toggle('menu-open', open);
-        logo.setAttribute('aria-expanded', String(open));
-        menu.setAttribute('aria-hidden', String(!open));
-      };
-      const isOpen = () => document.body.classList.contains('menu-open');
-      const toggle = () => setOpen(!isOpen());
-
-      logo.addEventListener('click', toggle);
-      logo.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-      });
-      menu.addEventListener('click', (e) => { if (e.target.closest('.menu__link')) setOpen(false); });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) setOpen(false); });
-      document.addEventListener('click', (e) => {
-        if (isOpen() && !e.target.closest('.menu') && !e.target.closest('.logo')) setOpen(false);
-      });
-    })();
-
     /* ---- scroll reveal ---- */
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     }, { threshold: 0.12 });
     document.querySelectorAll('.reveal').forEach(el => io.observe(el));
   </script>
+  <script src="/logo-menu.js"></script>
 </body>
 </html>
