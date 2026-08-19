@@ -95,19 +95,9 @@
     .logo { cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .logo:focus { outline: none; }
     .logo:focus-visible { outline: 2px solid #898989; outline-offset: 3px; }
-    /* ---- sprite hover transition (kept) ----
-       The logo SVG is a 4-frame horizontal strip; on hover it steps through the
-       frames to the two-bar menu mark. */
-    .logo .sprite { transition: transform 0.18s steps(4, jump-none); }
-    .pop { transform-box: view-box; transform-origin: 42.333px 25.4px; }
-    /* hover preview only on devices with a real pointer - on touch, :hover
-       sticks after a tap and the sprite would stay stuck on the menu mark
-       after the menu is toggled closed */
-    @media (hover: hover) {
-      .logo:hover .sprite { transform: translateX(-304.8px); }
-      .logo:hover .pop { animation: pop 0.2s ease; }
-    }
-    @keyframes pop { 40% { transform: scale(1.06); } 100% { transform: scale(1); } }
+    /* The mark itself is one vector path. logo-menu.js continuously morphs its
+       points into the two menu bars, so hover can reverse smoothly mid-flight. */
+    .logo__shape { fill: #000; fill-rule: evenodd; }
     @keyframes logo-glide {
       from {
         transform: translate(calc(50vw - var(--corner-left)), calc(50svh - var(--corner-top)))
@@ -164,8 +154,6 @@
       font-family: inherit;
       cursor: pointer;
     }
-    body.menu-open .logo .sprite { transform: translateX(-304.8px); }
-
     /* ================================================================
        layout - portfolio deck style: a big header wordmark, category
        tab buttons, a horizontally fanned row of overlapping project
@@ -435,8 +423,6 @@
        cards appear without animation */
     @media (prefers-reduced-motion: reduce) {
       .curtain { display: none; }
-      .logo .sprite { transition: none; }
-      .logo:hover .pop { animation: none; }
       .logo { animation: none; filter: invert(0); }
       .card, body.revealed .card { animation: none; opacity: 1; transform: none; }
       .menu { transition: none; }
@@ -456,20 +442,7 @@
   <svg class="logo" width="320" height="192" viewBox="0 0 84.666692 50.799987"
        xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0"
        aria-label="Menu" aria-controls="site-menu" aria-expanded="false">
-    <!-- 4-frame transition sprite (logo -> two-bar menu), authored in
-         jhokxtransition.svg. The viewBox is one 84.67-wide frame, so only one
-         frame shows at a time. -->
-    <g class="pop">
-    <g class="sprite">
-      <g transform="translate(-423.33334,-999.06659)">
-        <path style="fill:#000;stroke-width:2" d="m 423.33334,1015.9999 16.93333,16.9334 H 457.2 v -16.9334 H 440.26667 L 423.33334,999.0666 H 457.2 l 16.93334,16.9333 h 16.93333 V 999.0666 H 508 v 50.8 h -16.93333 v -16.9333 h -16.93333 v 16.9333 h -33.86667 l -16.93333,-16.9333 z"/>
-        <path style="fill:#000;stroke-width:2" d="m 524.93333,999.0666 v 16.9333 H 558.8 v 16.9334 h -33.86667 l 16.93334,16.9333 H 609.6 v -50.8 h -16.93334 v 33.8667 h -16.93333 v -16.9334 L 558.8,999.0666 Z"/>
-        <path style="fill:#000;stroke-width:2" d="m 626.53333,999.0666 v 16.9333 h 50.8 v 16.9334 h -50.8 l 16.93333,16.9333 h 67.73333 v -16.9333 h -16.93334 v -16.9334 h 16.93334 v -16.9333 z"/>
-        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="999.06659"/>
-        <rect style="fill:#000;stroke-width:2" width="84.666664" height="16.933332" x="728.1333" y="1032.9332"/>
-      </g>
-    </g>
-    </g>
+    <path class="logo__shape" d="M 0 16.933 L 16.933 33.867 L 33.867 33.867 L 33.867 16.933 L 16.933 16.933 L 0 0 L 33.867 0 L 50.8 16.933 L 67.733 16.933 L 67.733 0 L 84.667 0 L 84.667 50.8 L 67.733 50.8 L 67.733 33.867 L 50.8 33.867 L 50.8 50.8 L 16.933 50.8 L 0 33.867 Z"/>
   </svg>
 
   <div class="mode-bar" role="tablist" aria-label="Work categories">
@@ -706,33 +679,6 @@
 
     applyFilter();
 
-    /* ---- corner menu toggle (kept) ----
-       The corner logo doubles as the menu button. Clicking it - or Enter/Space
-       while focused - toggles the nav links. Escape / outside click closes. */
-    (function () {
-      const logo = document.querySelector('.logo');
-      const menu = document.getElementById('site-menu');
-      if (!logo || !menu) return;
-
-      const setOpen = (open) => {
-        document.body.classList.toggle('menu-open', open);
-        logo.setAttribute('aria-expanded', String(open));
-        menu.setAttribute('aria-hidden', String(!open));
-      };
-      const isOpen = () => document.body.classList.contains('menu-open');
-      const toggle = () => setOpen(!isOpen());
-
-      logo.addEventListener('click', toggle);
-      logo.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-      });
-      menu.addEventListener('click', (e) => { if (e.target.closest('.menu__link')) setOpen(false); });
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && isOpen()) setOpen(false); });
-      document.addEventListener('click', (e) => {
-        if (isOpen() && !e.target.closest('.menu') && !e.target.closest('.logo')) setOpen(false);
-      });
-    })();
-
     /* ---- intro (kept) ----
        Hold the curtain for the logo glide, then reveal. The reveal toggles
        `body.revealed`, which drives the curtain wipe, the logo recolor and the
@@ -767,5 +713,6 @@
       else setTimeout(reveal, MIN_INTRO);
     }
   </script>
+  <script src="/logo-menu.js"></script>
 </body>
 </html>
