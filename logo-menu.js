@@ -93,20 +93,24 @@
     (hoverMedia.matches && hovered) ? 1 : 0
   );
 
-  const setOpen = (open) => {
+  const setOpen = (open, restoreFocus = false) => {
     document.body.classList.toggle('menu-open', open);
     logo.setAttribute('aria-expanded', String(open));
     menu.setAttribute('aria-hidden', String(!open));
+    menu.toggleAttribute('inert', !open);
     syncMorph();
+    if (!open && restoreFocus) logo.focus();
   };
   const isOpen = () => document.body.classList.contains('menu-open');
   const toggle = () => setOpen(!isOpen());
 
-  logo.addEventListener('pointerenter', () => {
+  logo.addEventListener('pointerenter', (event) => {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
     hovered = true;
     syncMorph();
   });
-  logo.addEventListener('pointerleave', () => {
+  logo.addEventListener('pointerleave', (event) => {
+    if (event.pointerType && event.pointerType !== 'mouse') return;
     hovered = false;
     syncMorph();
   });
@@ -118,10 +122,11 @@
     }
   });
   menu.addEventListener('click', (event) => {
-    if (event.target.closest('.menu__link')) setOpen(false);
+    const link = event.target.closest('.menu__link');
+    if (link) setOpen(false, link.tagName === 'BUTTON');
   });
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && isOpen()) setOpen(false);
+    if (event.key === 'Escape' && isOpen()) setOpen(false, true);
   });
   document.addEventListener('click', (event) => {
     if (isOpen() && !event.target.closest('.menu') && !event.target.closest('.logo')) {
