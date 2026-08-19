@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Morph Lab</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #fff;
+      color: #000;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      background: #fff;
+    }
+
+    .lab-header {
+      min-height: 58px;
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #000;
+    }
+
+    .lab-title,
+    .lab-back {
+      margin: 0;
+      color: #000;
+      font: 400 11px/1 Arial, Helvetica, sans-serif;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+
+    .lab-back:focus-visible {
+      outline: 2px solid #000;
+      outline-offset: 4px;
+    }
+
+    .specimen-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .specimen {
+      position: relative;
+      min-width: 0;
+      min-height: calc((100svh - 58px) / 3);
+      padding: 36px 20px 20px;
+      display: grid;
+      place-items: center;
+      appearance: none;
+      border: 0;
+      border-right: 1px solid #000;
+      border-bottom: 1px solid #000;
+      border-radius: 0;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .specimen:nth-child(4n) { border-right: 0; }
+
+    .specimen:focus { outline: 0; }
+
+    .specimen:focus-visible {
+      box-shadow: inset 0 0 0 3px #000;
+    }
+
+    .specimen__name {
+      position: absolute;
+      top: 14px;
+      left: 16px;
+      font: 400 10px/1 Arial, Helvetica, sans-serif;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .specimen__logo {
+      width: clamp(42px, 4.4vw, 64px);
+      height: auto;
+      display: block;
+      overflow: visible;
+      pointer-events: none;
+    }
+
+    .specimen__shape { fill: currentColor; }
+
+    @media (max-width: 760px) {
+      .specimen-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .specimen { min-height: 168px; }
+      .specimen:nth-child(4n) { border-right: 1px solid #000; }
+      .specimen:nth-child(2n) { border-right: 0; }
+      .specimen__logo { width: 48px; }
+    }
+
+    @media (max-width: 390px) {
+      .lab-header { padding-inline: 14px; }
+      .specimen { min-height: 148px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="lab-header">
+    <h1 class="lab-title">Morph lab</h1>
+    <a class="lab-back" href="/">Back</a>
+  </header>
+
+  <main class="specimen-grid" aria-label="Logo morph experiments">
+    <button class="specimen" type="button" data-variant="kestrel"><span class="specimen__name">Kestrel</span></button>
+    <button class="specimen" type="button" data-variant="rail"><span class="specimen__name">Rail</span></button>
+    <button class="specimen" type="button" data-variant="mica"><span class="specimen__name">Mica</span></button>
+    <button class="specimen" type="button" data-variant="volt"><span class="specimen__name">Volt</span></button>
+    <button class="specimen" type="button" data-variant="plume"><span class="specimen__name">Plume</span></button>
+    <button class="specimen" type="button" data-variant="velvet"><span class="specimen__name">Velvet</span></button>
+    <button class="specimen" type="button" data-variant="comet"><span class="specimen__name">Comet</span></button>
+    <button class="specimen" type="button" data-variant="tundra"><span class="specimen__name">Tundra</span></button>
+    <button class="specimen" type="button" data-variant="pivot"><span class="specimen__name">Pivot</span></button>
+    <button class="specimen" type="button" data-variant="echo"><span class="specimen__name">Echo</span></button>
+    <button class="specimen" type="button" data-variant="halo"><span class="specimen__name">Halo</span></button>
+    <button class="specimen" type="button" data-variant="sable"><span class="specimen__name">Sable</span></button>
+  </main>
+
+  <script src="/logo-morph-lab.js"></script>
+</body>
+</html>
