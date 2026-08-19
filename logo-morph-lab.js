@@ -36,38 +36,26 @@
     ]
   ];
 
-  // The codenames deliberately cover the parameters that most alter feel:
-  // knot braking, spring frequency, damping ratio, segment allocation, and split timing.
+  // Comet is the control. Its derivatives make focused changes around its
+  // spring frequency, damping ratio, knot braking, split braking, and timing.
   const variants = {
-    kestrel: { stiffness: 420, damping: 38, knotBrake: 1, splitBrake: 1 },
-    rail: { stiffness: 420, damping: 41, knotBrake: 0, splitBrake: 0 },
-    mica: { stiffness: 260, damping: 32.25, knotBrake: 0.25, splitBrake: 0.25 },
-    volt: { stiffness: 760, damping: 55.14, knotBrake: 0.25, splitBrake: 0.25 },
-    plume: { stiffness: 170, damping: 26.08, knotBrake: 0.15, splitBrake: 0.15 },
-    velvet: { stiffness: 260, damping: 44, knotBrake: 0.2, splitBrake: 0.2 },
     comet: { stiffness: 520, damping: 31, knotBrake: 0.15, splitBrake: 0.15 },
-    tundra: { stiffness: 520, damping: 64, knotBrake: 0.2, splitBrake: 0.2 },
-    pivot: {
-      stiffness: 360,
-      damping: 38,
-      knotBrake: 0.2,
-      splitBrake: 0.2,
-      knots: [0, 0.24, 0.54, 1]
-    },
-    echo: {
-      stiffness: 360,
-      damping: 38,
-      knotBrake: 0.2,
-      splitBrake: 0.2,
-      knots: [0, 0.42, 0.72, 1]
-    },
-    halo: { stiffness: 330, damping: 36, knotBrake: 0.1, splitBrake: 1 },
-    sable: {
-      stiffness: 330,
-      damping: 36,
-      knotBrake: 0.45,
-      splitBrake: 0,
-      shapeRendering: 'geometricPrecision'
+    meteor: { stiffness: 640, damping: 34.5, knotBrake: 0.15, splitBrake: 0.15 },
+    orbit: { stiffness: 420, damping: 28, knotBrake: 0.15, splitBrake: 0.15 },
+    ion: { stiffness: 520, damping: 26, knotBrake: 0.15, splitBrake: 0.15 },
+    dust: { stiffness: 520, damping: 36, knotBrake: 0.15, splitBrake: 0.15 },
+    tail: { stiffness: 520, damping: 31, knotBrake: 0, splitBrake: 0 },
+    nucleus: { stiffness: 520, damping: 31, knotBrake: 0.07, splitBrake: 0.07 },
+    flare: { stiffness: 520, damping: 31, knotBrake: 0.28, splitBrake: 0.28 },
+    slingshot: { stiffness: 640, damping: 30, knotBrake: 0.05, splitBrake: 0.05 },
+    perihelion: { stiffness: 520, damping: 31, knotBrake: 0.05, splitBrake: 0.3 },
+    aphelion: { stiffness: 520, damping: 31, knotBrake: 0.3, splitBrake: 0.05 },
+    eclipse: {
+      stiffness: 520,
+      damping: 31,
+      knotBrake: 0.1,
+      splitBrake: 0.1,
+      knots: [0, 0.28, 0.6, 1]
     }
   };
 
