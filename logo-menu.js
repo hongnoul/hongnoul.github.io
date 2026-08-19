@@ -43,6 +43,18 @@
     ]
   ];
 
+  // Nucleus: quick, lightly underdamped travel with only a trace of braking
+  // at authored poses, so they read as waypoints rather than stops.
+  const SPRING_STIFFNESS = 520;
+  const SPRING_DAMPING = 31;
+  const KNOT_BRAKE = 0.07;
+  const SPLIT_BRAKE = 0.07;
+
+  const easeLocal = (amount, brake) => {
+    const smooth = amount * amount * (3 - 2 * amount);
+    return amount + (smooth - amount) * brake;
+  };
+
   const mix = (from, to, amount) => from.map((point, index) => [
     point[0] + (to[index][0] - point[0]) * amount,
     point[1] + (to[index][1] - point[1]) * amount
@@ -53,14 +65,16 @@
     const position = Math.min(Math.max(amount, 0), 1) * morphSegments.length;
     const segmentIndex = Math.min(Math.floor(position), morphSegments.length - 1);
     const local = position - segmentIndex;
-    const eased = local * local * (3 - 2 * local);
+    const eased = easeLocal(local, KNOT_BRAKE);
     const [from, to] = morphSegments[segmentIndex];
     const outline = ring(mix(from, to, eased));
     shapes.forEach((shape) => shape.setAttribute('d', outline));
 
     // Frames one through three remain whole. During only the final segment,
     // two overlapping clips separate from the center into the authored bars.
-    const split = segmentIndex === morphSegments.length - 1 ? eased : 0;
+    const split = segmentIndex === morphSegments.length - 1
+      ? easeLocal(local, SPLIT_BRAKE)
+      : 0;
     const closedTop = H / 2 + 0.05;
     const closedBottom = H / 2 - 0.05;
     const topHeight = closedTop + (ROW - closedTop) * split;
@@ -83,8 +97,8 @@
     const delta = Math.min(Math.max((time - previousTime) / 1000, 0), 0.032);
     previousTime = time;
 
-    // A critically damped spring preserves velocity when hover reverses midway.
-    velocity += ((target - amount) * 420 - velocity * 38) * delta;
+    // Preserve velocity when hover reverses midway.
+    velocity += ((target - amount) * SPRING_STIFFNESS - velocity * SPRING_DAMPING) * delta;
     amount += velocity * delta;
 
     if (amount <= 0 || amount >= 1) {
