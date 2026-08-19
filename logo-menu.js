@@ -1,36 +1,48 @@
 (() => {
   const logo = document.querySelector('.logo');
   const menu = document.getElementById('site-menu');
-  const shape = logo?.querySelector('.logo__shape');
-  if (!logo || !menu || !shape) return;
+  const shapes = logo ? [...logo.querySelectorAll('.logo__shape')] : [];
+  const topClip = logo?.querySelector('.logo__clip-top');
+  const bottomClip = logo?.querySelector('.logo__clip-bottom');
+  if (!logo || !menu || shapes.length !== 2 || !topClip || !bottomClip) return;
 
   const W = 84.6667;
   const H = 50.8;
   const ROW = H / 3;
 
-  // The original mark and the menu state share one 18-point outline. The menu
-  // state adds an expanding even-odd cutout, yielding two separate bars without
-  // a sprite sheet or hand-authored in-between frames.
-  const markOutline = [
-    [0, ROW], [ROW, ROW * 2], [ROW * 2, ROW * 2],
-    [ROW * 2, ROW], [ROW, ROW], [0, 0],
-    [ROW * 2, 0], [ROW * 3, ROW], [ROW * 4, ROW],
-    [ROW * 4, 0], [W, 0], [W, H],
-    [ROW * 4, H], [ROW * 4, ROW * 2], [ROW * 3, ROW * 2],
-    [ROW * 3, H], [ROW, H], [0, ROW * 2]
+  // Each adjacent pair is registered independently. Collinear points preserve
+  // every authored corner while these explicit correspondences avoid folds.
+  const grid = (points) => points.map(([x, y]) => [
+    x === 5 ? W : x * ROW,
+    y === 3 ? H : y * ROW
+  ]);
+  const morphSegments = [
+    [
+      grid([[0, 1], [1, 2], [2, 2], [2, 1], [1, 1], [0, 0],
+        [2, 0], [3, 1], [4, 1], [4, 0], [5, 0], [5, 3],
+        [4, 3], [4, 2], [3, 2], [3, 3], [1, 3], [0, 2]]),
+      grid([[0, 2], [2, 2], [2, 1], [0, 1], [0, 0], [2, 0],
+        [3, 1], [3, 2], [4, 2], [4, 1], [4, 0], [5, 0],
+        [5, 1.5], [5, 3], [4, 3], [3, 3], [2, 3], [1, 3]])
+    ],
+    [
+      grid([[0, 0], [0, 1], [1, 1], [2, 1], [2, 2], [1, 2],
+        [0, 2], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3],
+        [5, 2.25], [5, 1.5], [5, 0], [4, 0], [4, 1], [4, 2],
+        [3, 2], [3, 1], [2, 0], [1, 0]]),
+      grid([[0.75, 1], [1.5, 1], [2.25, 1], [3, 1], [3, 2], [1.5, 2],
+        [0, 2], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3],
+        [5, 2], [4, 2], [4, 1], [5, 1], [5, 0], [3.75, 0],
+        [2.5, 0], [1.25, 0], [0, 0], [0, 1]])
+    ],
+    [
+      grid([[0, 0], [0, 1], [3, 1], [3, 2], [0, 2], [1, 3],
+        [5, 3], [5, 2], [4, 2], [4, 1], [5, 1], [5, 0]]),
+      grid([[1.25, 0], [0, 0], [0, 1.5], [0, 3], [1.25, 3], [2.5, 3],
+        [3.75, 3], [5, 3], [5, 1.5], [5, 0], [3.75, 0], [2.5, 0]])
+    ]
   ];
 
-  const barOutline = [
-    [0, ROW], [0, ROW * 0.8], [0, ROW * 0.6],
-    [0, ROW * 0.4], [0, ROW * 0.2], [0, 0],
-    [ROW, 0], [ROW * 2, 0], [ROW * 3, 0],
-    [ROW * 4, 0], [W, 0], [W, H],
-    [ROW * 4, H], [ROW * 3.5, H], [ROW * 3, H],
-    [ROW * 2, H], [ROW, H], [0, H]
-  ];
-
-  const closedCutout = Array.from({ length: 4 }, () => [W / 2, H / 2]);
-  const openCutout = [[0, ROW], [W, ROW], [W, ROW * 2], [0, ROW * 2]];
   const mix = (from, to, amount) => from.map((point, index) => [
     point[0] + (to[index][0] - point[0]) * amount,
     point[1] + (to[index][1] - point[1]) * amount
@@ -38,7 +50,24 @@
   const point = ([x, y]) => `${x.toFixed(3)} ${y.toFixed(3)}`;
   const ring = (points) => `M ${points.map(point).join(' L ')} Z`;
   const render = (amount) => {
-    shape.setAttribute('d', `${ring(mix(markOutline, barOutline, amount))} ${ring(mix(closedCutout, openCutout, amount))}`);
+    const position = Math.min(Math.max(amount, 0), 1) * morphSegments.length;
+    const segmentIndex = Math.min(Math.floor(position), morphSegments.length - 1);
+    const local = position - segmentIndex;
+    const eased = local * local * (3 - 2 * local);
+    const [from, to] = morphSegments[segmentIndex];
+    const outline = ring(mix(from, to, eased));
+    shapes.forEach((shape) => shape.setAttribute('d', outline));
+
+    // Frames one through three remain whole. During only the final segment,
+    // two overlapping clips separate from the center into the authored bars.
+    const split = segmentIndex === morphSegments.length - 1 ? eased : 0;
+    const closedTop = H / 2 + 0.05;
+    const closedBottom = H / 2 - 0.05;
+    const topHeight = closedTop + (ROW - closedTop) * split;
+    const bottomY = closedBottom + (ROW * 2 - closedBottom) * split;
+    topClip.setAttribute('height', topHeight.toFixed(3));
+    bottomClip.setAttribute('y', bottomY.toFixed(3));
+    bottomClip.setAttribute('height', (H - bottomY).toFixed(3));
   };
 
   const hoverMedia = matchMedia('(hover: hover)');

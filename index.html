@@ -95,9 +95,9 @@
     .logo { cursor: pointer; -webkit-tap-highlight-color: transparent; }
     .logo:focus { outline: none; }
     .logo:focus-visible { outline: 2px solid #898989; outline-offset: 3px; }
-    /* The mark itself is one vector path. logo-menu.js continuously morphs its
-       points into the two menu bars, so hover can reverse smoothly mid-flight. */
-    .logo__shape { fill: #000; fill-rule: evenodd; }
+    /* Two clipped copies of one vector outline continuously pass through all
+       four authored sprite poses, so hover can reverse smoothly mid-flight. */
+    .logo__shape { fill: #000; }
     @keyframes logo-glide {
       from {
         transform: translate(calc(50vw - var(--corner-left)), calc(50svh - var(--corner-top)))
@@ -442,7 +442,16 @@
   <svg class="logo" width="320" height="192" viewBox="0 0 84.666692 50.799987"
        xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0"
        aria-label="Menu" aria-controls="site-menu" aria-expanded="false">
-    <path class="logo__shape" d="M 0 16.933 L 16.933 33.867 L 33.867 33.867 L 33.867 16.933 L 16.933 16.933 L 0 0 L 33.867 0 L 50.8 16.933 L 67.733 16.933 L 67.733 0 L 84.667 0 L 84.667 50.8 L 67.733 50.8 L 67.733 33.867 L 50.8 33.867 L 50.8 50.8 L 16.933 50.8 L 0 33.867 Z"/>
+    <defs aria-hidden="true">
+      <clipPath id="logo-clip-top" clipPathUnits="userSpaceOnUse">
+        <rect class="logo__clip-top" x="0" y="0" width="84.667" height="25.45"/>
+      </clipPath>
+      <clipPath id="logo-clip-bottom" clipPathUnits="userSpaceOnUse">
+        <rect class="logo__clip-bottom" x="0" y="25.35" width="84.667" height="25.45"/>
+      </clipPath>
+    </defs>
+    <path class="logo__shape" clip-path="url(#logo-clip-top)" d="M 0 16.933 L 16.933 33.867 L 33.867 33.867 L 33.867 16.933 L 16.933 16.933 L 0 0 L 33.867 0 L 50.8 16.933 L 67.733 16.933 L 67.733 0 L 84.667 0 L 84.667 50.8 L 67.733 50.8 L 67.733 33.867 L 50.8 33.867 L 50.8 50.8 L 16.933 50.8 L 0 33.867 Z"/>
+    <path class="logo__shape" clip-path="url(#logo-clip-bottom)" d="M 0 16.933 L 16.933 33.867 L 33.867 33.867 L 33.867 16.933 L 16.933 16.933 L 0 0 L 33.867 0 L 50.8 16.933 L 67.733 16.933 L 67.733 0 L 84.667 0 L 84.667 50.8 L 67.733 50.8 L 67.733 33.867 L 50.8 33.867 L 50.8 50.8 L 16.933 50.8 L 0 33.867 Z"/>
   </svg>
 
   <div class="mode-bar" role="tablist" aria-label="Work categories">
