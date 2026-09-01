@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>My dev rice - a desktop built around agents, not apps - 홍승우</title>
-  <meta name="description" content="niri's scrollable tiling, jcode as the primary interface to the machine, hwatu for free visual verification. A tour of a keyboard-driven, agent-first Linux desktop.">
+  <title>gwae — infinite strip multiplexer, panes never shrink — 홍승우</title>
+  <meta name="description" content="gwae is niri's scrolling tiling for your CLI agents, in any terminal: an infinite 2D grid of strips where panes never shrink. Single process, agent-aware via OSC 133.">
   <meta name="author" content="홍승우">
   <link rel="canonical" href="https://hongnoul.github.io/work/setup.html">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
-  <meta property="og:title" content="My dev rice - a desktop built around agents, not apps">
-  <meta property="og:description" content="niri's scrollable tiling, jcode as the primary interface to the machine, hwatu for free visual verification.">
+  <meta property="og:title" content="gwae — infinite strip multiplexer, panes never shrink">
+  <meta property="og:description" content="niri's scrolling tiling, for your CLI agents, in any terminal. An infinite 2D grid of strips where panes never shrink. No daemon.">
   <meta property="og:url" content="https://hongnoul.github.io/work/setup.html">
   <meta property="og:type" content="article">
+  <meta property="og:image" content="https://hongnoul.github.io/work/gwae-social.png">
   <meta name="theme-color" content="#fafafa">
   <script>document.documentElement.classList.add('js');</script>
   <style>
@@ -25,9 +26,6 @@
     }
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; background: #fafafa; }
-
-    /* ---- cross-document view transition: the deck card's thumb morphs into
-       this page's hero (both carry view-transition-name: project-hero) ---- */
     @media (prefers-reduced-motion: no-preference) {
       @view-transition { navigation: auto; }
       ::view-transition-group(project-hero) {
@@ -44,20 +42,13 @@
       -webkit-font-smoothing: antialiased;
     }
     ::selection { background: #ff2400; color: #fff; }
-
     a { color: inherit; text-decoration-color: #c9c9c9; text-underline-offset: 3px; transition: color .2s ease, text-decoration-color .2s ease; }
     a:hover { color: #ff2400; text-decoration-color: #ff2400; }
     code { font: 400 0.88em ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: #f0f0f0; padding: 1px 5px; }
-
     .wrap { max-width: 680px; margin: 0 auto; padding: 0 24px 140px; }
-
-    /* ---- top chrome: the same corner logo + hamburger menu as the
-       homepage, so navigation chrome stays constant across pages. The
-       shared vector morph doubles as the menu toggle; sizing tracks the
-       homepage's --corner-* vars. ---- */
     :root {
       --corner-w: 42px;
-      --logo-h: calc(var(--corner-w) * 0.6);   /* aspect 50.8/84.67 */
+      --logo-h: calc(var(--corner-w) * 0.6);
       --corner-left: 30px;
       --corner-top: 20px;
     }
@@ -75,7 +66,6 @@
     .logo:focus { outline: none; }
     .logo:focus-visible { outline: 2px solid #898989; outline-offset: 3px; }
     .logo__shape { fill: #000; }
-
     .menu {
       position: fixed;
       top: 0;
@@ -107,8 +97,6 @@
       transition: color 0.2s ease;
     }
     .menu__link:hover, .menu__link:focus-visible { color: #ff2400; outline: none; }
-    /* category links mirror the homepage: hidden on desktop (the homepage
-       shows its tab bar there), visible in the menu on mobile */
     .menu__filter { display: none; }
     @media (max-width: 768px) {
       :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
@@ -118,14 +106,12 @@
     @media (prefers-reduced-motion: reduce) {
       .menu { transition: none; }
     }
-
-    /* ---- header ---- */
     header { padding-top: 110px; margin-bottom: 72px; }
     .hero {
       view-transition-name: project-hero;
-      display: block; width: 100%; aspect-ratio: 1980 / 1080;  /* matches .card__thumb */
+      display: block; width: 100%; aspect-ratio: 1980 / 1080;
       margin: 0 0 44px; overflow: hidden;
-      border: 1px solid #e4e4e4; background: #1a1b1e;
+      border: 1px solid #e4e4e4; background: #0c0e11;
     }
     .hero img, .hero video { width: 100%; height: 100%; object-fit: cover; display: block; }
     .hero-caption {
@@ -142,8 +128,6 @@
     }
     .lede { font-size: clamp(17px, 2.2vw, 20px); line-height: 1.5; color: #444; margin: 0; text-wrap: pretty; }
     .lede strong { color: #111; font-weight: 550; }
-
-    /* ---- sections ---- */
     section { margin: 84px 0 0; }
     h2 {
       font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase;
@@ -153,13 +137,31 @@
     h2::after { content: ""; flex: 1; height: 1px; background: #e4e4e4; transform: translateY(-3px); }
     p { margin: 0 0 16px; text-wrap: pretty; }
     p:last-child { margin-bottom: 0; }
-
     .figure { margin: 28px 0; }
-    .figure img { width: 100%; height: auto; display: block; }
+    .figure img, .figure video { width: 100%; height: auto; display: block; border: 1px solid #e4e4e4; }
     .figure figcaption { font-size: 12.5px; color: #898989; margin-top: 10px; }
 
-    /* ---- the strip demo: a live model of the desktop. Breaks out of the
-       680px text column so the 16:9 viewport is big enough to read ---- */
+    /* ---- install cmd ---- */
+    .install {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      margin: 22px 0 10px;
+      background: #111; color: #e8e8e8; border: 1px solid #222;
+      padding: 12px 14px; overflow-x: auto;
+      font: 400 13px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    }
+    .install code { background: transparent; color: inherit; padding: 0; }
+    .install button {
+      margin-left: auto;
+      font: 500 11px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      letter-spacing: .06em; text-transform: uppercase;
+      background: #fff; color: #111; border: 1px solid #fff;
+      padding: 6px 10px; cursor: pointer; white-space: nowrap;
+    }
+    .install button:hover { background: #ff2400; color: #fff; border-color: #ff2400; }
+    .install__alt { font-size: 13px; color: #898989; margin: 8px 0 0; }
+    .install__alt code { font-size: 12px; }
+
+    /* ---- the strip demo ---- */
     .strip {
       --bleed: min(180px, calc((100vw - 100%) / 2 - 24px));
       margin: 32px calc(-1 * max(0px, var(--bleed)));
@@ -173,27 +175,26 @@
     .strip__dots { display: flex; gap: 5px; }
     .strip__dots i { width: 9px; height: 9px; border-radius: 50%; background: #e4e4e4; }
     .strip__title { font-size: 12px; color: #898989; }
-    .strip__keys { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+    .strip__keys { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
     .strip__hint { font-size: 11px; color: #b5b5b5; margin-right: 4px; user-select: none; white-space: nowrap; }
     @media (max-width: 900px) { .strip__hint { display: none; } }
-    /* real keycaps: they depress when you press the actual chord */
     .strip__key {
-      font: 500 12px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font: 500 11px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
       color: #444; background: #fbfbfb; border: 1px solid #d5d5d5;
       border-radius: 5px;
-      padding: 6px 10px; cursor: pointer;
+      padding: 6px 9px; cursor: pointer;
       user-select: none;
       box-shadow: 0 2px 0 #d5d5d5;
       transform: translateY(0);
       transition: transform .06s ease, box-shadow .06s ease,
                   background .15s ease, color .15s ease, border-color .15s ease;
+      white-space: nowrap;
     }
     .strip__key:hover { background: #111; color: #fff; border-color: #111; box-shadow: 0 2px 0 #000; }
     .strip__key.down, .strip__key:active {
       transform: translateY(2px); box-shadow: 0 0 0 #d5d5d5;
       background: #ff2400; color: #fff; border-color: #ff2400;
     }
-    /* niri-style hotkey HUD: shows the real action name when a chord fires */
     .strip__hud {
       position: absolute; top: 40px; right: 12px; z-index: 4;
       display: flex; align-items: center; gap: 8px;
@@ -214,31 +215,15 @@
     .strip__view {
       position: relative; overflow: hidden; background: #101418;
     }
-    /* the world: workspaces stacked vertically, the way niri stacks them.
-       alt+j/k translate this; alt+h/l translate the row inside a workspace */
     .strip__world { will-change: transform; }
     .strip__world.anim { transition: transform .6s cubic-bezier(.33,1,.68,1); }
-    /* height set by JS to keep the viewport 16:9 */
     .strip__ws { position: relative; height: 560px; overflow: hidden; }
     .strip__ws + .strip__ws { border-top: 2px solid #2a2f36; }
-    .strip__ws-tag {
-      position: absolute; left: 10px; bottom: 10px; z-index: 2;
-      padding: 4px 8px;
-      background: rgba(10, 12, 15, 0.8);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 4px;
-      font: 500 11px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-      color: #9aa3ad; pointer-events: none;
-    }
     .strip__row {
       display: flex; height: 100%; padding: 0;
       will-change: transform;
     }
     .strip__row.anim { transition: transform .45s cubic-bezier(.33,1,.68,1); }
-
-    /* ---- waybar mockup: the real bar, modeled. 28px, black, three
-       modules: niri/window title left, the workspace ticker center,
-       tray + fcitx badge + clock right (config.jsonc, style.css) ---- */
     .wb {
       display: flex; align-items: center; height: 28px;
       background: #000; color: #e4e4e7;
@@ -266,15 +251,12 @@
     .wb__fcitx { background: #e4e4e7; color: #18181b; padding: 1px 4px; font-weight: 600; }
     .wb__clock { color: #e4e4e7; }
     @media (max-width: 700px) { .wb__win, .wb__right { display: none; } .wb { justify-content: center; } }
-
-    /* ---- terminal windows: kitty columns, no decorations, niri's 1px
-       white focus ring, unfocused windows dimmed (the compositor's job) ---- */
     .strip__scene { position: relative; overflow: hidden; }
     .kt {
       flex: 0 0 auto; height: 100%; position: relative; overflow: hidden;
       background: #0c0e11; color: #b9bec4;
       padding: 12px 13px 30px;
-      font: 400 11.5px/1.75 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font: 400 11px/1.7 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
       box-shadow: inset 0 0 0 1px #1a1e24;
       filter: brightness(.5) saturate(.8);
       transition: filter .35s ease;
@@ -294,7 +276,6 @@
       white-space: nowrap; overflow: hidden;
     }
     .kt__st { width: 5px; height: 10px; flex: 0 0 auto; transition: background .25s ease; }
-    /* the hwatu verification window: a rendered page, not a terminal */
     .kt--web { background: #fafafa; color: #333; box-shadow: inset 0 0 0 1px #d9d9d9; }
     .kt--web.focused { box-shadow: inset 0 0 0 1px #fff, inset 0 0 0 2px #bbb; }
     .web__chrome { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; color: #999; font-size: 8.5px; }
@@ -304,15 +285,11 @@
     .web__thumb { height: 34%; background: #101418; margin-top: 12px; }
     .strip__note { font-size: 12.5px; color: #898989; margin: 0; padding: 14px 18px 16px; border-top: 1px solid #eee; }
     .strip__note b { color: #444; font-weight: 550; }
-
-    /* ---- keybind table ---- */
     table { width: 100%; border-collapse: collapse; margin: 26px 0; font-size: 14px; }
     th, td { text-align: left; padding: 10px 12px 10px 0; border-bottom: 1px solid #e9e9e9; }
     th { font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: #898989; }
     td.key { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; white-space: nowrap; }
     .tbl-note { font-size: 12.5px; color: #898989; margin-top: -14px; }
-
-    /* ---- terminal transcript ---- */
     pre.term {
       margin: 26px 0; padding: 20px 18px; overflow-x: auto;
       background: #111; color: #d6d6d6;
@@ -322,34 +299,37 @@
     pre.term .cmd { color: #fff; }
     pre.term .out { color: #8f8f8f; }
     pre.term .cmt { color: #5c9e5c; }
-
-    /* ---- stack list ---- */
     .stack { margin: 26px 0 0; padding: 0; list-style: none; font-size: 15px; }
     .stack li { display: flex; gap: 14px; padding: 10px 0; border-bottom: 1px solid #e9e9e9; }
     .stack li:first-child { border-top: 1px solid #e9e9e9; }
-    .stack b { flex: 0 0 128px; font-weight: 550; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; padding-top: 1px; }
+    .stack b { flex: 0 0 132px; font-weight: 550; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; padding-top: 1px; }
     .stack span { color: #555; }
-
-    /* ---- footer / links ---- */
+    .compare { font-size: 13px; }
+    .compare td, .compare th { padding: 8px 10px 8px 0; }
     .links { display: flex; gap: 26px; flex-wrap: wrap; margin-top: 26px; font-size: 15px; }
     .colophon {
       margin-top: 96px; padding-top: 22px; border-top: 1px solid #e4e4e4;
       font-size: 13px; color: #898989;
     }
     .colophon b { color: #ff2400; font-weight: 550; }
-
-    /* ---- reveal on scroll (JS-gated so content is never hidden without it) ---- */
     @media (prefers-reduced-motion: no-preference) {
       html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.33,1,.68,1), transform .7s cubic-bezier(.33,1,.68,1); }
       html.js .reveal.in { opacity: 1; transform: none; }
     }
     @media print { html.js .reveal { opacity: 1 !important; transform: none !important; } }
-
     @media (max-width: 560px) {
       header { padding-top: 90px; }
-      .win { flex-basis: 168px; height: 178px; }
       .stack b { flex-basis: 96px; }
+      .install { font-size: 12px; }
     }
+    /* minimap preview box */
+    .minimap-preview {
+      margin: 22px 0; padding: 14px 16px;
+      background: #0c0e11; color: #b9bec4; border: 1px solid #1a1e24;
+      font: 400 11px/1.6 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      overflow-x: auto; white-space: pre;
+    }
+    .minimap-preview b { color: #fff; font-weight: 600; }
   </style>
 </head>
 <body>
@@ -382,46 +362,52 @@
     <header>
       <figure class="hero" aria-hidden="true">
         <video autoplay muted loop playsinline
-               poster="/work/setup-strip-poster.jpg"
+               poster="/work/gwae-poster.jpg"
                width="1600" height="900">
-          <source src="/work/setup-strip-real.mp4" type="video/mp4">
-          <img src="/work/setup-strip-poster.jpg" alt="" width="1600" height="900">
+          <source src="/work/gwae-demo.mp4" type="video/mp4">
+          <img src="/work/gwae-poster.jpg" alt="gwae demo" width="1600" height="900">
         </video>
       </figure>
       <p class="hero-caption">
-        Real footage, July 25 2026, 1.6x: eight jcode sessions, two
-        workspaces, ending on this page hosting itself.
+        gwae demo — not sped up, you can go much faster. Six agents on an infinite no-shrink strip grid.
       </p>
-      <p class="kicker"><b>my dev rice</b> · systems / tools · as of jul 2026</p>
-      <h1>A desktop built around agents, not apps.</h1>
+      <p class="kicker"><b>gwae</b> · terminal multiplexer · macOS / linux / windows · mit</p>
+      <h1>Panes never shrink.</h1>
       <p class="lede">
-        <strong>Agents do the work, I direct.</strong> One agent per
-        <a href="https://github.com/YaLTeR/niri">niri</a> column,
-        <a href="https://github.com/1jehuang/jcode">jcode</a> as the
-        interface, <a href="https://hongnoul.github.io/hwatu/">hwatu</a> for
-        verification.
+        <strong>niri's scrolling tiling, for your CLI agents, in any terminal.</strong>
+        Every multiplexer divides a fixed screen; <a href="https://github.com/hongnoul/gwae">gwae</a>
+        scrolls an infinite 2D grid of strips instead. One process, no daemon,
+        <a href="https://gitlab.freedesktop.org/terminal-wg/specifications/-/blob/master/docs/OSC-133.md">OSC 133</a> agent-aware.
+      </p>
+      <div class="install" role="group" aria-label="Install command">
+        <code id="install-cmd">curl -fsSL https://hongnoul.github.io/gwae/install.sh | bash</code>
+        <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('install-cmd').textContent);this.textContent='copied';setTimeout(()=>this.textContent='copy',1200)">copy</button>
+      </div>
+      <p class="install__alt">
+        also <code>brew install hongnoul/tap/gwae</code> · <code>cargo install gwae</code> · <a href="https://github.com/hongnoul/gwae/releases">releases</a> · <a href="https://github.com/hongnoul/gwae">github</a>
       </p>
     </header>
 
     <section class="reveal">
       <h2>The strip</h2>
       <p>
-        <a href="https://github.com/YaLTeR/niri">niri</a>: infinite horizontal
-        strip, screen as viewport. New windows never resize existing ones.
-        Another agent costs width, nothing else.
+        Fixed-width columns (<code>1/4</code> by default, <code>1/3 → 1/2 → 1/4</code> on <code>⌥+r</code>).
+        A row that outgrows the screen scrolls past the viewport edge — it doesn't cram.
+        Strips stack infinitely downward. Viewport rests only on column boundaries
+        so the grid paints pixel-identically in every scroll state.
       </p>
 
       <div class="strip" id="strip">
         <div class="strip__bar">
           <div class="strip__dots" aria-hidden="true"><i></i><i></i><i></i></div>
-          <span class="strip__title">a working scale model of the desktop: the real bar format, the real binds</span>
+          <span class="strip__title">live model — gwae strip grid, real binds</span>
           <div class="strip__keys">
-            <span class="strip__hint" aria-hidden="true">these work for real &rarr;</span>
-            <button class="strip__key" data-chord="h" type="button" aria-label="Focus column left (alt+h)">alt+h</button>
-            <button class="strip__key" data-chord="j" type="button" aria-label="Workspace down (alt+j)">alt+j</button>
-            <button class="strip__key" data-chord="k" type="button" aria-label="Workspace up (alt+k)">alt+k</button>
-            <button class="strip__key" data-chord="l" type="button" aria-label="Focus column right (alt+l)">alt+l</button>
-            <button class="strip__key" data-chord="`" type="button" aria-label="Jump to oldest waiting agent (alt+`)">alt+`</button>
+            <span class="strip__hint" aria-hidden="true">try it &rarr;</span>
+            <button class="strip__key" data-chord="h" type="button" aria-label="Focus left">⌥+h</button>
+            <button class="strip__key" data-chord="l" type="button" aria-label="Focus right">⌥+l</button>
+            <button class="strip__key" data-chord="j" type="button" aria-label="Focus down">⌥+j</button>
+            <button class="strip__key" data-chord="k" type="button" aria-label="Focus up">⌥+k</button>
+            <button class="strip__key" data-chord="g" type="button" aria-label="Smart jump">⌥+g</button>
           </div>
         </div>
         <div class="strip__view" id="stripView">
@@ -440,127 +426,174 @@
           </div>
         </div>
         <p class="strip__note">
-          Live model, real binds: hold <b>alt</b>, tap <b>h / j / k / l</b>,
-          or <b>alt+`</b> for the oldest waiting agent.
+          Live model: <b>⌥+h / ⌥+l</b> columns, <b>⌥+j / ⌥+k</b> strips,
+          <b>⌥+g</b> jumps to the pane that needs you. Hold <b>⌥</b> to see the minimap in the real app.
         </p>
       </div>
     </section>
 
     <section class="reveal">
+      <h2>Why gwae</h2>
+      <p>
+        I run a lot of coding agents in parallel. At 2 panes, <code>tmux</code> is fine.
+        At 6+, every fixed-screen tiler makes each pane smaller until nothing is readable.
+        <a href="https://github.com/YaLTeR/niri">niri</a> solved this on the desktop with
+        scrolling tiling — columns keep their size and the viewport moves instead.
+        gwae brings that model into the terminal you already use.
+      </p>
+      <p>
+        The entire terminal-orchestrator tier (Claude Squad, amux, dmux, workmux) rents
+        <code>tmux</code> for display and owns no layout. The two projects that do own the
+        niri strip — Séance (GTK) and tairi (macOS app) — are GUI-bound, not over SSH,
+        not in a plain terminal. gwae is the mirror image: it <em>is</em> the layout.
+      </p>
+      <ul class="stack">
+        <li><b>no daemon</b><span>your agents already persist via <code>--resume</code>. A shell that must survive the terminal belongs in <code>tmux</code> inside a gwae pane</span></li>
+        <li><b>native windows</b><span>builds natively via ConPTY (M3 runtime verification) — tmux needs WSL</span></li>
+        <li><b>one process</b><span>no socket, no attach/detach. Crashing one pane's emulator can't take the TUI down</span></li>
+      </ul>
+    </section>
+
+    <section class="reveal">
+      <h2>Features</h2>
+      <ul class="stack">
+        <li><b>no-shrink</b><span>fixed-width columns; row scrolls past the edge. Skeleton placeholders tile the empty right side</span></li>
+        <li><b>quantized scroll</b><span>viewport rests only on column boundaries — no slivers, no wobble, verified at 342-col hostile widths</span></li>
+        <li><b>agent dashboard</b><span>standard OSC 133 <code>» ! ✓ ✗</code> — zero instrumentation. Hold <code>⌥</code> for minimap, <code>⌥+g</code> smart-jumps</span></li>
+        <li><b>hot reload</b><span><code>GWAE_DEV_RELOAD=1</code> + <code>./scripts/hot.sh</code>: save a file, new build swaps in place — same pid, same PTYs</span></li>
+        <li><b>kitty graphics</b><span><code>kitten icat</code> and agent screenshots render inside their pane, APC forwarded verbatim, clipped to pane rect</span></li>
+        <li><b>mouse, handled</b><span>click to focus, drag to copy. Full-screen apps that asked for mouse get every event in their own coords; gwae claims no wheel</span></li>
+        <li><b>onboarding</b><span><code>gwae init</code> — theme, layout, chrome with live mockup under every question. <code>⌥+t</code> live-previews themes</span></li>
+        <li><b>cross-platform</b><span>any terminal on macOS/Linux; Windows (ConPTY) builds natively. 256-color minimum, truecolor/kitty/mouse auto-detected</span></li>
+      </ul>
+    </section>
+
+    <section class="reveal">
+      <h2>Agent awareness</h2>
+      <p>
+        Panes speak standard <a href="https://gitlab.freedesktop.org/terminal-wg/specifications/-/blob/master/docs/OSC-133.md">OSC 133</a> — zero instrumentation. Without it, a quiet-heuristic fallback still triages.
+        <code>»</code> working, <code>!</code> wants attention, <code>✓</code> done, <code>✗</code> failed.
+      </p>
+      <figure class="figure" style="margin-top:18px">
+        <video autoplay muted loop playsinline poster="/work/gwae-poster.jpg" width="1600" height="900" style="border:1px solid #e4e4e4">
+          <source src="/work/gwae-attention.mp4" type="video/mp4">
+          <img src="/work/gwae-poster.jpg" alt="gwae attention demo">
+        </video>
+        <figcaption>Hold <code>⌥</code> for the centered dashboard — one row per strip, one tile per pane, width ∝ column share. <code>⌥+g</code> jumps.</figcaption>
+      </figure>
+      <div class="minimap-preview" aria-hidden="true">╭────────────────────────────────────────────────────────╮
+│1 <b>»1 jcode    »2 claude   !3 cargo… 3m»4      ✗5▸depl… 50m</b>│
+│  ────────────────────────────────────                    │
+│2 <b>»1 vim      »2</b>                                          │
+│                                             9 <b>»6 !1 ✓1 ✗1</b>      │
+│         <b>⌥1-9 col · ⌥g attention · ⌥hjkl move · ⌥/ keys</b>         │
+╰────────────────────────────────────────────────────────╯</div>
+      <p class="tbl-note"><code>▸</code> marks where <code>⌥+g</code> would land. Rule under a strip = the part currently on screen. Click a tile to focus.</p>
+    </section>
+
+    <section class="reveal">
       <h2>Binds</h2>
+      <p>Every action is an <code>⌥</code> chord (Option on macOS, Alt elsewhere). Works with Meta and with macOS Unicode glyphs (<code>…</code> for <code>⌥+;</code>) — no toggle.</p>
       <table>
         <thead><tr><th>chord</th><th>action</th></tr></thead>
         <tbody>
-          <tr><td class="key">alt+h/j/k/l</td><td>walk columns / workspaces</td></tr>
-          <tr><td class="key">alt+;</td><td>jcode in <code>~</code></td></tr>
-          <tr><td class="key">alt+'</td><td>jcode in the current project</td></tr>
-          <tr><td class="key">alt+shift+'</td><td>jcode self-dev, on its own source</td></tr>
-          <tr><td class="key">alt+`</td><td>oldest agent waiting for input</td></tr>
-          <tr><td class="key">alt+shift+`</td><td>triage: cycle every session</td></tr>
-          <tr><td class="key">alt+space</td><td>jofi launcher</td></tr>
+          <tr><td class="key">⌥+h / ⌥+l</td><td>focus left / right</td></tr>
+          <tr><td class="key">⌥+k / ⌥+j</td><td>focus up / down — crosses strips; past last strip creates one, leaving empties discards it</td></tr>
+          <tr><td class="key">⌥+Shift+h / l</td><td>move column left / right</td></tr>
+          <tr><td class="key">⌥+Shift+k / j</td><td>move pane up / down — carries to neighboring strip at edge</td></tr>
+          <tr><td class="key">⌥+Enter</td><td>new column to the right of focus</td></tr>
+          <tr><td class="key">⌥+Shift+Enter</td><td>new strip below</td></tr>
+          <tr><td class="key">⌥+;</td><td>spawn agent column (€_right of focus_)</td></tr>
+          <tr><td class="key">⌥+s</td><td>split — new pane below</td></tr>
+          <tr><td class="key">⌥+r</td><td>cycle column width <code>1/3 → 1/2 → 1/4</code></td></tr>
+          <tr><td class="key">⌥+f</td><td>toggle full width</td></tr>
+          <tr><td class="key">⌥+q</td><td>kill pane</td></tr>
+          <tr><td class="key">⌥+↑/↓</td><td>scrollback (typing snaps to live); <code>Shift</code> = page</td></tr>
+          <tr><td class="key">⌥+1 … 9</td><td>jump to column N (hold <code>⌥</code> to type 10+)</td></tr>
+          <tr><td class="key">⌥+g</td><td><strong>smart-jump</strong> to pane that needs you</td></tr>
+          <tr><td class="key">⌥+t</td><td>theme picker — <code>←→</code> preview, <code>⏎</code> keep</td></tr>
+          <tr><td class="key">⌥+d</td><td>spawn-dir picker (zoxide + git roots)</td></tr>
+          <tr><td class="key">⌥+c / ⌥+v</td><td>copy mode / paste (bracketed)</td></tr>
+          <tr><td class="key">⌥+/</td><td>cheat-sheet HUD</td></tr>
         </tbody>
       </table>
-      <p class="tbl-note">
-        jcode writes its own launch hotkeys into niri&rsquo;s config (plain
-        KDL, with backups).
-      </p>
+      <p class="tbl-note">All other keys pass through. Full table + macOS glyphs in <a href="https://github.com/hongnoul/gwae#keyboard-shortcuts">README</a> · bindings live in <code>binds.rs</code>, tests enforce HUD/docs/README agree.</p>
     </section>
 
     <section class="reveal">
-      <h2>The bar</h2>
-      <p>
-        <code>barstatus</code>: one Rust daemon for every custom waybar
-        module. Replaced four runtimes (a compiled binary, two persistent
-        Pythons, a 0.5s shell poller).
-      </p>
-      <ul class="stack">
-        <li><b>workspaces</b><span>ticker addressing windows as cells (<code>A03</code> = workspace A, column 4), colored from <code>~/.jcode/session_status/</code></span></li>
-        <li><b>tokens</b><span>live jcode token burn, inotify on <code>~/.jcode</code> logs</span></li>
-        <li><b>resources</b><span>CPU / mem / PSI / GPU, click for quickshell stats panel</span></li>
-        <li><b>fcitx</b><span>input method, DBus signals, 2ms propagation</span></li>
-        <li><b>bus</b><span>threads publish JSON lines over one unix socket; waybar <code>exec</code>s <code>barstatus tail</code></span></li>
-        <li><b>palette</b><span><code>palette.rs</code> generates <code>colors.css</code>: stylesheet and pango colors can&rsquo;t drift</span></li>
-      </ul>
-      <table>
-        <thead><tr><th>color</th><th>meaning</th></tr></thead>
+      <h2>Install</h2>
+      <pre class="term"><span class="ps1">$</span> <span class="cmd">curl -fsSL https://hongnoul.github.io/gwae/install.sh | bash</span>  <span class="cmt"># macOS &amp; Linux → ~/.local/bin</span>
+<span class="ps1">$</span> <span class="cmd">brew install hongnoul/tap/gwae</span>
+<span class="ps1">$</span> <span class="cmd">cargo install gwae</span>                                           <span class="cmt"># Rust 1.85+</span>
+<span class="out">gwae                     # one strip, one 1/4 pane + skeletons
+gwae run "claude"        # agent in col 0, rest shells
+gwae init                # guided setup (re-runnable)
+gwae doctor              # config + theme + layout smoke
+gwae upgrade            # upgrades the way it was installed, or prints what to run</span></pre>
+      <p class="tbl-note">Windows: <code>irm https://hongnoul.github.io/gwae/install.ps1 | iex</code> · prebuilt <code>gwae-*.tar.gz</code> + <code>.zip</code> on <a href="https://github.com/hongnoul/gwae/releases">releases</a> with SHA-256.</p>
+    </section>
+
+    <section class="reveal">
+      <h2>Config</h2>
+      <p><code>$XDG_CONFIG_HOME/gwae/gwae.toml</code> (default <code>~/.config/gwae/gwae.toml</code>). TOML, all keys optional. Live-reloads appearance.</p>
+      <pre class="term"><span class="out">default_column_width = "quarter"  # half, two-thirds, full, or 80 (cells)
+content_width = 0                 # &gt;0 = wider logical grid, pan with ⌥+←/→
+default_agent = "claude"          # first pane + ⌥+; spawn this
+startup_panes = 1
+theme = "catppuccin-mocha"        # nord, tokyo-night, gruvbox, rose-pine, dracula …
+cell_labels = true
+
+[minimap]
+mode = "off"                      # off | overlay | edge_ticks
+
+<span class="cmt"># [theme] preset = "nord" + per-key overrides; gwae doctor validates</span></span></pre>
+      <p class="tbl-note"><code>⌥+t</code> previews themes live; <code>gwae init</code> asks the opinionated subset. Docs: <a href="https://github.com/hongnoul/gwae/blob/main/docs/CONFIG.md">CONFIG.md</a>.</p>
+    </section>
+
+    <section class="reveal">
+      <h2>Compared</h2>
+      <table class="compare">
+        <thead><tr><th>project</th><th>layout</th><th>in a terminal?</th><th>detach?</th><th>platforms</th></tr></thead>
         <tbody>
-          <tr><td class="key"><span style="color:#2ecc71">&#9632;</span> green</td><td>working - leave it alone</td></tr>
-          <tr><td class="key"><span style="color:#f1c40f">&#9632;</span> yellow</td><td>waiting on input - the queue</td></tr>
-          <tr><td class="key"><span style="color:#e74c3c">&#9632;</span> red</td><td>stalled - needs rescuing</td></tr>
-          <tr><td class="key"><span style="color:#71717a">&#9632;</span> dim</td><td>spawned, not yet tasked</td></tr>
+          <tr><td>tmux</td><td>plane tiling</td><td>yes</td><td>yes (server)</td><td>macOS/Linux/*BSD</td></tr>
+          <tr><td>Zellij</td><td>plane tiling + floating</td><td>yes</td><td>yes</td><td>macOS/Linux/Windows</td></tr>
+          <tr><td>Séance</td><td>niri strip (GUI)</td><td>no</td><td>socket</td><td>Linux (GTK)</td></tr>
+          <tr><td>tairi</td><td>niri strip (GUI)</td><td>no</td><td>workspaces</td><td>macOS</td></tr>
+          <tr><td><b>gwae</b></td><td><b>2D niri strip grid</b></td><td><b>yes</b></td><td><b>no (<code>--resume</code>)</b></td><td><b>macOS/Windows/Linux</b></td></tr>
         </tbody>
       </table>
-      <p class="tbl-note">
-        Ticker design by <a href="https://github.com/1jehuang">Jeremy
-        Huang</a>. <code>alt+`</code> and <code>alt+shift+`</code> are
-        <code>barstatus</code> subcommands: the daemon that colors the queue
-        also answers it.
-      </p>
+      <p class="tbl-note">Measured 2026-08-25: gwae 5× lower latency than Zellij, 13× less memory, 16× smaller binary. tmux wins echo RTT (0.24 ms vs 2.5 ms — both &lt; 1/6 frame) but crams panes; gwae never shrinks. See <a href="https://github.com/hongnoul/gwae/blob/main/docs/WHY.md">WHY.md</a> + <a href="https://github.com/hongnoul/gwae/blob/main/docs/COMPARISON.md">COMPARISON.md</a>.</p>
     </section>
 
     <section class="reveal">
-      <h2>Verification</h2>
-      <p>
-        <a href="https://hongnoul.github.io/hwatu/">hwatu</a>: 13&nbsp;ms
-        daemon browser. Agents screenshot rendered pages in a hot loop;
-        one window rule keeps them out of the way.
-      </p>
-      <pre class="term"><span class="out">window-rule {
-    match app-id="hwatu-background"
-    open-focused false
-}</span></pre>
-    </section>
-
-    <section class="reveal">
-      <h2>Stack</h2>
-      <ul class="stack">
-        <li><b>compositor</b><span>niri, Wayland scrollable tiling</span></li>
-        <li><b>agent</b><span>jcode, 8-12 live sessions + self-dev harness</span></li>
-        <li><b>terminal</b><span>kitty, 1/4-width columns</span></li>
-        <li><b>browser</b><span>hwatu, agent-driven</span></li>
-        <li><b>bar</b><span>waybar + barstatus</span></li>
-        <li><b>launcher</b><span>jofi</span></li>
-        <li><b>osd</b><span>quickshell: volume, brightness, power menu, stats</span></li>
-        <li><b>shell / editor</b><span>zsh / neovim</span></li>
-        <li><b>hardware</b><span>MSI Thin GF63 · i7-12650H · RTX 4050 · 16 GB</span></li>
-      </ul>
+      <h2>Architecture</h2>
+      <pre class="term"><span class="out">gwae (one process)
+├── Layout core (rows/strips/columns/panes) — pure, no I/O
+├── Pane tasks (one per PTY: bytes → parse → grid + OSC 133)
+├── Composer (coalesce damage → single 2D cell buffer)
+├── Render (diff buffer → batched ANSI, sync-update markers)
+├── Input (raw mode: decode keys, route to pane or ⌥)
+└── Minimap / smart-jump (per-pane status → chrome)</span></pre>
+      <p class="tbl-note">Crates: <code>gwae</code> (TUI) · <code>gwae-layout</code> (pure grid, proptest invariants) · <code>gwae-term</code> (emulator facade) · <code>gwae-testkit</code> (fake PTYs). Full: <a href="https://github.com/hongnoul/gwae/blob/main/docs/ARCHITECTURE.md">ARCHITECTURE.md</a> + <a href="https://github.com/hongnoul/gwae/blob/main/docs/LAYOUT-SPEC.md">LAYOUT-SPEC.md</a>.</p>
     </section>
 
     <section class="reveal">
       <h2>Links</h2>
       <div class="links">
-        <a href="https://github.com/YaLTeR/niri">niri</a>
-        <a href="https://github.com/1jehuang/jcode">jcode</a>
-        <a href="https://hongnoul.github.io/hwatu/">hwatu</a>
+        <a href="https://github.com/hongnoul/gwae">gwae on GitHub</a>
+        <a href="https://hongnoul.github.io/gwae/">gwae docs site</a>
+        <a href="https://github.com/hongnoul/gwae/blob/main/docs/CONFIG.md">config</a>
+        <a href="https://github.com/hongnoul/gwae/blob/main/docs/ARCHITECTURE.md">architecture</a>
       </div>
       <p class="colophon">
-        Dated <b>July 2026</b>. A rice is a snapshot, not a promise.
-        Workflow from <a href="https://github.com/1jehuang">Jeremy Huang</a>,
-        tuned to this machine. Written by a jcode agent running in column two.
+        Built by <a href="https://github.com/hongnoul">홍승우</a> — MIT. The only bottleneck should be your brain.<br>
+        Pair with <a href="https://github.com/1jehuang/jcode">jcode</a> + <a href="https://hongnoul.github.io/hwatu/">hwatu</a> for the full loop: agents in strips, 13 ms visual verification.
       </p>
     </section>
 
   </div>
 
   <script>
-    /* ---- a working scale model of the desktop ----------------------------
-       One state object drives everything: the niri viewport (columns on an
-       infinite strip, workspaces stacked vertically) and the waybar mockup
-       on top. Both are pure renders of the same state, so they can never
-       disagree - which is the whole point of the real setup.
-
-       Fidelity notes, all measured from this machine:
-       - ticker format: exactly what ~/.config/waybar/niri-workspaces emits:
-         | per window, ▌ for each workspace's active window, the focused
-         cell as a "A03"-style bgcolor badge, two-space gaps between
-         workspace groups.
-       - colors: #2ecc71 running, #f1c40f waiting, #e74c3c stalled,
-         #3498db active-but-quiet, #a855f7 focused badge - the palette
-         strings inside the real Rust binary.
-       - states come from ~/.jcode/session_status/*.json:
-         fresh / running / waiting / finished.
-       - terminals: kitty, no decorations, 1/4 screen width, zero gaps,
-         niri's 1px white focus ring, unfocused windows dimmed.        ---- */
     (function () {
       const view   = document.getElementById('stripView');
       const scene  = document.getElementById('stripScene');
@@ -572,48 +605,40 @@
       const caps   = {};
       document.querySelectorAll('.strip__key').forEach(b => { caps[b.dataset.chord] = b; });
 
-      /* ---- state: the fleet. Titles and states mirror a real evening. ---- */
-      const COLORS = { running: '#2ecc71', waiting: '#f1c40f',
-                       stalled: '#e74c3c', fresh: '#71717a', active: '#3498db' };
+      const COLORS = { running: '#3498db', waiting: '#f1c40f', stalled: '#e74c3c', fresh: '#71717a', done: '#2ecc71', failed: '#e74c3c' };
+      const glyphFor = { running: '»', waiting: '!', done: '✓', failed: '✗', fresh: '·' };
       const state = {
-        ws: 0, col: 0,          /* focused cell */
+        ws: 0, col: 0,
         workspaces: [
-          [ { title: '~/git/hwatu',                st: 'running' },
-            { title: '~/git/hongnoul.github.io',   st: 'waiting' },
-            { title: '~/git/beni-hana',            st: 'running' },
-            { title: 'jcode self-dev',             st: 'waiting' } ],
-          [ { title: '~/git/hwatu benchmarks',     st: 'running' },
-            { title: 'hwatu: stripe.com clone',    st: 'web'     },
-            { title: '~ (anything session)',       st: 'fresh'   },
-            { title: '~/git/jofi',                 st: 'stalled' } ],
+          [ { title: 'jcode — gwae layout',      st: 'running' },
+            { title: 'claude — hwatu fix',       st: 'waiting' },
+            { title: 'cargo test gwae-layout',   st: 'running' },
+            { title: 'jcode self-dev',           st: 'done' } ],
+          [ { title: 'nvim — docs/CONFIG.md',    st: 'running' },
+            { title: 'hwatu — stripe clone',     st: 'web'     },
+            { title: 'zsh — ~/git/gwae',         st: 'fresh'   },
+            { title: 'cargo — bench',            st: 'failed' } ],
         ],
-        waitingSince: {},        /* "ws:col" -> timestamp, for alt+` */
+        waitingSince: {},
       };
       state.workspaces.forEach((cols, w) => cols.forEach((c, i) => {
-        if (c.st === 'waiting') state.waitingSince[w + ':' + i] = Date.now() - (w * 4 + i) * 60000;
+        if (c.st === 'waiting' || c.st === 'failed') state.waitingSince[w + ':' + i] = Date.now() - (w * 4 + i) * 60000;
       }));
 
-      /* ---- build the DOM: one .strip__ws per workspace, .term per column.
-         Each terminal gets generated transcript lines so no two look alike. */
       const SNIPPETS = [
-        ['&gt; fix the settled-wait race in the bench harness', 'I should check the git log to see what the other agent committed.', '✓ bash · git log --oneline -5 · 43 tok', '✓ bash · cargo test settled · 217 tok', 'All 28/28 tests passing across warm and cold runs.', '✓ bash · commit + push · 44 tok', '● Run benchmark on settled-wait'],
-        ['&gt; [image 1] what is up with this black bar', 'The black bars appear as full-width horizontal bands at fixed positions, which could indicate unpainted or failed tiles.', "I'm considering a practical mitigation: setting the webview background color to match the page.", '✓ Explore hwatud screenshot/automa…', '✓ Add IPC: Motion (spec extraction)', '○ Iterate diff loop until stripe.c…'],
-        ['&gt; ok go build this feature, success will be measured', 'Scope/process gates: work committed with clear messages and pushed; other client&rsquo;s uncommitted docs changes left untouched.', '✓ bash · Stress warm and col… · 35 tok', '✓ bash · Run benchmark on s… · 131 tok', 'Background task started 712906esfa'],
-        ['&gt; remove the trust ai risk assessment entry', 'Found the entry at index.html:573. Removing the six-line card and its unused thumbnail.', '✓ edit · index.html · 1 occurrence', '✓ bash · git commit + push · 6613d64', 'Done. Entry removed, thumbnail deleted, pushed to origin main.'],
-        ['&gt; why is the fcitx badge square', 'GTK CSS has no real transparency clipping, so the badge is a white box with the glyph knocked out in the bar background color.', '✓ read · ~/.config/waybar/style.css', 'The 18px height after 5px margins makes an 18px square.'],
-        ['&gt; draft the AUR PKGBUILD', 'I need to check the hwatu repository docs to understand the recent product update before preparing the submission.', '✓ bash · Inspect repo layou… · 269 tok', '✓ bash · Read latest posit… · 1.9k tok', '2&gt; yes git/hwatu had major product update so refer to the latest docs'],
-        ['&gt; connect discord MCP', 'Connection keeps getting killed by server reloads, likely the jcode server. Let me check the status and attempt to call channels directly.', '· Point discord MCP at… · 6 tok', '· Run discord MCP ma… · 137 tok', 'raise [provider] idle_timeout_secs if your model thinks for longer.'],
+        ['> gwae run "claude"  — agent in col 0, rest shells', '✓ pane task 0: PTY fork → grid + OSC 133', '» claude thinking …  217 tok', '✓ layout: quantized scroll, no slivers at 342 cols', '✓ composer → single 2D cell buffer → batched ANSI'],
+        ['> fix settled-wait race in bench harness', '✓ cargo test gwae-layout — 28/28 proptest invariants', '» running bench_vs_muxes.py — PTY 120×30', 'All 28/28 tests passing across warm and cold runs.', '✓ commit + push — 44 tok'],
+        ['> gwae init — guided setup with live mockup', '✓ theme: catppuccin-mocha → tokyo-night (⌥+t preview)', '✓ default_column_width = quarter → half → quarter (⌥+r)', 'Hint: hold ⌥ for minimap, ⌥+g to jump where needed'],
+        ['> why is the fcitx badge square', 'GTK CSS has no real transparency clipping — badge is a white box', '✓ style.css: badge knocked out in bar bg color', ' Pane status: » working  ! wants attention  ✓ done  ✗ failed'],
+        ['> draft the AUR PKGBUILD', 'Inspect repo layout …  269 tok', 'Read latest docs/WHY.md …  1.9k tok', 'gwae upgrade — detects brew/cargo/install.sh receipt'],
       ];
-      function esc(s) { return s; }
       function termHTML(col, w, i) {
         if (col.st === 'web') {
-          return '<div class="web__chrome"><span>●</span><span class="web__url">localhost:4173 · stripe clone · hwatu --background</span></div>' +
+          return '<div class="web__chrome"><span>●</span><span class="web__url">localhost:4173 · hwatu --background</span></div>' +
                  '<div class="web__h"></div><div class="web__p" style="width:92%"></div><div class="web__p" style="width:84%"></div>' +
                  '<div class="web__p" style="width:88%"></div><div class="web__p" style="width:61%"></div><div class="web__thumb"></div>' +
                  statusHTML(col, w, i);
         }
-        /* fill the column like a real long-running session: this snippet,
-           then earlier "scrollback" from the other transcripts */
         const base = (w * 4 + i) % SNIPPETS.length;
         const snip = [];
         for (let k = 0; snip.length < 42; k++) {
@@ -621,17 +646,18 @@
         }
         let html = '';
         snip.forEach((ln, n) => {
-          const cls = ln.startsWith('&gt;') || ln.startsWith('2&gt;') ? 'kt__ln--user'
+          const cls = ln.startsWith('>') ? 'kt__ln--user'
                     : ln.startsWith('✓') ? 'kt__ln--ok'
-                    : ln.startsWith('●') || ln.startsWith('○') || ln.startsWith('·') ? 'kt__ln--run'
+                    : ln.startsWith('»') || ln.startsWith('!') || ln.startsWith('✗') || ln.startsWith('·') ? 'kt__ln--run'
                     : (n % 2 ? 'kt__ln--dim' : '');
-          html += '<span class="kt__ln ' + cls + '">' + esc(ln) + '</span>';
-          if (cls === 'kt__ln--user') html += '<span class="term__ln"></span>';
+          html += '<span class="kt__ln ' + cls + '">' + ln + '</span>';
         });
         return html + statusHTML(col, w, i);
       }
       function statusHTML(col, w, i) {
-        return '<span class="kt__status"><i class="kt__st"></i><b class="kt__title"></b><span class="kt__meta">· jcode · ' + (12 + ((w * 7 + i * 3) % 46)) + 'm</span></span>';
+        const g = glyphFor[col.st] || '·';
+        const age = col.st === 'waiting' || col.st === 'failed' ? ' · ' + (3 + ((w*7+i*3)%9)) + 'm' : '';
+        return '<span class="kt__status"><i class="kt__st"></i><b class="kt__title"></b><span class="kt__meta">' + g + ' · gwae' + age + '</span></span>';
       }
       state.workspaces.forEach((cols, w) => {
         const ws = document.createElement('div');
@@ -651,7 +677,6 @@
         cols.row = row;
       });
 
-      /* ---- render: state -> viewport + bar ---- */
       const wsEls = Array.from(world.querySelectorAll('.strip__ws'));
       function wsH()  { return wsEls[0].offsetHeight; }
       function colW() { return view.clientWidth / 4; }
@@ -665,7 +690,7 @@
         state.workspaces.forEach((cols, w) => {
           if (w) html += '<span class="gap"></span>';
           cols.forEach((col, i) => {
-            const color = col.st === 'web' ? COLORS.active : (COLORS[col.st] || COLORS.fresh);
+            const color = col.st === 'web' ? COLORS.running : (COLORS[col.st] || COLORS.fresh);
             if (w === state.ws && i === state.col) {
               html += '<span class="badge" style="background:#a855f7"> ' + cellName(w, i) + ' </span>';
             } else {
@@ -682,15 +707,15 @@
           col.el.classList.toggle('focused', w === state.ws && i === state.col);
           const st = col.el.querySelector('.kt__st');
           const title = col.el.querySelector('.kt__title');
-          if (st) st.style.background = col.st === 'web' ? COLORS.active : (COLORS[col.st] || COLORS.fresh);
-          if (title) title.textContent = col.st;
+          const c = col.st === 'web' ? COLORS.running : (COLORS[col.st] || COLORS.fresh);
+          if (st) st.style.background = c;
+          if (title) title.textContent = glyphFor[col.st] || '·';
         }));
       }
       function renderCamera(anim) {
         world.classList.toggle('anim', !!anim);
         world.style.transform = 'translateY(' + (-state.ws * wsH()) + 'px)';
         state.workspaces.forEach((cols, w) => {
-          /* keep the focused column in view, niri-style */
           const focusI = (w === state.ws) ? state.col : 0;
           const maxX = Math.max(0, cols.length * colW() - view.clientWidth);
           let x = Math.min(Math.max(focusI * colW() - colW() * 1.5, 0), maxX);
@@ -700,14 +725,12 @@
       }
       function render(anim) { renderBar(); renderTerms(); renderCamera(anim); }
       function layout() {
-        /* whole viewport (bar + scene) locked to 16:9, like the panel */
         const h = Math.round(view.clientWidth * 9 / 16);
         wsEls.forEach(el => { el.style.height = (h - 28) + 'px'; });
         view.style.height = h + 'px';
         layoutTerms(); render(false);
       }
 
-      /* clock: the real bar shows %H:%M */
       const wbClock = document.getElementById('wbClock');
       function tickClock() {
         const d = new Date();
@@ -715,7 +738,6 @@
       }
       tickClock(); setInterval(tickClock, 15000);
 
-      /* ---- actions: the same chord -> action table as config.kdl ---- */
       function focusCol(dir) {
         const cols = state.workspaces[state.ws];
         state.col = Math.max(0, Math.min(cols.length - 1, state.col + dir));
@@ -726,23 +748,25 @@
         state.col = Math.min(state.col, state.workspaces[state.ws].length - 1);
         render(true);
       }
-      function focusWaiting() {
-        /* alt+`: jump to the oldest agent waiting for input */
-        let oldest = null, at = Infinity;
+      function smartJump() {
+        let best = null, bestScore = Infinity;
+        const pri = { failed: 0, waiting: 1, done: 2, running: 99, fresh: 99, web: 99 };
         state.workspaces.forEach((cols, w) => cols.forEach((col, i) => {
-          const k = w + ':' + i;
-          if (col.st === 'waiting' && (state.waitingSince[k] || 0) < at) {
-            at = state.waitingSince[k] || 0; oldest = [w, i];
-          }
+          if (w === state.ws && i === state.col) return;
+          const p = pri[col.st] ?? 99;
+          if (p >= 99) return;
+          const dist = Math.abs(w - state.ws) * 10 + Math.abs(i - state.col);
+          const score = p * 100 + dist;
+          if (score < bestScore) { bestScore = score; best = [w,i]; }
         }));
-        if (oldest) { state.ws = oldest[0]; state.col = oldest[1]; render(true); }
+        if (best) { state.ws = best[0]; state.col = best[1]; render(true); }
       }
       const binds = {
         h:   { act: 'focus-column-left',              run: () => focusCol(-1) },
         l:   { act: 'focus-column-right',             run: () => focusCol( 1) },
         j:   { act: 'focus-window-or-workspace-down', run: () => focusWs( 1) },
         k:   { act: 'focus-window-or-workspace-up',   run: () => focusWs(-1) },
-        '`': { act: 'jcode: focus oldest waiting',    run: focusWaiting },
+        g:   { act: 'smart-jump — pane that needs you', run: smartJump },
       };
 
       let hudTimer;
@@ -755,7 +779,7 @@
           cap.classList.add('down');
           setTimeout(() => cap.classList.remove('down'), 140);
         }
-        hud.innerHTML = '<span class="chord">alt+' + chord + '</span><span class="act">' + bind.act + '</span>';
+        hud.innerHTML = '<span class="chord">⌥+' + chord + '</span><span class="act">' + bind.act + '</span>';
         hud.classList.add('show');
         clearTimeout(hudTimer);
         hudTimer = setTimeout(() => hud.classList.remove('show'), 1100);
@@ -764,7 +788,6 @@
         btn.addEventListener('click', () => fire(chord));
       });
 
-      /* real chords, armed only while the strip is on screen */
       function stripVisible() {
         const r = strip.getBoundingClientRect();
         const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
@@ -772,16 +795,13 @@
       }
       document.addEventListener('keydown', e => {
         if (!e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
-        const chord = e.key === 'Backquote' ? '`' : e.key.toLowerCase();
+        const chord = e.key.toLowerCase();
         if (!binds[chord] || !stripVisible()) return;
         e.preventDefault();
         fire(chord);
       });
 
-      /* ---- fleet life: agents flip state on their own, event-driven like
-         the real session_status files. The bar updates the same instant. */
-      const FLIPS = { running: ['waiting', 'running', 'running'], waiting: ['running'],
-                      stalled: ['running'], fresh: ['running'] };
+      const FLIPS = { running: ['waiting', 'running', 'running', 'done'], waiting: ['running'], done: ['running'], failed: ['running'], fresh: ['running'] };
       setInterval(() => {
         if (!stripVisible()) return;
         const w = Math.random() < 0.5 ? 0 : 1;
@@ -794,20 +814,18 @@
         const to = next[Math.floor(Math.random() * next.length)];
         if (to === col.st) return;
         col.st = to;
-        if (to === 'waiting') state.waitingSince[w + ':' + i] = Date.now();
+        if (to === 'waiting' || to === 'failed') state.waitingSince[w + ':' + i] = Date.now();
         renderBar(); renderTerms();
       }, 2600);
 
       window.addEventListener('resize', layout);
       layout();
 
-      /* idle tour on first view: walk two columns, hop down, come back,
-         then answer the bar with alt+` */
       let toured = false;
       new IntersectionObserver((entries, obs) => {
         if (entries[0].isIntersecting && !toured) {
           toured = true;
-          const tour = [() => fire('l'), () => fire('l'), () => fire('j'), () => fire('k'), () => fire('`')];
+          const tour = [() => fire('l'), () => fire('l'), () => fire('j'), () => fire('g')];
           let i = 0;
           const drift = () => { if (i < tour.length) { tour[i++](); setTimeout(drift, 1100); } };
           setTimeout(drift, 900);
@@ -816,7 +834,6 @@
       }, { threshold: 0.5 }).observe(view);
     })();
 
-    /* ---- scroll reveal ---- */
     const io = new IntersectionObserver((entries) => {
       for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
     }, { threshold: 0.12 });
