@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkyMesh · phone-based drone detection · 홍승우</title>
+  <meta name="description" content="A DNHacks 2026 prototype: on-device acoustic drone detection, distributed sensor readings, and a map-first operator workspace.">
+  <meta name="author" content="홍승우">
+  <link rel="canonical" href="https://hongnoul.github.io/work/skymesh.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <meta property="og:title" content="SkyMesh · a shared sky, powered by phones">
+  <meta property="og:description" content="On-device drone detection meets distributed sensing. A DNHacks 2026 prototype.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://hongnoul.github.io/work/skymesh.html">
+  <meta property="og:image" content="https://hongnoul.github.io/work/skymesh-simulation.png">
+  <meta property="og:image:alt" content="SkyMesh synthetic planning sandbox showing a five-node sensor mesh and a simulated drone route.">
+  <meta name="theme-color" content="#fafafa">
+  <style>
+    @font-face { font-family: InterVariable; src: url('/fonts/InterVariable.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fafafa; color: #111; font: 400 16px/1.65 InterVariable, system-ui, sans-serif; }
+    ::selection { background: #ff2400; color: white; }
+    a { color: inherit; text-underline-offset: 4px; }
+    a:hover { color: #c51c00; }
+    a:focus-visible, video:focus-visible { outline: 2px solid #ff2400; outline-offset: 5px; }
+    nav { max-width: 1100px; margin: auto; padding: 28px 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    nav img { width: 36px; height: 30px; }
+    nav a { min-height: 44px; display: inline-flex; align-items: center; font-size: 13px; }
+    main { max-width: 1100px; margin: auto; padding: 44px 24px 100px; }
+    header { max-width: 740px; margin-bottom: 44px; }
+    .eyebrow, h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; font-weight: 550; }
+    .eyebrow { color: #666; }
+    .eyebrow span { color: #c51c00; }
+    h1 { font-size: clamp(40px, 7vw, 76px); line-height: 1.06; letter-spacing: -.045em; font-weight: 550; margin: 20px 0 24px; text-wrap: balance; }
+    .lede { font-size: clamp(18px, 2.4vw, 23px); color: #444; line-height: 1.5; }
+    .meta { color: #666; font-size: 13px; }
+    figure { margin: 0; }
+    .hero { view-transition-name: project-hero; }
+    figure img, video { display: block; width: 100%; height: auto; border: 1px solid #ddd; background: #0b121b; }
+    figcaption, .caption { font-size: 13px; color: #555; margin-top: 12px; }
+    .story { max-width: 740px; margin: 0 auto; }
+    section { margin-top: 64px; }
+    h2 { color: #666; border-top: 1px solid #ddd; padding-top: 20px; margin-bottom: 24px; }
+    h3 { font-size: 17px; margin-bottom: 8px; font-weight: 600; }
+    p { margin: 0 0 18px; }
+    .steps { padding-left: 22px; }
+    li { padding-left: 6px; margin-bottom: 14px; }
+    .note { border-left: 3px solid #ff2400; padding: 4px 0 4px 20px; }
+    footer { margin-top: 64px; border-top: 1px solid #ddd; padding-top: 24px; }
+    @media (prefers-reduced-motion: no-preference) { @view-transition { navigation: auto; } ::view-transition-group(project-hero) { animation-duration: .45s; } }
+    @media (max-width: 600px) { main { padding-top: 20px; } section { margin-top: 44px; } }
+  </style>
+</head>
+<body>
+  <nav aria-label="Project navigation">
+    <a href="/" aria-label="홍승우 home"><img src="/favicon.svg" alt="" width="36" height="30"></a>
+    <a href="/?mode=hackathons">← All hackathons</a>
+  </nav>
+  <main>
+    <header>
+      <p class="eyebrow"><span>SkyMesh</span> · DNHacks 2026 · Team prototype</p>
+      <h1>A shared sky.<br>Powered by phones.</h1>
+      <p class="lede">Turn phones into acoustic drone sensors. Detect on the device, share compact readings, and compute the picture independently at each node.</p>
+      <p class="meta">Edge ML / Distributed sensing / Operator interface<br>Next.js · TypeScript · ONNX Runtime Web · FastAPI · Leaflet</p>
+    </header>
+    <figure>
+      <img class="hero" src="/work/skymesh-simulation.png" width="1440" height="786" fetchpriority="high" alt="SkyMesh planning sandbox: five synthetic sensors connected over a satellite map, with a simulated drone route and contact propagation.">
+      <figcaption>The separate planning sandbox, captured during its built-in demo. Sensors, route, coverage, and contacts in this image are synthetic, not field measurements. Imagery © Esri, Maxar, Earthstar Geographics.</figcaption>
+    </figure>
+    <div class="story">
+      <section aria-labelledby="idea">
+        <h2 id="idea">01 / The idea</h2>
+        <p>Instead of asking one central sensor to hear everything, let many small sensors contribute what they hear. SkyMesh explores that idea with hardware people already have: their phones.</p>
+        <p>Built as a team project for the DNHacks 2026 defense track presented by Second Front Systems. The prototype brings together acoustic classification, a replicated sensor log, local fusion, and an operator workspace.</p>
+      </section>
+      <section aria-labelledby="flow">
+        <h2 id="flow">02 / From sound to a shared picture</h2>
+        <ol class="steps">
+          <li><strong>Listen locally.</strong> Microphone audio becomes a mel-spectrogram in TypeScript. An ONNX CRNN classifier runs in the browser and produces a drone-confidence score. Audio stays on the phone.</li>
+          <li><strong>Share readings, not recordings.</strong> Nodes gossip compact sensor records to neighbors and maintain their own copies of the log.</li>
+          <li><strong>Compute independently.</strong> Each node derives its own fused picture from the readings it has received. The operator view is not a privileged server-side answer.</li>
+          <li><strong>Make the network visible.</strong> The workspace brings enrollment, participant placement, topology, confidence, and link-failure controls beside the map.</li>
+        </ol>
+        <p class="note">Distributed computation does not mean serverless transport. The browser demo uses a WebSocket relay for delivery. Direct radio links are a hardware direction, not a demonstrated browser capability.</p>
+      </section>
+      <section aria-labelledby="demo">
+        <h2 id="demo">03 / Watch the synthetic demo</h2>
+        <video controls playsinline preload="none" poster="/work/skymesh-simulation.png" aria-label="Silent recording of the SkyMesh synthetic planning demo" aria-describedby="demo-description" width="1440" height="786">
+          <source src="/work/skymesh-demo.webm" type="video/webm">
+          <a href="/work/skymesh-demo.webm">Download the demo recording</a>.
+        </video>
+        <p class="caption" id="demo-description">Silent screen recording, about 15 seconds. The built-in demo creates five synthetic sensors and a route, then starts the simulated drone. One sensor acquires a contact and the report spreads through the mesh. This demonstrates the planning interface, not live microphone detection or real-world accuracy.</p>
+        <p>The sandbox is deliberately separate from the live session. Its synthetic contacts never become microphone readings. That distinction also guides the operator interface: connection health, sensor confidence, and scenario notices communicate different things.</p>
+      </section>
+      <section aria-labelledby="operations">
+        <h2 id="operations">04 / A workspace for real participants</h2>
+        <figure>
+          <img src="/work/skymesh-station.png" width="1440" height="900" loading="lazy" alt="SkyMesh operations workspace in its empty-session state, showing a participant map, enrollment QR code, confidence panel, and topology controls.">
+          <figcaption>The actual operations interface before participants join. This capture has no connected relay or admitted phones. The QR code points to the local capture environment, not a public demo.</figcaption>
+        </figure>
+        <h3>My contribution</h3>
+        <p>My recorded work includes integrating the hardware viewer into the sensor and operations interfaces, adding a separate node simulation-alert channel, and verification work covering simulation alerts alongside live ONNX sensing. The detector, mesh, and operator experience are presented here as a team-built system, not a solo project.</p>
+      </section>
+      <section aria-labelledby="limits">
+        <h2 id="limits">05 / What this prototype does not prove</h2>
+        <p>SkyMesh is not a field-validated counter-drone system. The fusion model needs real-room calibration before position estimates can be trusted. Simulation coverage and contact timing are properties of the simulated scenario, not measured deployment performance.</p>
+        <p>Local sensing and replicated state are distinct from message delivery: losing the relay interrupts browser-to-browser transport. A live multi-phone demonstration also needs HTTPS, microphone permission, and a running relay, so this page uses a recording rather than dropping visitors into an empty enrollment flow.</p>
+      </section>
+      <footer><a href="/?mode=hackathons">← Back to hackathons</a></footer>
+    </div>
+  </main>
+</body>
+</html>

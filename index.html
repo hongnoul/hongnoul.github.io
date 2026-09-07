@@ -328,7 +328,8 @@
       transition: opacity 0.25s ease, transform 0.25s ease;
       pointer-events: none;
     }
-    .card:hover .card__desc { opacity: 1; transform: translateY(0); }
+    .card:hover .card__desc, .card:focus-visible .card__desc { opacity: 1; transform: translateY(0); }
+    .card:focus-visible { outline: 2px solid #ff2400; outline-offset: 4px; }
 
     .card[hidden] { display: none; }
 
@@ -513,6 +514,10 @@
           'emotional states, semantic color tokens, motion choreography, ' +
           'surface physics, and a primitives kit, all documented as living ' +
           'brand guidelines.' },
+      { title: 'SkyMesh · DNHacks 2026', mode: 'hackathons',
+        tags: ['systems', 'ai', 'web'], img: '/work/skymesh-simulation.png',
+        href: '/work/skymesh.html',
+        description: 'Phones become acoustic drone sensors: local ONNX inference, shared sensor readings, and independently computed fusion. A map-first operator workspace and a separate synthetic planning sandbox. DNHacks 2026 prototype.' },
       { title: 'Groundwork - Ripple Designathon', mode: 'hackathons',
         tags: ['web', 'design'], img: '/groundwork_poster.jpg',
         href: 'https://frontend-brown-eta-51.vercel.app',
@@ -609,6 +614,8 @@
        Re-stagger the reveal indexes after each filter so the rise-in stays tidy. */
     const cards = [...deck.querySelectorAll('.card')];
     let activeMode = 'all';
+    // Query-string filters call setOffset during initialization.
+    let offset = 0;
 
     function applyFilter() {
       let vis = 0;
@@ -647,7 +654,6 @@
        with a translateX clamped to the overflow. Pointer events cover mouse and
        touch; a wheel handler maps vertical scroll over the deck to a pan too.
        On mobile the CSS stacks the cards vertically and forces transform: none. */
-    let offset = 0;
     function maxOffset() {
       const over = deck.scrollWidth - deck.parentElement.clientWidth;
       return Math.max(0, over);
