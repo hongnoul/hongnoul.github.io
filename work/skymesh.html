@@ -13,8 +13,8 @@
   <meta property="og:description" content="On-device drone detection meets distributed sensing. A DNHacks 2026 prototype.">
   <meta property="og:type" content="article">
   <meta property="og:url" content="https://hongnoul.github.io/work/skymesh.html">
-  <meta property="og:image" content="https://hongnoul.github.io/work/skymesh-simulation.png">
-  <meta property="og:image:alt" content="SkyMesh synthetic planning sandbox showing a five-node sensor mesh and a simulated drone route.">
+  <meta property="og:image" content="https://hongnoul.github.io/work/skymesh-fly-phone.jpg">
+  <meta property="og:image:alt" content="The deployed SkyMesh phone enrollment interface, with retro gray panels and an ASCII mascot.">
   <meta name="theme-color" content="#fafafa">
   <style>
     @font-face { font-family: InterVariable; src: url('/fonts/InterVariable.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
@@ -63,10 +63,11 @@
       <h1>A shared sky.<br>Powered by phones.</h1>
       <p class="lede">Turn phones into acoustic drone sensors. Detect on the device, share compact readings, and compute the picture independently at each node.</p>
       <p class="meta">Edge ML / Distributed sensing / Operator interface<br>Next.js · TypeScript · ONNX Runtime Web · FastAPI · Leaflet</p>
+      <p><a href="https://skymesh-hongnoul.fly.dev/" target="_blank" rel="noopener">Open SkyMesh ↗</a> · <a href="https://skymesh-hongnoul.fly.dev/station/" target="_blank" rel="noopener">Operator workspace ↗</a></p>
     </header>
     <figure>
-      <img class="hero" src="/work/skymesh-simulation.png" width="1440" height="786" fetchpriority="high" alt="SkyMesh planning sandbox: five synthetic sensors connected over a satellite map, with a simulated drone route and contact propagation.">
-      <figcaption>The separate planning sandbox, captured during its built-in demo. Sensors, route, coverage, and contacts in this image are synthetic, not field measurements. Imagery © Esri, Maxar, Earthstar Geographics.</figcaption>
+      <img class="hero" src="/work/skymesh-fly-phone.jpg" width="1440" height="786" fetchpriority="high" alt="The actual SkyMesh Fly.io landing page: retro gray enrollment panel, local detection and privacy indicators, microphone join button, and ASCII mascot.">
+      <figcaption>The actual product at skymesh-hongnoul.fly.dev, captured September 7, 2026. This is the phone enrollment screen before microphone permission, not the simulation sandbox.</figcaption>
     </figure>
     <div class="story">
       <section aria-labelledby="idea">
@@ -90,14 +91,14 @@
           <source src="/work/skymesh-demo.webm" type="video/webm">
           <a href="/work/skymesh-demo.webm">Download the demo recording</a>.
         </video>
-        <p class="caption" id="demo-description">Silent screen recording, about 15 seconds. The built-in demo creates five synthetic sensors and a route, then starts the simulated drone. One sensor acquires a contact and the report spreads through the mesh. This demonstrates the planning interface, not live microphone detection or real-world accuracy.</p>
+        <p class="caption" id="demo-description">Secondary reference: a silent recording of the local synthetic sandbox, about 15 seconds. The built-in demo creates five synthetic sensors and a route, then starts the simulated drone. One sensor acquires a contact and the report spreads through the mesh. This demonstrates the planning interface, not live microphone detection or real-world accuracy.</p>
         <p>The sandbox is deliberately separate from the live session. Its synthetic contacts never become microphone readings. That distinction also guides the operator interface: connection health, sensor confidence, and scenario notices communicate different things.</p>
       </section>
       <section aria-labelledby="operations">
         <h2 id="operations">04 / A workspace for real participants</h2>
         <figure>
-          <img src="/work/skymesh-station.png" width="1440" height="900" loading="lazy" alt="SkyMesh operations workspace in its empty-session state, showing a participant map, enrollment QR code, confidence panel, and topology controls.">
-          <figcaption>The actual operations interface before participants join. This capture has no connected relay or admitted phones. The QR code points to the local capture environment, not a public demo.</figcaption>
+          <img src="/work/skymesh-fly-station.jpg" width="1440" height="786" loading="lazy" alt="SkyMesh operations workspace in its empty-session state, showing a participant map, enrollment QR code, confidence panel, and topology controls.">
+          <figcaption>The deployed Fly.io operations workspace, captured in a separate empty session with its relay connected. No phones were admitted and no sensor readings were fabricated. Imagery © Esri, Maxar, Earthstar Geographics.</figcaption>
         </figure>
         <h3>My contribution</h3>
         <p>My recorded work includes integrating the hardware viewer into the sensor and operations interfaces, adding a separate node simulation-alert channel, and verification work covering simulation alerts alongside live ONNX sensing. The detector, mesh, and operator experience are presented here as a team-built system, not a solo project.</p>
@@ -105,7 +106,7 @@
       <section aria-labelledby="limits">
         <h2 id="limits">05 / What this prototype does not prove</h2>
         <p>SkyMesh is not a field-validated counter-drone system. The fusion model needs real-room calibration before position estimates can be trusted. Simulation coverage and contact timing are properties of the simulated scenario, not measured deployment performance.</p>
-        <p>Local sensing and replicated state are distinct from message delivery: losing the relay interrupts browser-to-browser transport. A live multi-phone demonstration also needs HTTPS, microphone permission, and a running relay, so this page uses a recording rather than dropping visitors into an empty enrollment flow.</p>
+        <p>Local sensing and replicated state are distinct from message delivery: losing the relay interrupts browser-to-browser transport. A live multi-phone demonstration also needs HTTPS, microphone permission, and a running relay, the live product links above open its enrollment and operator interfaces. The separate recording illustrates only the synthetic planning sandbox.</p>
       </section>
       <footer><a href="/?mode=hackathons">← Back to hackathons</a></footer>
     </div>

@@ -15,9 +15,13 @@ for (const engine of [chromium, webkit]) {
       assert.equal(await page.locator('.card:visible').count(), 4);
       const card = page.locator('.card[data-href="/work/skymesh.html"]');
       assert.equal(await card.isVisible(), true);
+      assert.equal(await card.locator('img').getAttribute('src'), '/work/skymesh-fly-phone.jpg');
       await card.focus();
       await page.keyboard.press('Enter');
       await page.waitForURL('**/work/skymesh.html');
+      assert.equal(await page.locator('.hero').getAttribute('src'), '/work/skymesh-fly-phone.jpg');
+      assert.equal(await page.locator('meta[property="og:image"]').getAttribute('content'), 'https://hongnoul.github.io/work/skymesh-fly-phone.jpg');
+      assert.equal(await page.getByRole('link', { name: 'Open SkyMesh' }).getAttribute('href'), 'https://skymesh-hongnoul.fly.dev/');
       await page.locator('footer').scrollIntoViewIfNeeded();
       await page.waitForFunction(() => [...document.images].every(i => i.complete && i.naturalWidth > 0));
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
