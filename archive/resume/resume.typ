@@ -5,7 +5,7 @@
 #let data = json("resume.data.json")
 
 #set document(title: data.name + " - Resume", author: data.name)
-#set page(paper: "us-letter", margin: (x: 0.7in, y: 0.65in))
+#set page(paper: "us-letter", margin: (x: 0.7in, y: 0.5in))
 #set text(
   font: ("Libertinus Serif", "New Computer Modern", "FreeSerif"),
   size: 10pt,
@@ -23,13 +23,15 @@
   #text(size: 30pt, weight: 800, tracking: -0.6pt)[#data.name]
   #v(9pt, weak: true)
   #text(size: 9pt, fill: rgb("#222"))[#contact]
+  #v(6pt, weak: true)
+  #text(size: 10pt, weight: 700)[Expected Graduation: December 2028]
 ]
 
-#v(20pt, weak: false)
+#v(14pt, weak: false)
 
 // - Section / entry primitives --------------------
 
-#let section(title, body) = block(below: 15pt, breakable: false)[
+#let section(title, body) = block(below: 12pt, breakable: false)[
   #text(size: 10pt, weight: 700, tracking: 0.6pt)[#upper(title)]
   #v(3pt, weak: true)
   #line(length: 100%, stroke: 1.5pt)

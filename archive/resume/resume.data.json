@@ -40,7 +40,7 @@
       "title": "Work & Leadership Experience",
       "entries": [
         {
-          "org": "TrustAI Labs (Y Combinator S26)",
+          "org": "OneTriangle (Y Combinator S26)",
           "loc": "San Francisco, CA",
           "role": "Founding Engineer",
           "date": "March 2026 -- Present",
@@ -83,17 +83,18 @@
           ]
         },
         {
+          "org": "gwae",
+          "date": "2026",
+          "bullets": [
+            "Built a terminal multiplexer in Rust for running many CLI coding agents at once: an infinite 2D grid of strips where panes never shrink, with quantized scrolling and an OSC 133-based agent-status dashboard",
+            "Single-process, daemon-free design; sole author, *280+ commits*, MIT-licensed with a live in-browser demo (real xterm.js, no server)"
+          ]
+        },
+        {
           "org": "Subconscious Hackathon",
           "date": "May 2026",
           "bullets": [
             "Built an autonomous freight-exception agent in a 2-hour sprint: plan-approve-execute UX on Cloudflare Workers with live SSE trace drafting carrier and customer messages"
-          ]
-        },
-        {
-          "org": "Cursor Hackathon",
-          "date": "May 2026",
-          "bullets": [
-            "Built an ACL-injury triage dashboard: pose extraction (MediaPipe) + retrieval-grounded rehab guidance turning short video intake into severity bands for 60+ athlete rosters"
           ]
         }
       ]
