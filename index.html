@@ -20,6 +20,7 @@
   .section-title{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:#999;margin:1.6em 0 0}
   hr{border:0;border-top:1px solid #ddd;margin:2em 0}
   h2 small{font-size:60%;color:#999;font-weight:normal}
+  h2 img{width:1em;height:1em;vertical-align:-0.12em;margin-right:.35em}
   @media (max-width:900px){.layout{display:block}.side{position:static}}
 </style>
 </head>
@@ -41,14 +42,14 @@
 <main>
   <p id="projects" class="section-title">Projects</p>
 
-  <h2 id="hwatu"><a href="/hwatu/">hwatu</a></h2>
+  <h2 id="hwatu"><img src="/hwatu.png" alt="" width="32" height="32"><a href="/hwatu/">hwatu</a></h2>
   <p>A daemon-based WebKit browser that makes visual verification nearly
   free for AI agents. 13&nbsp;ms median window spawn, 216&nbsp;ms full verify
   loop. MCP server over stdio, JSON over socket, human hand-off into a
   tiling WM. Rust + WebKitGTK&nbsp;6.</p>
   <p><a href="/hwatu/">docs</a> · <a href="https://github.com/hongnoul/hwatu">github</a></p>
 
-  <h2 id="gwae"><a href="/gwae/">gwae</a></h2>
+  <h2 id="gwae"><img src="/gwae.svg" alt="" width="32" height="32"><a href="/gwae/">gwae</a></h2>
   <p>A terminal multiplexer where panes never shrink: niri's scrolling
   tiling for CLI agents, in any terminal. An infinite 2D grid of strips,
   quantized scroll, OSC&nbsp;133 dashboard. Single process, no daemon, no
