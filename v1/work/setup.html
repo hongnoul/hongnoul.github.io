@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>gwae — infinite strip multiplexer, panes never shrink — 홍승우</title>
+  <meta name="description" content="gwae is niri's scrolling tiling for your CLI agents, in any terminal: an infinite 2D grid of strips where panes never shrink. Single process, agent-aware. Try it live in the browser — real xterm.js, no server.">
+  <meta name="author" content="홍승우">
+  <link rel="canonical" href="https://hongnoul.github.io/v1/work/setup.html">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/v1/fonts/InterVariable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+  <meta property="og:title" content="gwae — infinite strip multiplexer, panes never shrink">
+  <meta property="og:description" content="niri's scrolling tiling, for your CLI agents, in any terminal. An infinite 2D grid where panes never shrink. Live terminal demo in the browser.">
+  <meta property="og:url" content="https://hongnoul.github.io/v1/work/setup.html">
+  <meta property="og:type" content="article">
+  <meta property="og:image" content="https://hongnoul.github.io/v1/work/gwae-social.png">
+  <meta name="theme-color" content="#fafafa">
+  <script>document.documentElement.classList.add('js');</script>
+  <style>
+    @font-face {
+      font-family: "InterVariable";
+      src: url("/fonts/InterVariable.woff2") format("woff2");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; background: #fafafa; }
+    @media (prefers-reduced-motion: no-preference) {
+      @view-transition { navigation: auto; }
+      ::view-transition-group(project-hero) {
+        animation-duration: .45s;
+        animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+      }
+      ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; }
+    }
+    body {
+      color: #111;
+      font: 400 16px/1.55 "InterVariable", system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::selection { background: #ff2400; color: #fff; }
+    a { color: inherit; text-decoration-color: #c9c9c9; text-underline-offset: 3px; transition: color .2s ease, text-decoration-color .2s ease; }
+    a:hover { color: #ff2400; text-decoration-color: #ff2400; }
+    code { font: 400 0.88em ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: #f0f0f0; padding: 1px 5px; }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 0 24px 140px; }
+    :root { --corner-w: 42px; --logo-h: calc(var(--corner-w) * 0.6); --corner-left: 30px; --corner-top: 20px; }
+    .logo { position: fixed; top: var(--corner-top); left: var(--corner-left); z-index: 60; width: var(--corner-w); height: auto; display: block; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+    .logo:focus { outline: none; }
+    .logo:focus-visible { outline: 2px solid #898989; outline-offset: 3px; }
+    .logo__shape { fill: #000; }
+    .menu {
+      position: fixed; top: 0; bottom: 0; left: 0; z-index: 48; background: #fff; box-sizing: border-box;
+      padding: calc(var(--corner-top) + var(--logo-h) + clamp(8px, 1.5vh, 14px)) clamp(14px, 1.6vw, 22px) clamp(16px, 3vh, 28px) var(--corner-left);
+      display: flex; flex-direction: column; gap: clamp(3px, 0.6vh, 6px);
+      transform: translateX(-100%); transition: transform 0.13s cubic-bezier(0.33, 1, 0.68, 1); pointer-events: none;
+    }
+    body.menu-open .menu { transform: translateX(0); pointer-events: auto; }
+    .menu__link { display: block; color: #898989; text-decoration: none; font-size: clamp(12px, 0.95vw, 14px); font-weight: 400; letter-spacing: 0.02em; line-height: 1.4; text-transform: uppercase; white-space: nowrap; transition: color 0.2s ease; }
+    .menu__link:hover, .menu__link:focus-visible { color: #ff2400; outline: none; }
+    .menu__filter { display: none; }
+    @media (max-width: 768px) {
+      :root { --corner-w: 34px; --corner-left: clamp(20px, 5vw, 60px); --corner-top: 14px; }
+      .menu__filter { display: block; }
+      .menu__link--work { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) { .menu { transition: none; } }
+    header { padding-top: 110px; margin-bottom: 56px; }
+    .hero { view-transition-name: project-hero; display: block; width: 100%; aspect-ratio: 1980 / 1080; margin: 0 0 44px; overflow: hidden; border: 1px solid #e4e4e4; background: #0c0e11; }
+    .hero img, .hero video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-caption { font-size: 12.5px; color: #898989; margin: -32px 0 44px; line-height: 1.55; }
+    .kicker { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #898989; margin: 0 0 18px; }
+    .kicker b { color: #ff2400; font-weight: 500; }
+    h1 { font-size: clamp(34px, 6vw, 54px); font-weight: 550; letter-spacing: -0.025em; line-height: 1.06; margin: 0 0 22px; text-wrap: balance; }
+    .lede { font-size: clamp(17px, 2.2vw, 20px); line-height: 1.5; color: #444; margin: 0; text-wrap: pretty; }
+    .lede strong { color: #111; font-weight: 550; }
+    section { margin: 84px 0 0; }
+    h2 { font-size: 11px; font-weight: 500; letter-spacing: .14em; text-transform: uppercase; color: #898989; margin: 0 0 20px; display: flex; align-items: baseline; gap: 12px; }
+    h2::after { content: ""; flex: 1; height: 1px; background: #e4e4e4; transform: translateY(-3px); }
+    p { margin: 0 0 16px; text-wrap: pretty; }
+    p:last-child { margin-bottom: 0; }
+    /* ---- strip ---- */
+    .strip { --bleed: min(180px, calc((100vw - 100%) / 2 - 24px)); margin: 32px calc(-1 * max(0px, var(--bleed))); border: 1px solid #e4e4e4; background: #fff; overflow: hidden; }
+    .strip__bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid #eee; }
+    .strip__dots { display: flex; gap: 5px; } .strip__dots i { width: 9px; height: 9px; border-radius: 50%; background: #e4e4e4; }
+    .strip__title { font-size: 12px; color: #898989; }
+    .strip__keys { margin-left: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+    .strip__key { font: 500 11px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #444; background: #fbfbfb; border: 1px solid #d5d5d5; border-radius: 5px; padding: 6px 9px; cursor: pointer; user-select: none; box-shadow: 0 2px 0 #d5d5d5; transform: translateY(0); transition: transform .06s ease, box-shadow .06s ease, background .15s ease, color .15s ease, border-color .15s ease; white-space: nowrap; }
+    .strip__key:hover { background: #111; color: #fff; border-color: #111; box-shadow: 0 2px 0 #000; }
+    .strip__key.down, .strip__key:active { transform: translateY(2px); box-shadow: 0 0 0 #d5d5d5; background: #ff2400; color: #fff; border-color: #ff2400; }
+    .strip__hud { position: absolute; top: 40px; right: 12px; z-index: 4; display: flex; align-items: center; gap: 8px; padding: 7px 12px; background: rgba(10, 12, 15, 0.88); border: 1px solid rgba(255, 255, 255, 0.14); border-radius: 6px; font: 500 12px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace; color: #e8e8e8; opacity: 0; transform: translateY(-4px); transition: opacity .18s ease, transform .18s ease; pointer-events: none; backdrop-filter: blur(4px); }
+    .strip__hud.show { opacity: 1; transform: translateY(0); }
+    .strip__hud .chord { color: #ff6a52; } .strip__hud .act { color: #9fe29f; }
+    .strip__view { position: relative; overflow: hidden; background: #1e1e2e; }
+    .strip__world { will-change: transform; } .strip__world.anim { transition: transform .6s cubic-bezier(.33,1,.68,1); }
+    .strip__ws { position: relative; height: 560px; overflow: hidden; }
+    .strip__ws + .strip__ws { border-top: 2px solid #6c7086; }
+    .strip__row { display: flex; height: 100%; padding: 0; will-change: transform; }
+    .strip__row.anim { transition: transform .45s cubic-bezier(.33,1,.68,1); }
+    .wb { display: flex; align-items: center; height: 28px; background: #181825; color: #a6adc8; font: 500 11px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace; padding: 0 10px; gap: 10px; position: relative; z-index: 3; user-select: none; }
+    .wb__win { color: #a1a1aa; flex: 1 1 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .wb__ticker { display: flex; align-items: center; flex: 0 0 auto; }
+    .wb__ticker .t  { font-weight: 700; width: 7px; text-align: center; }
+    .wb__ticker .gap { width: 14px; }
+    .wb__ticker .badge { color: #fff; padding: 2px 5px; margin: 0 2px; font-weight: 700; }
+    .wb__right { flex: 1 1 0; min-width: 0; display: flex; justify-content: flex-end; align-items: center; gap: 9px; }
+    .wb__dot { width: 5px; height: 5px; background: #585b70; }
+    .wb__fcitx { background: #a6adc8; color: #1e1e2e; padding: 1px 4px; font-weight: 600; }
+    .wb__clock { color: #a6adc8; }
+    @media (max-width: 700px) { .wb__win, .wb__right { display: none; } .wb { justify-content: center; } }
+    .strip__scene { position: relative; overflow: hidden; }
+    /* ---- real terminal panes ---- */
+    .kt { flex: 0 0 auto; height: 100%; position: relative; overflow: hidden; background: #1e1e2e; box-shadow: inset 0 0 0 1px #6c7086; filter: brightness(.62) saturate(.9); transition: filter .28s ease, box-shadow .28s ease; cursor: pointer; display: flex; flex-direction: column; }
+    .kt.focused { filter: none; box-shadow: inset 0 0 0 1px #74c7ec; z-index: 1; }
+    .kt__term { flex: 1; min-height: 0; padding: 6px 0 0 6px; overflow: hidden; }
+    .kt__term .xterm { height: 100%; padding: 4px; }
+    .kt__term .xterm-viewport { overflow-y: auto; }
+    .kt__status { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; padding: 5px 10px; font: 500 9px/1 ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: rgba(24,24,37,.72); color: #a6adc8; white-space: nowrap; overflow: hidden; border-top: 1px solid #6c7086; }
+    .kt__st { width: 5px; height: 10px; flex: 0 0 auto; }
+    .kt__title { font-weight: 600; color: #cdd6f4; }
+    .strip__note { font-size: 12.5px; color: #898989; margin: 0; padding: 14px 18px 16px; border-top: 1px solid #eee; }
+    .strip__note b { color: #444; font-weight: 550; }
+    .strip__note code { background: #f0f0f0; }
+    .links { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 18px; font-size: 14px; }
+    .colophon { margin-top: 72px; padding-top: 22px; border-top: 1px solid #e4e4e4; font-size: 13px; color: #898989; }
+    .colophon b { color: #ff2400; font-weight: 550; }
+    @media (prefers-reduced-motion: no-preference) {
+      html.js .reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.33,1,.68,1), transform .7s cubic-bezier(.33,1,.68,1); }
+      html.js .reveal.in { opacity: 1; transform: none; }
+    }
+    @media print { html.js .reveal { opacity: 1 !important; transform: none !important; } }
+    @media (max-width: 560px) { header { padding-top: 90px; } }
+  </style>
+</head>
+<body>
+  <nav class="menu" id="site-menu" aria-label="Menu" aria-hidden="true" inert>
+      <a class="menu__link menu__link--work" href="/v1/#work">Work</a>
+      <a class="menu__link menu__filter" href="/v1/">All</a>
+      <a class="menu__link menu__filter" href="/v1/?mode=work">Work</a>
+      <a class="menu__link menu__filter" href="/v1/?mode=hackathons">Hackathons</a>
+      <a class="menu__link menu__filter" href="/v1/?mode=studies">Studies</a>
+      <a class="menu__link" href="/v1/#about">About</a>
+  </nav>
+  <svg class="logo" width="320" height="192" viewBox="0 0 84.666692 50.799987" xmlns="http://www.w3.org/2000/svg" role="button" tabindex="0" aria-label="Menu" aria-controls="site-menu" aria-expanded="false">
+    <defs aria-hidden="true">
+      <clipPath id="logo-clip-top" clipPathUnits="userSpaceOnUse"><rect class="logo__clip-top" x="0" y="0" width="84.667" height="25.45"/></clipPath>
+      <clipPath id="logo-clip-bottom" clipPathUnits="userSpaceOnUse"><rect class="logo__clip-bottom" x="0" y="25.35" width="84.667" height="25.45"/></clipPath>
+    </defs>
+    <path class="logo__shape" clip-path="url(#logo-clip-top)" d="M 0 16.933 L 16.933 33.867 L 33.867 33.867 L 33.867 16.933 L 16.933 16.933 L 0 0 L 33.867 0 L 50.8 16.933 L 67.733 16.933 L 67.733 0 L 84.667 0 L 84.667 50.8 L 67.733 50.8 L 67.733 33.867 L 50.8 33.867 L 50.8 50.8 L 16.933 50.8 L 0 33.867 Z"/>
+    <path class="logo__shape" clip-path="url(#logo-clip-bottom)" d="M 0 16.933 L 16.933 33.867 L 33.867 33.867 L 33.867 16.933 L 16.933 16.933 L 0 0 L 33.867 0 L 50.8 16.933 L 67.733 16.933 L 67.733 0 L 84.667 0 L 84.667 50.8 L 67.733 50.8 L 67.733 33.867 L 50.8 33.867 L 50.8 50.8 L 16.933 50.8 L 0 33.867 Z"/>
+  </svg>
+
+  <div class="wrap">
+    <header>
+      <figure class="hero" aria-hidden="true">
+        <video autoplay muted loop playsinline poster="/v1/work/gwae-poster.jpg" width="1600" height="900">
+          <source src="/v1/work/gwae-demo.mp4" type="video/mp4">
+          <img src="/v1/work/gwae-poster.jpg" alt="gwae demo" width="1600" height="900">
+        </video>
+      </figure>
+      <p class="hero-caption">gwae demo — not sped up, you can go much faster. Six agents on an infinite strip grid.</p>
+      <p class="kicker"><b>gwae</b> · terminal multiplexer · macOS / linux / windows · mit</p>
+      <h1>Panes never shrink.</h1>
+      <p class="lede">
+        <strong>niri's scrolling tiling, for your CLI agents, in any terminal.</strong>
+        Every multiplexer divides a fixed screen; <a href="https://github.com/hongnoul/gwae">gwae</a>
+        scrolls an infinite 2D grid of strips instead. One process, no daemon. Try it — every pane below is a real <code>xterm.js</code> terminal.
+      </p>
+    </header>
+
+    <!-- live terminal embed — real xterm.js panes, no server -->
+    <section class="reveal">
+      <div class="strip" id="strip">
+        <div class="strip__bar">
+          <div class="strip__dots" aria-hidden="true"><i></i><i></i><i></i></div>
+          <span class="strip__title">live — real terminals, type anywhere</span>
+          <div class="strip__keys">
+            <button class="strip__key" data-chord="h" type="button">⌥+h</button>
+            <button class="strip__key" data-chord="l" type="button">⌥+l</button>
+            <button class="strip__key" data-chord="j" type="button">⌥+j</button>
+            <button class="strip__key" data-chord="k" type="button">⌥+k</button>
+            <button class="strip__key" data-chord="g" type="button">⌥+g</button>
+          </div>
+        </div>
+        <div class="strip__view" id="stripView">
+          <div class="strip__hud" id="stripHud" aria-hidden="true"></div>
+          <div class="wb" aria-hidden="true">
+            <span class="wb__win" id="wbWin"></span>
+            <span class="wb__ticker" id="wbTicker"></span>
+            <span class="wb__right"><i class="wb__dot"></i><i class="wb__dot"></i><i class="wb__dot"></i><span class="wb__fcitx">A</span><span class="wb__clock" id="wbClock"></span></span>
+          </div>
+          <div class="strip__scene" id="stripScene"><div class="strip__world" id="stripWorld"></div></div>
+        </div>
+        <p class="strip__note"><b>⌥+h / ⌥+l</b> columns · <b>⌥+j / ⌥+k</b> strips · <b>⌥+g</b> jumps to the pane that needs you. Click any pane to focus and type — try <code>help</code>, <code>ls</code>, <code>git status</code>, <code>gwae</code>.</p>
+      </div>
+    </section>
+
+    <section class="reveal">
+      <h2>About</h2>
+      <p>
+        <a href="https://github.com/hongnoul/gwae">gwae</a> is a terminal multiplexer that keeps every pane at full size.
+        Fixed-width columns, quantized scroll on column boundaries, strips stacked infinitely down. Hold <code>⌥</code> for the minimap — one tile per pane tinted by <a href="https://gitlab.freedesktop.org/terminal-wg/specifications/-/blob/master/docs/OSC-133.md">OSC 133</a> status (<code>»</code> working · <code>!</code> needs you · <code>✓</code> done · <code>✗</code> failed) — and <code>⌥+g</code> smart-jumps to where you're needed.
+      </p>
+      <p>
+        Single process, no daemon, no socket. Any terminal on macOS / Linux / Windows (ConPTY). 256-color minimum. Install with <code>curl -fsSL https://hongnoul.github.io/gwae/install.sh | bash</code> or <code>brew install hongnoul/tap/gwae</code>. Above is a client-only <code>xterm.js</code> emulation of the layout — no backend, no API keys in the frontend.
+      </p>
+      <div class="links">
+        <a href="https://github.com/hongnoul/gwae">GitHub</a>
+        <a href="https://hongnoul.github.io/gwae/">Docs</a>
+        <a href="https://github.com/hongnoul/gwae/releases">Releases</a>
+      </div>
+      <p class="colophon">Built by <a href="https://github.com/hongnoul">홍승우</a> — MIT. The only bottleneck should be your brain.</p>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.min.js"></script>
+  <script>
+    (function () {
+      const view   = document.getElementById('stripView');
+      const world  = document.getElementById('stripWorld');
+      const strip  = document.getElementById('strip');
+      const hud    = document.getElementById('stripHud');
+      const ticker = document.getElementById('wbTicker');
+      const wbWin  = document.getElementById('wbWin');
+      const caps   = {};
+      document.querySelectorAll('.strip__key').forEach(b => { caps[b.dataset.chord] = b; });
+
+      const COLORS = { running: '#89b4fa', waiting: '#fab387', done: '#a6e3a1', failed: '#f38ba8', fresh: '#6c7086' }; // catppuccin-mocha: theme.rs CATPPUCCIN_MOCHA
+      const GLYPH = { running: '»', waiting: '!', done: '✓', failed: '✗', fresh: '·' };
+
+      // ---- state: 2 strips x 4 cols, mirrors real session names ----
+      const state = {
+        ws: 0, col: 0,
+        workspaces: [
+          [ { title: 'jcode — gwae layout',    st: 'running', prompt: '~/git/gwae' },
+            { title: 'claude — hwatu fix',     st: 'waiting', prompt: '~/git/hwatu' },
+            { title: 'cargo test gwae-layout', st: 'running', prompt: '~/git/gwae' },
+            { title: 'jcode self-dev',         st: 'done',    prompt: '~/git/gwae' } ],
+          [ { title: 'nvim — docs/CONFIG.md',  st: 'running', prompt: '~/git/gwae' },
+            { title: 'zsh — ~/git/gwae',       st: 'fresh',   prompt: '~' },
+            { title: 'cargo — bench',          st: 'failed',  prompt: '~/git/gwae' },
+            { title: 'jcode — docs',           st: 'waiting', prompt: '~/git/gwae' } ],
+        ],
+      };
+
+      // ---- tiny in-browser filesystem for the demo shell ----
+      const FS = {
+        '~/git/gwae': ['README.md','Cargo.toml','gwae.toml','docs/','crates/','scripts/'],
+        '~/git/hwatu': ['README.md','Cargo.toml','src/'],
+        '~': ['git/','notes/','.config/'],
+      };
+      const FILES = {
+        'README.md': '# gwae — panes never shrink\n\nniri\'s scrolling tiling, for CLI agents, in any terminal.\n\n```sh\ncurl -fsSL https://hongnoul.github.io/gwae/install.sh | bash\ngwae\n```\n',
+        'gwae.toml': 'default_column_width = "quarter"\nstartup_panes = 1\ntheme = "catppuccin-mocha"\n\n[minimap]\nmode = "off"\n',
+        'Cargo.toml': '[workspace]\nmembers = ["crates/gwae","crates/gwae-layout"]\n',
+      };
+
+      function banner(term, col) {
+        term.writeln('\x1b[90m— gwae demo shell — type \x1b[1mhelp\x1b[22m\x1b[90m —\x1b[0m');
+        if (col.st === 'waiting') term.writeln('\x1b[33m! needs input · try: git status\x1b[0m');
+        if (col.st === 'failed') term.writeln('\x1b[31m✗ failed · try: cargo test\x1b[0m');
+        if (col.st === 'done') term.writeln('\x1b[32m✓ done\x1b[0m');
+      }
+
+      function esc(s){ return s.replace(/\x1b/g,''); }
+
+      // build DOM + terminals
+      const terms = []; // [ws][col] -> {term, fit, el, line, cwd}
+      state.workspaces.forEach((cols, w) => {
+        const ws = document.createElement('div'); ws.className = 'strip__ws';
+        const row = document.createElement('div'); row.className = 'strip__row';
+        const rowTerms = [];
+        cols.forEach((col, i) => {
+          const pane = document.createElement('div'); pane.className = 'kt';
+          const host = document.createElement('div'); host.className = 'kt__term';
+          const status = document.createElement('div'); status.className = 'kt__status';
+          status.innerHTML = '<i class="kt__st"></i><b class="kt__title"></b><span class="kt__meta"></span>';
+          pane.appendChild(host); pane.appendChild(status);
+          pane.addEventListener('click', () => { state.ws = w; state.col = i; render(true); focusTerm(); });
+          // also focus on mousedown inside xterm
+          row.appendChild(pane);
+          col.el = pane; col.host = host; col.statusEl = status;
+
+          const term = new Terminal({
+            fontFamily: 'ui-monospace, "SF Mono", Menlo, Consolas, monospace',
+            fontSize: 11,
+            lineHeight: 1.25,
+            cursorBlink: true,
+            cursorStyle: 'bar',
+            theme: { background: '#1e1e2e', foreground: '#cdd6f4', cursor: '#f5e0dc', selectionBackground: 'rgba(116,199,236,0.28)' },
+            convertEol: true,
+            scrollback: 800,
+            allowTransparency: false,
+          });
+          let fit = null;
+          try { fit = new FitAddon.FitAddon(); term.loadAddon(fit); } catch {}
+          term.open(host);
+          try { fit && fit.fit(); } catch {}
+
+          const cwd = col.prompt || '~/git/gwae';
+          const stateLine = { buf: '' };
+          const prompt = () => '\r\n\x1b[90m' + cwd + '\x1b[0m \x1b[32m$\x1b[0m ';
+          function writePrompt(){ term.write(prompt()); }
+
+          banner(term, col);
+          writePrompt();
+
+          term.onData(data => {
+            // ensure focused
+            if (state.ws !== w || state.col !== i) { state.ws = w; state.col = i; render(true); }
+            for (const ch of data) {
+              const code = ch.charCodeAt(0);
+              if (code === 13) { // enter
+                term.writeln('');
+                const cmd = stateLine.buf.trim();
+                stateLine.buf = '';
+                if (cmd) runCmd(term, cmd, cwd, col);
+                // status heuristic: running -> waiting etc could cycle, but keep simple
+                writePrompt();
+              } else if (code === 127 || code === 8) { // backspace
+                if (stateLine.buf.length > 0) {
+                  stateLine.buf = stateLine.buf.slice(0, -1);
+                  term.write('\b \b');
+                }
+              } else if (code === 3) { // ctrl+c
+                term.writeln('^C');
+                stateLine.buf = '';
+                writePrompt();
+              } else if (code === 12) { // ctrl+l
+                term.clear();
+                banner(term, col);
+                writePrompt();
+              } else if (code < 32) {
+                // ignore other controls
+              } else {
+                stateLine.buf += ch;
+                term.write(ch);
+              }
+            }
+          });
+
+          // also handle key for ctrl sequences via onKey
+          term.onKey(e => {
+            if (e.domEvent.ctrlKey && e.key === 'c') {
+              // already handled in onData, but ensure
+            }
+          });
+
+          rowTerms.push({ term, fit, el: pane, host, line: stateLine, cwd, col });
+        });
+        ws.appendChild(row);
+        world.appendChild(ws);
+        cols.row = row;
+        terms.push(rowTerms);
+      });
+
+      function runCmd(term, raw, cwd, col) {
+        const [cmd, ...args] = raw.split(/\s+/);
+        const argStr = args.join(' ');
+        switch (cmd) {
+          case 'help':
+            term.writeln('\x1b[1mavailable:\x1b[0m help  ls  cat <file>  echo <text>  clear  pwd  git status  git log  gwae  gwae --help  cargo test');
+            term.writeln('hint: try \x1b[33mgwae\x1b[0m or \x1b[33mgit status\x1b[0m — mulitpane nav is \x1b[1m⌥hjkl / ⌥g\x1b[0m');
+            break;
+          case 'clear':
+            term.clear();
+            banner(term, col);
+            break;
+          case 'pwd':
+            term.writeln(cwd);
+            break;
+          case 'ls': {
+            const list = FS[cwd] || FS['~/git/gwae'];
+            term.writeln(list.join('  '));
+            break;
+          }
+          case 'cat': {
+            const name = args[0];
+            if (!name) term.writeln('cat: missing file operand');
+            else if (FILES[name]) term.writeln(FILES[name]);
+            else if ((FS[cwd]||[]).includes(name) || (FS[cwd]||[]).includes(name+'/')) term.writeln('\x1b[90m' + name + ' is a directory or binary — try ls\x1b[0m');
+            else term.writeln('cat: ' + name + ': No such file');
+            break;
+          }
+          case 'echo':
+            term.writeln(argStr);
+            break;
+          case 'git': {
+            const sub = args[0]||'';
+            if (sub === 'status') {
+              term.writeln('On branch main');
+              term.writeln('Your branch is up to date with \'origin/main\'.');
+              term.writeln('');
+              term.writeln('nothing to commit, working tree clean');
+              if (col.st === 'waiting') { col.st = 'running'; scheduleBar(); }
+            } else if (sub === 'log') {
+              term.writeln('\x1b[33ma74a62d\x1b[0m work/setup: trim to hero + live terminal demo + short description');
+              term.writeln('\x1b[33m7f0da33\x1b[0m work/setup: replace rice page with gwae (infinite strip multiplexer)');
+              term.writeln('\x1b[33m97818d4\x1b[0m Merge pull request #3 from hongnoul/docs/smooth-logo-morph');
+            } else {
+              term.writeln('usage: git <status|log>');
+            }
+            break;
+          }
+          case 'gwae': {
+            if (args[0] === '--help' || args[0] === '-h') {
+              term.writeln('gwae — panes never shrink');
+              term.writeln('usage: gwae [run \"<cmd>\"] [init] [doctor] [upgrade]');
+              term.writeln('  gwae              one strip, one 1/4 pane + skeletons');
+              term.writeln('  gwae run \"claude\"  agent in col 0');
+              term.writeln('  gwae init         guided setup');
+            } else if (argStr.trim()) {
+              term.writeln('\x1b[90m→ would launch: gwae ' + esc(raw) + '\x1b[0m');
+              term.writeln('in the real app this opens a new column. here try \x1b[1m⌥+h/l\x1b[0m to move.');
+            } else {
+              term.writeln('\x1b[1mgwae\x1b[0m 1 strip · 1 pane · quantized scroll · OSC 133 dashboard');
+              term.writeln('try: \x1b[32mgwae --help\x1b[0m  ·  docs: https://hongnoul.github.io/gwae/');
+            }
+            break;
+          }
+          case 'cargo': {
+            if (argStr.includes('test')) {
+              term.writeln('running 28 tests');
+              term.writeln('\x1b[32mtest result: ok. 28 passed; 0 failed\x1b[0m');
+              col.st = 'done'; scheduleBar();
+            } else term.writeln('cargo: try `cargo test`');
+            break;
+          }
+          default:
+            term.writeln(cmd + ': command not found — type \x1b[1mhelp\x1b[0m');
+        }
+      }
+
+      // ---- layout + chrome (quantized scroll + waybar ticker) ----
+      const wsEls = Array.from(world.querySelectorAll('.strip__ws'));
+      function wsH()  { return wsEls[0].offsetHeight; }
+      function colW() { return view.clientWidth / 4; }
+      function layoutTerms() {
+        state.workspaces.forEach((cols, w) => cols.forEach((c, idx) => {
+          c.el.style.width = colW() + 'px';
+          const t = terms[w][idx];
+          try { t.fit && t.fit.fit(); } catch {}
+        }));
+      }
+      function cellName(w, i) { return String.fromCharCode(65 + w) + String(i).padStart(2, '0'); }
+      function scheduleBar(){ renderBar(); renderTerms(); }
+      function renderBar() {
+        let html = '';
+        state.workspaces.forEach((cols, w) => {
+          if (w) html += '<span class="gap"></span>';
+          cols.forEach((col, i) => {
+            const color = COLORS[col.st] || COLORS.fresh;
+            if (w === state.ws && i === state.col) html += '<span class="badge" style="background:#a855f7"> ' + cellName(w, i) + ' </span>';
+            else { const glyph = (i === (w === state.ws ? state.col : 0)) ? '▌' : '|'; html += '<span class="t" style="color:' + color + '">' + glyph + '</span>'; }
+          });
+        });
+        ticker.innerHTML = html;
+        wbWin.textContent = state.workspaces[state.ws][state.col].title;
+      }
+      function renderTerms() {
+        state.workspaces.forEach((cols, w) => cols.forEach((col, i) => {
+          const focused = w === state.ws && i === state.col;
+          col.el.classList.toggle('focused', focused);
+          const st = col.statusEl.querySelector('.kt__st');
+          const title = col.statusEl.querySelector('.kt__title');
+          const meta = col.statusEl.querySelector('.kt__meta');
+          const c = COLORS[col.st] || COLORS.fresh;
+          const g = GLYPH[col.st] || '·';
+          if (st) st.style.background = c;
+          if (title) title.textContent = g;
+          if (meta) meta.textContent = ' ' + g + ' · ' + col.title + (col.st==='waiting'?' · 3m':'') + (col.st==='failed'?' · 50m':'');
+        }));
+      }
+      function renderCamera(anim) {
+        world.classList.toggle('anim', !!anim);
+        world.style.transform = 'translateY(' + (-state.ws * wsH()) + 'px)';
+        state.workspaces.forEach((cols, w) => {
+          const focusI = (w === state.ws) ? state.col : 0;
+          const maxX = Math.max(0, cols.length * colW() - view.clientWidth);
+          let x = Math.min(Math.max(focusI * colW() - colW() * 1.5, 0), maxX);
+          cols.row.classList.toggle('anim', !!anim);
+          cols.row.style.transform = 'translateX(' + (-x) + 'px)';
+        });
+      }
+      function render(anim) { renderBar(); renderTerms(); renderCamera(anim); }
+      function layout() {
+        const h = Math.round(view.clientWidth * 9 / 16);
+        wsEls.forEach(el => { el.style.height = (h - 28) + 'px'; });
+        view.style.height = h + 'px';
+        layoutTerms(); render(false);
+        // refit after layout settles
+        requestAnimationFrame(() => terms.flat().forEach(t => { try{ t.fit && t.fit.fit(); }catch{} }));
+      }
+      function focusTerm(){
+        const t = terms[state.ws][state.col];
+        if (t) try{ t.term.focus(); }catch{}
+      }
+
+      const wbClock = document.getElementById('wbClock');
+      function tickClock() { const d=new Date(); wbClock.textContent = String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+      tickClock(); setInterval(tickClock, 15000);
+
+      function focusCol(dir){ const cols=state.workspaces[state.ws]; state.col=Math.max(0,Math.min(cols.length-1,state.col+dir)); render(true); focusTerm(); }
+      function focusWs(dir){ state.ws=Math.max(0,Math.min(state.workspaces.length-1,state.ws+dir)); state.col=Math.min(state.col,state.workspaces[state.ws].length-1); render(true); focusTerm(); }
+      function smartJump(){
+        let best=null, bestScore=Infinity;
+        const pri={ failed:0, waiting:1, done:2, running:99, fresh:99 };
+        state.workspaces.forEach((cols,w)=>cols.forEach((col,i)=>{
+          if(w===state.ws&&i===state.col) return;
+          const p=pri[col.st]??99; if(p>=99) return;
+          const dist=Math.abs(w-state.ws)*10+Math.abs(i-state.col);
+          const score=p*100+dist;
+          if(score<bestScore){bestScore=score; best=[w,i];}
+        }));
+        if(best){ state.ws=best[0]; state.col=best[1]; render(true); focusTerm(); }
+      }
+      const binds={
+        h:{act:'focus-column-left', run:()=>focusCol(-1)},
+        l:{act:'focus-column-right', run:()=>focusCol(1)},
+        j:{act:'focus-window-or-workspace-down', run:()=>focusWs(1)},
+        k:{act:'focus-window-or-workspace-up', run:()=>focusWs(-1)},
+        g:{act:'smart-jump — pane that needs you', run:smartJump},
+      };
+      let hudTimer;
+      function fire(chord){
+        const b=binds[chord]; if(!b) return;
+        b.run();
+        const cap=caps[chord]; if(cap){cap.classList.add('down'); setTimeout(()=>cap.classList.remove('down'),140);}
+        hud.innerHTML='<span class="chord">⌥+'+chord+'</span><span class="act">'+b.act+'</span>';
+        hud.classList.add('show'); clearTimeout(hudTimer); hudTimer=setTimeout(()=>hud.classList.remove('show'),1100);
+      }
+      Object.entries(caps).forEach(([chord,btn])=>{ btn.addEventListener('click',()=>fire(chord)); });
+      function stripVisible(){ const r=strip.getBoundingClientRect(); const h=Math.min(r.bottom,innerHeight)-Math.max(r.top,0); return h>r.height*0.25; }
+      document.addEventListener('keydown', e=>{
+        if(!e.altKey||e.ctrlKey||e.metaKey||e.shiftKey) return;
+        const chord=e.key.toLowerCase();
+        if(!binds[chord]||!stripVisible()) return;
+        e.preventDefault(); fire(chord);
+      });
+
+      window.addEventListener('resize', layout);
+      layout();
+      // focus first terminal on load
+      setTimeout(()=>focusTerm(), 200);
+
+      let toured=false;
+      new IntersectionObserver((entries, obs)=>{
+        if(entries[0].isIntersecting&&!toured){
+          toured=true;
+          const tour=[()=>fire('l'),()=>fire('l'),()=>fire('j'),()=>fire('g')];
+          let i=0; const drift=()=>{ if(i<tour.length){ tour[i++](); setTimeout(drift,1100);} };
+          setTimeout(drift,900); obs.disconnect();
+        }
+      },{threshold:0.5}).observe(view);
+    })();
+
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  </script>
+  <script src="/v1/logo-menu.js"></script>
+</body>
+</html>
