@@ -16,6 +16,10 @@
   .layout>nav.toc{grid-column:1;grid-row:1}
   .side{position:sticky;top:40px;font-size:16px}
   nav.toc ul{list-style:none;margin:0;padding:0}
+  nav.toc ul ul{padding:0 0 8px 12px}
+  .section-title{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:#999;margin:1.6em 0 0}
+  hr{border:0;border-top:1px solid #ddd;margin:2em 0}
+  h2 small{font-size:60%;color:#999;font-weight:normal}
   @media (max-width:900px){.layout{display:block}.side{position:static}}
 </style>
 </head>
@@ -35,6 +39,8 @@
 </header>
 
 <main>
+  <p id="projects" class="section-title">Projects</p>
+
   <h2 id="hwatu"><a href="/hwatu/">hwatu</a></h2>
   <p>A daemon-based WebKit browser that makes visual verification nearly
   free for AI agents. 13&nbsp;ms median window spawn, 216&nbsp;ms full verify
@@ -57,14 +63,41 @@
   in. Dogfooded on an ASUS Ascent GX10, 340+ TPS. Best Developer awards,
   HackMIT&nbsp;2026.</p>
   <p><a href="https://github.com/hongnoul/clique">github</a></p>
+
+  <hr>
+
+  <p id="experience" class="section-title">Experience</p>
+
+  <h2 id="onetriangle">OneTriangle <small>(Y Combinator S26)</small></h2>
+  <p>Founding engineer, first employee alongside two cofounders, San
+  Francisco, March 2026 to present. Sole builder of the entire product
+  and web surface: 240+ TypeScript/React components including 170+
+  interactive agent-workflow demos across 6 industries. The product has
+  landed deals with a Fortune&nbsp;10 company.</p>
+
+  <h2 id="roka">Republic of Korea Army</h2>
+  <p>Squad leader and personnel administration specialist, Yeoncheon,
+  July 2024 to January 2026. Led a squad in a top-ranked infantry
+  platoon (1st of 48) in CQB room-clearing competition. 19 months of
+  national service.</p>
 </main>
 
 <nav class="toc side" aria-label="Contents">
   <h3>Contents</h3>
   <ul>
-    <li><a href="#hwatu">hwatu</a></li>
-    <li><a href="#gwae">gwae</a></li>
-    <li><a href="#clique">clique</a></li>
+    <li>Projects
+      <ul>
+        <li><a href="#hwatu">hwatu</a></li>
+        <li><a href="#gwae">gwae</a></li>
+        <li><a href="#clique">clique</a></li>
+      </ul>
+    </li>
+    <li>Experience
+      <ul>
+        <li><a href="#onetriangle">OneTriangle</a></li>
+        <li><a href="#roka">Republic of Korea Army</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
 
